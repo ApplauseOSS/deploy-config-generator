@@ -1,0 +1,1 @@
+# applause-deploy-config-generator
