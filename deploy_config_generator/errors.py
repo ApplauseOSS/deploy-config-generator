@@ -14,6 +14,13 @@ class VarsParseError(Exception):
         self.line = line
 
 
+class VarsReplacementError(Exception):
+
+    '''
+    Exception wrapper class used by vars file parser
+    '''
+
+
 class DeployConfigError(Exception):
 
     '''

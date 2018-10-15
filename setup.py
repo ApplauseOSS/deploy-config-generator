@@ -29,6 +29,7 @@ setup(
     install_requires=[
         'Jinja2>=2.7',
         'PyYAML',
+        'six',
     ],
     entry_points={
         'console_scripts': [

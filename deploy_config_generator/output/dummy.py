@@ -13,14 +13,6 @@ class OutputPlugin(OutputPluginBase):
             'required': True,
         },
         {
-            'name': 'image',
-            'default': 'applause/{{ SERVICE_NAME }}',
-        },
-        {
-            'name': 'cpus',
-            'default': 0.5,
-        },
-        {
             'name': 'dummy',
             'default': False,
         },

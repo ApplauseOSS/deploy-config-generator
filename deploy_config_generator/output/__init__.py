@@ -1,7 +1,7 @@
 import inspect
 import os.path
 
-from jinja2 import Template
+from deploy_config_generator.template import render_template
 from deploy_config_generator.errors import ConfigGenerationError
 
 
@@ -31,10 +31,17 @@ class OutputPluginBase(object):
     def is_needed(self, config):
         return False
 
+    def merge_with_field_defaults(self, config):
+        ret = {}
+        for field in self.FIELDS:
+            if 'default' in field:
+                ret[field['name']] = field['default']
+        ret.update(config)
+        return ret
+
     def generate(self, config, index):
         try:
             path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
-            t = Template(inspect.cleandoc(self.TEMPLATE))
             # Build vars for template
             # We start with an empty dict and use .update() to prevent issues
             # with getting a ref to any of the source dicts directly and risking
@@ -46,11 +53,11 @@ class OutputPluginBase(object):
                 'OUTPUT_FILE': os.path.basename(path),
                 'OUTPUT_PATH': path,
                 # App config
-                'CONFIG': config,
+                'CONFIG': self.merge_with_field_defaults(config),
                 # Parsed vars
                 'VARS': dict(self._vars),
             })
-            output = t.render(**tmp_vars)
+            output = render_template(inspect.cleandoc(self.TEMPLATE), tmp_vars)
             self._display.v('Writing output file %s' % path)
             with open(path, 'w') as f:
                 f.write(output)
