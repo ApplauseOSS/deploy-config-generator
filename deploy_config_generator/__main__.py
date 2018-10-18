@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import os.path
+import os
 import sys
 import yaml
 import importlib
@@ -10,7 +10,7 @@ import pkgutil
 import deploy_config_generator.output as output_ns
 from deploy_config_generator.display import Display
 from deploy_config_generator.vars import Vars
-from deploy_config_generator.errors import DeployConfigError, ConfigGenerationError
+from deploy_config_generator.errors import DeployConfigError, ConfigGenerationError, VarsReplacementError
 
 DISPLAY = None
 
@@ -27,16 +27,22 @@ def find_deploy_dir(path):
 
 
 def load_deploy_config(deploy_dir, varset):
-    yaml_content = ''
-    with open(os.path.join(deploy_dir, 'config.yml')) as f:
-        for line in f:
-            yaml_content += varset.replace_vars(line)
-    obj = yaml.load(yaml_content)
-    # Wrap the config in a list if it's not already a list
-    # This makes it easier to process
-    if not isinstance(obj, list):
-        obj = [ obj ]
-    return obj
+    try:
+        path = os.path.join(deploy_dir, 'config.yml')
+        DISPLAY.v('Loading deploy config file %s' % path)
+        yaml_content = ''
+        with open(path) as f:
+            for line in f:
+                yaml_content += varset.replace_vars(line)
+        obj = yaml.load(yaml_content)
+        # Wrap the config in a list if it's not already a list
+        # This makes it easier to process
+        if not isinstance(obj, list):
+            obj = [ obj ]
+        return obj
+    except VarsReplacementError as e:
+        DISPLAY.display('Failed to load deploy config: %s' % str(e))
+        sys.exit(1)
 
 
 def find_vars_files(path, cluster):
@@ -72,7 +78,8 @@ def app_validate_fields(app, app_index, output_plugins):
             if not valid_field:
                 raise DeployConfigError("field '%s' in application %d is not valid for relevant output plugins" % (field, app_index + 1))
     except DeployConfigError as e:
-        DISPLAY.display('Failed to load deploy config: %s' % str(e))
+        DISPLAY.display('Failed to validate fields in deploy config: %s' % str(e))
+        sys.exit(1)
 
 
 def app_render_output(app, app_index, output_plugins):
@@ -82,6 +89,7 @@ def app_render_output(app, app_index, output_plugins):
                 plugin.generate(app, app_index + 1)
     except ConfigGenerationError as e:
         DISPLAY.display('Failed to generate deploy config: %s' % str(e))
+        sys.exit(1)
 
 
 def main():
@@ -96,6 +104,7 @@ def main():
         '-v', '--verbose',
         action='count',
         help='Increase verbosity level',
+        default=0,
     )
     parser.add_argument(
         '-c', '--cluster',
@@ -111,15 +120,17 @@ def main():
 
     DISPLAY = Display(args.verbose)
 
-    DISPLAY.display('Running with args:', 3)
-    DISPLAY.display('', 3)
+    DISPLAY.vv('Running with args:')
+    DISPLAY.vv('')
     for arg in dir(args):
         if arg.startswith('_'):
             continue
-        DISPLAY.display('%s: %s' % (arg, getattr(args, arg)), 3)
-    DISPLAY.display('', 3)
+        DISPLAY.vv('%s: %s' % (arg, getattr(args, arg)))
+    DISPLAY.vv('')
 
     varset = Vars()
+    # Load env vars
+    varset.update(os.environ)
 
     output_plugins = load_output_plugins(varset, args.output_dir)
 
@@ -136,10 +147,10 @@ def main():
         DISPLAY.v('Loading vars from %s' % vars_file)
         varset.read_vars_file(vars_file)
 
-    DISPLAY.vv()
-    DISPLAY.vv('Vars:')
-    DISPLAY.vv()
-    DISPLAY.vv(yaml.dump(dict(varset), default_flow_style=False, indent=2))
+    DISPLAY.vvv()
+    DISPLAY.vvv('Vars:')
+    DISPLAY.vvv()
+    DISPLAY.vvv(yaml.dump(dict(varset), default_flow_style=False, indent=2))
 
     deploy_config = load_deploy_config(deploy_dir, varset)
 

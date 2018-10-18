@@ -1,7 +1,7 @@
 import re
 import shlex
 
-from deploy_config_generator.errors import VarsParseError
+from deploy_config_generator.errors import VarsParseError, VarsReplacementError
 
 BASE_VAR_END_TOKENS = ('\r', '\n', ' ')
 
@@ -67,7 +67,10 @@ class Vars(dict):
 
     def replace_vars(self, value):
         def replace_var(match):
-            return self[match.group(1)]
+            try:
+                return self[match.group(1)]
+            except KeyError:
+                raise VarsReplacementError("Unknown variable '%s'" % match.group(1))
 
         ret = value
         # Replace bracketed vars
