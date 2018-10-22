@@ -1,4 +1,5 @@
 import inspect
+import six
 import unittest
 
 # py2/3 compatibility
@@ -12,6 +13,12 @@ from deploy_config_generator.errors import VarsParseError
 
 
 class TestVars (unittest.TestCase):
+
+    def setUp(self):
+        # Map PY3 name for function (used in code below) to PY2 name
+        # This allows us to run the tests on both without deprecation warnings
+        if six.PY2:
+            self.assertRaisesRegex = self.assertRaisesRegexp
 
     def wrap_file(self, data):
         return StringIO(inspect.cleandoc(data))
@@ -101,7 +108,7 @@ class TestVars (unittest.TestCase):
         FOO=bar baz
         '''
         my_vars = Vars()
-        with self.assertRaisesRegexp(VarsParseError, "line 1: Did not find expected token '=' after var name"):
+        with self.assertRaisesRegex(VarsParseError, "line 1: Did not find expected token '=' after var name"):
             my_vars.read_vars(self.wrap_file(vars_content))
 
     def test_parse_errors_2(self):
@@ -109,7 +116,7 @@ class TestVars (unittest.TestCase):
         FOO="bar
         '''
         my_vars = Vars()
-        with self.assertRaisesRegexp(VarsParseError, 'line 1: No closing quotation'):
+        with self.assertRaisesRegex(VarsParseError, 'line 1: No closing quotation'):
             my_vars.read_vars(self.wrap_file(vars_content))
 
     def test_parse_errors_3(self):
@@ -117,7 +124,7 @@ class TestVars (unittest.TestCase):
         =bar
         '''
         my_vars = Vars()
-        with self.assertRaisesRegexp(VarsParseError, "line 1: Encountered '=' before var name"):
+        with self.assertRaisesRegex(VarsParseError, "line 1: Encountered '=' before var name"):
             my_vars.read_vars(self.wrap_file(vars_content))
 
     def test_parse_errors_4(self):
@@ -125,7 +132,7 @@ class TestVars (unittest.TestCase):
         FOO BAR=baz
         '''
         my_vars = Vars()
-        with self.assertRaisesRegexp(VarsParseError, "line 1: Did not find expected token '=' after var name"):
+        with self.assertRaisesRegex(VarsParseError, "line 1: Did not find expected token '=' after var name"):
             my_vars.read_vars(self.wrap_file(vars_content))
 
     def test_parse_errors_5(self):
@@ -133,5 +140,5 @@ class TestVars (unittest.TestCase):
         FOO= bar
         '''
         my_vars = Vars()
-        with self.assertRaisesRegexp(VarsParseError, "line 1: Did not find expected token '=' after var name"):
+        with self.assertRaisesRegex(VarsParseError, "line 1: Did not find expected token '=' after var name"):
             my_vars.read_vars(self.wrap_file(vars_content))

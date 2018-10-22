@@ -7,16 +7,16 @@ class OutputPlugin(OutputPluginBase):
     DESCR = 'Dummy output plugin for testing'
     FILE_EXT = '.foo'
 
-    FIELDS = [
-        {
-            'name': 'name',
-            'required': True,
-        },
-        {
-            'name': 'dummy',
-            'default': False,
-        },
-    ]
+    DEFAULT_CONFIG = {
+        'fields': {
+            'name': {
+                'required': True,
+            },
+            'dummy': {
+                'default': False,
+            },
+        }
+    }
 
     TEMPLATE = '''
     Dummy output plugins
@@ -25,14 +25,18 @@ class OutputPlugin(OutputPluginBase):
 
     {{ VARS }}
 
-    Config:
+    Site config:
 
-    {{ CONFIG }}
+    {{ CONFIG.get_config() }}
+
+    App config:
+
+    {{ APP }}
 
     SERVICE_NAME = {{ VARS.SERVICE_NAME | default('N/A') }}
     '''
 
-    def is_needed(self, config):
-        if 'dummy' in config:
-            return True
-        return False
+#    def is_needed(self, config):
+#        if 'dummy' in config:
+#            return True
+#        return False

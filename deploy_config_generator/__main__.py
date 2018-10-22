@@ -3,14 +3,15 @@
 import argparse
 import os
 import sys
-import yaml
 import importlib
 import pkgutil
 
 import deploy_config_generator.output as output_ns
+from deploy_config_generator.site_config import SiteConfig
 from deploy_config_generator.display import Display
 from deploy_config_generator.vars import Vars
-from deploy_config_generator.errors import DeployConfigError, ConfigGenerationError, VarsReplacementError
+from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, VarsReplacementError, ConfigError
+from deploy_config_generator.utils import yaml_dump, yaml_load, show_traceback
 
 DISPLAY = None
 
@@ -34,7 +35,7 @@ def load_deploy_config(deploy_dir, varset):
         with open(path) as f:
             for line in f:
                 yaml_content += varset.replace_vars(line)
-        obj = yaml.load(yaml_content)
+        obj = yaml_load(yaml_content)
         # Wrap the config in a list if it's not already a list
         # This makes it easier to process
         if not isinstance(obj, list):
@@ -45,10 +46,11 @@ def load_deploy_config(deploy_dir, varset):
         sys.exit(1)
 
 
-def find_vars_files(path, cluster):
+def find_vars_files(path, env):
     ret = []
     vars_dir = os.path.join(path, 'var')
-    for foo in ('defaults.var', '%s.var' % cluster):
+    # TODO: make vars path/files configurable via site config
+    for foo in ('defaults.var', '%s.var' % env):
         var_file = os.path.join(vars_dir, foo)
         if os.path.isfile(var_file):
             ret.append(var_file)
@@ -60,9 +62,15 @@ def load_output_plugins(varset, output_dir):
     for finder, name, ispkg in pkgutil.iter_modules(output_ns.__path__, output_ns.__name__ + '.'):
         try:
             mod = importlib.import_module(name)
-            plugins.append(getattr(mod, 'OutputPlugin')(varset, output_dir, DISPLAY))
+            cls = getattr(mod, 'OutputPlugin')
+            plugins.append(cls(varset, output_dir))
+        except ConfigError as e:
+            DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
+            sys.exit(1)
         except Exception as e:
-            DISPLAY.display('Failed to load output plugin %s: %s' % (name, str(e)))
+            show_traceback(DISPLAY.get_verbosity())
+            DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
+            sys.exit(1)
     return plugins
 
 
@@ -73,6 +81,9 @@ def app_validate_fields(app, app_index, output_plugins):
             valid_field = False
             for plugin in output_plugins:
                 if plugin.has_field(field) and plugin.is_needed(app):
+                    if plugin.is_field_locked(field):
+                        DISPLAY.display("The field '%s' has been locked by the plugin config and cannot be overridden" % field)
+                        sys.exit(1)
                     valid_field = True
                     break
             if not valid_field:
@@ -87,7 +98,7 @@ def app_render_output(app, app_index, output_plugins):
         for plugin in output_plugins:
             if plugin.is_needed(app):
                 plugin.generate(app, app_index + 1)
-    except ConfigGenerationError as e:
+    except DeployConfigGenerationError as e:
         DISPLAY.display('Failed to generate deploy config: %s' % str(e))
         sys.exit(1)
 
@@ -107,8 +118,12 @@ def main():
         default=0,
     )
     parser.add_argument(
-        '-c', '--cluster',
-        help="Cluster to generate deploy configs for (defaults to 'local')",
+        '-c', '--config',
+        help='Path to config file',
+    )
+    parser.add_argument(
+        '-e', '--env',
+        help="Environment to generate deploy configs for (defaults to 'local')",
         default='local'
     )
     parser.add_argument(
@@ -118,15 +133,29 @@ def main():
     )
     args = parser.parse_args()
 
-    DISPLAY = Display(args.verbose)
+    DISPLAY = Display()
+    DISPLAY.set_verbosity(args.verbose)
 
     DISPLAY.vv('Running with args:')
-    DISPLAY.vv('')
+    DISPLAY.vv()
     for arg in dir(args):
         if arg.startswith('_'):
             continue
         DISPLAY.vv('%s: %s' % (arg, getattr(args, arg)))
-    DISPLAY.vv('')
+    DISPLAY.vv()
+
+    config = SiteConfig()
+    if args.config:
+        try:
+            config.load(args.config)
+        except ConfigError as e:
+            DISPLAY.display('Failed to load site config: %s' % str(e))
+            sys.exit(1)
+
+    DISPLAY.vvv('Site config:')
+    DISPLAY.vvv()
+    DISPLAY.vvv(yaml_dump(config.get_config()))
+    DISPLAY.vvv()
 
     varset = Vars()
     # Load env vars
@@ -141,7 +170,7 @@ def main():
     DISPLAY.vvv()
 
     deploy_dir = find_deploy_dir(args.path)
-    vars_files = find_vars_files(deploy_dir, args.cluster)
+    vars_files = find_vars_files(deploy_dir, args.env)
 
     for vars_file in vars_files:
         DISPLAY.v('Loading vars from %s' % vars_file)
@@ -150,13 +179,13 @@ def main():
     DISPLAY.vvv()
     DISPLAY.vvv('Vars:')
     DISPLAY.vvv()
-    DISPLAY.vvv(yaml.dump(dict(varset), default_flow_style=False, indent=2))
+    DISPLAY.vvv(yaml_dump(dict(varset), default_flow_style=False, indent=2))
 
     deploy_config = load_deploy_config(deploy_dir, varset)
 
     DISPLAY.vvv('Deploy config:')
     DISPLAY.vvv()
-    DISPLAY.vvv(yaml.dump(deploy_config, default_flow_style=False, indent=2))
+    DISPLAY.vvv(yaml_dump(deploy_config, default_flow_style=False, indent=2))
 
     for app_idx, app in enumerate(deploy_config):
         app_validate_fields(app, app_idx, output_plugins)
