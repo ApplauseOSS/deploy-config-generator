@@ -1,13 +1,24 @@
 # This helps make things py3 compatible
 from __future__ import print_function
 
+from six import with_metaclass
 
-class Display(object):
+from deploy_config_generator.utils import Singleton
+
+
+class Display(with_metaclass(Singleton, object)):
 
     _verbosity = 0
 
-    def __init__(self, verbosity):
+    def __init__(self, verbosity=None):
+        if verbosity:
+            self.set_verbosity(verbosity)
+
+    def set_verbosity(self, verbosity):
         self._verbosity = verbosity
+
+    def get_verbosity(self):
+        return self._verbosity
 
     def display(self, msg='', verbosity_level=0):
         if self._verbosity >= verbosity_level:

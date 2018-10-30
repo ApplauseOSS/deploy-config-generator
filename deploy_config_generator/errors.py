@@ -34,8 +34,15 @@ class DeployConfigError(Exception):
         self.line = line
 
 
-class ConfigGenerationError(Exception):
+class DeployConfigGenerationError(Exception):
 
     '''
     Exception wrapper class used when generating config
+    '''
+
+
+class ConfigError(Exception):
+
+    '''
+    Exception wrapper class used when loading the site config
     '''
