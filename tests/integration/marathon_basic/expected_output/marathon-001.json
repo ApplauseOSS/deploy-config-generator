@@ -1,0 +1,18 @@
+{
+  "container": {
+    "docker": {
+      "forcePullImage": true,
+      "image": "foo/bar",
+      "network": "BRIDGE",
+      "parameters": [],
+      "privileged": false
+    },
+    "type": "DOCKER",
+    "volumes": []
+  },
+  "cpus": 1.0,
+  "disk": 10,
+  "id": "some/service",
+  "instances": 1,
+  "mem": 1024
+}

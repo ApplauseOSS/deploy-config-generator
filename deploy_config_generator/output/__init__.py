@@ -50,6 +50,13 @@ class OutputPluginBase(object):
             return True
         return False
 
+    def get_required_fields(self):
+        ret = []
+        for k, v in self._plugin_config['fields'].items():
+            if v.get('required', False) and not v.get('default', None):
+                ret.append(k)
+        return ret
+
     def is_field_locked(self, field):
         if field in self._plugin_config['fields']:
             if self._plugin_config['fields'][field].get('locked', False):

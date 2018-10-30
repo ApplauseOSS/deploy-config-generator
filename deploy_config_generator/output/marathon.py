@@ -10,14 +10,24 @@ class OutputPlugin(OutputPluginBase):
 
     DEFAULT_CONFIG = {
         'fields': {
-            'id': {},
-            'image': {},
-            'cpus': {},
-            'mem': {},
-            'disk': {},
-            'instances': {
-                'default': 1,
-            },
+            'id': dict(
+                required=True,
+            ),
+            'image': dict(
+                required=True,
+            ),
+            'cpus': dict(
+                required=True,
+            ),
+            'mem': dict(
+                required=True,
+            ),
+            'disk': dict(
+                required=True,
+            ),
+            'instances': dict(
+                default=1,
+            ),
             'constraints': {},
             'ports': {},
             'env': {},
