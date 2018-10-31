@@ -1,0 +1,18 @@
+---
+jobs:
+  - group: some_group
+    name: some_job
+    cpus: ${MY_CPUS}
+    mem: 1024
+    disk: 10
+    cmd: echo Hello world
+    schedules:
+      - id: foo
+        enabled: true
+        cron: '5 * * * *'
+  - group: some_group
+    name: another_job
+    cpus: ${MY_CPUS}
+    mem: 256
+    disk: 5
+    cmd: echo Goodbye world

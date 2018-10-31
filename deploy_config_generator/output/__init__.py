@@ -17,6 +17,7 @@ class OutputPluginBase(object):
     _vars = None
     _output_dir = None
     _display = None
+    _section = None
 
     DEFAULT_CONFIG = {}
 
@@ -32,9 +33,9 @@ class OutputPluginBase(object):
         if self.NAME in self._site_config.plugins:
             for k, v in self._site_config['plugins'][self.NAME].items():
                 if k == 'fields':
-                    # Merge fields down to a depth of 2 to allow merging of attributes
+                    # Merge fields down to a depth of 3 to allow merging of attributes
                     # for each field rather than overwriting of the entire field config
-                    self._plugin_config['fields'] = dict_merge(self._plugin_config['fields'], self._site_config['plugins'][self.NAME]['fields'], depth=2)
+                    self._plugin_config['fields'] = dict_merge(self._plugin_config['fields'], self._site_config['plugins'][self.NAME]['fields'], depth=3)
                 else:
                     if k in self._plugin_config:
                         self._plugin_config[k] = v.copy()
@@ -45,33 +46,41 @@ class OutputPluginBase(object):
         self._display.vvv(yaml_dump(self._plugin_config))
         self._display.vvv()
 
+    def set_section(self, section):
+        self._section = section
+
     def has_field(self, field):
-        if field in self._plugin_config['fields']:
+        if self._section in self._plugin_config['fields'] and field in self._plugin_config['fields'][self._section]:
             return True
         return False
 
     def get_required_fields(self):
         ret = []
-        for k, v in self._plugin_config['fields'].items():
-            if v.get('required', False) and not v.get('default', None):
-                ret.append(k)
+        if self._section in self._plugin_config['fields']:
+            for k, v in self._plugin_config['fields'].items():
+                if v.get('required', False) and not v.get('default', None):
+                    ret.append(k)
         return ret
 
     def is_field_locked(self, field):
-        if field in self._plugin_config['fields']:
-            if self._plugin_config['fields'][field].get('locked', False):
+        if self._section in self._plugin_config['fields'] and field in self._plugin_config['fields'][self._section]:
+            if self._plugin_config['fields'][self._section][field].get('locked', False):
                 return True
         return False
 
     def is_needed(self, app):
+        # We aren't needed if we have no fields for the current section
+        if self._section not in self._plugin_config['fields']:
+            return False
+        # We are needed if we're the configured default plugin
         if self._site_config.default_output == self.NAME:
             return True
-        return False
+        return True
 
     def merge_with_field_defaults(self, app):
         ret = {}
         # Apply defaults
-        for field, value in self._plugin_config['fields'].items():
+        for field, value in self._plugin_config['fields'][self._section].items():
             # If no default is specified, use None. This way, all fields always
             # have a value
             ret[field] = value.get('default', None)

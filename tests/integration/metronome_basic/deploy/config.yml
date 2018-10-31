@@ -1,0 +1,8 @@
+---
+jobs:
+  id: some.service
+  cpus: 1
+  mem: 1024
+  disk: 10
+  docker_image: foo/bar
+  cmd: echo Hello world

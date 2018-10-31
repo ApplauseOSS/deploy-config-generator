@@ -2,11 +2,12 @@
 plugins:
   marathon:
     fields:
-      id:
-        default: '/{{ APP.group }}/{{ APP.name }}'
-      group:
-        required: true
-      name:
-        required: true
-      image:
-        default: '1234567890.dkr.ecr.us-east-1.amazonaws.com/{{ APP.name }}'
+      apps:
+        id:
+          default: '/{{ APP.group }}/{{ APP.name }}'
+        group:
+          required: true
+        name:
+          required: true
+        image:
+          default: '1234567890.dkr.ecr.us-east-1.amazonaws.com/{{ APP.name }}'

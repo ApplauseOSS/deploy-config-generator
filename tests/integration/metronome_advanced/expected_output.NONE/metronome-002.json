@@ -1,0 +1,12 @@
+{
+  "id": "some_group.another_job",
+  "run": {
+    "cmd": "echo Goodbye world",
+    "cpus": 2.0,
+    "disk": 5,
+    "docker": {
+      "image": "1234567890.dkr.ecr.us-east-1.amazonaws.com/some_group"
+    },
+    "mem": 256
+  }
+}

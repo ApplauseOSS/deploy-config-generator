@@ -1,6 +1,7 @@
 ---
-id: some/service
-cpus: 1
-mem: 1024
-disk: 10
-image: foo/bar
+apps:
+  id: some/service
+  cpus: 1
+  mem: 1024
+  disk: 10
+  image: foo/bar

@@ -1,0 +1,19 @@
+{
+  "id": "some_group.some_job",
+  "run": {
+    "cmd": "echo Hello world",
+    "cpus": 3.0,
+    "disk": 10,
+    "docker": {
+      "image": "1234567890.dkr.ecr.us-east-1.amazonaws.com/some_group"
+    },
+    "mem": 1024
+  },
+  "schedules": [
+    {
+      "cron": "5 * * * *",
+      "enabled": true,
+      "id": "foo"
+    }
+  ]
+}
