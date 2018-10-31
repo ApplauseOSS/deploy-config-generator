@@ -88,6 +88,13 @@ def app_validate_fields(app, app_index, output_plugins):
                     break
             if not valid_field:
                 raise DeployConfigError("field '%s' in application %d is not valid for relevant output plugins" % (field, app_index + 1))
+        # Check for required fields
+        for plugin in output_plugins:
+            if plugin.is_needed(app):
+                req_fields = plugin.get_required_fields()
+                for field in req_fields:
+                    if field not in app:
+                        raise DeployConfigError("required field '%s' not defined" % field)
     except DeployConfigError as e:
         DISPLAY.display('Failed to validate fields in deploy config: %s' % str(e))
         sys.exit(1)
