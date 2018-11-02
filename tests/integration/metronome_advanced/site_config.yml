@@ -1,0 +1,13 @@
+---
+plugins:
+  metronome:
+    fields:
+      jobs:
+        id:
+          default: '{{ APP.group }}.{{ APP.name }}'
+        group:
+          required: true
+        name:
+          required: true
+        docker_image:
+          default: '1234567890.dkr.ecr.us-east-1.amazonaws.com/{{ APP.group }}'

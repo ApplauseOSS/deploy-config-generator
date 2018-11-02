@@ -10,39 +10,41 @@ class OutputPlugin(OutputPluginBase):
 
     DEFAULT_CONFIG = {
         'fields': {
-            'id': dict(
-                required=True,
-            ),
-            'image': dict(
-                required=True,
-            ),
-            'cpus': dict(
-                required=True,
-            ),
-            'mem': dict(
-                required=True,
-            ),
-            'disk': dict(
-                required=True,
-            ),
-            'instances': dict(
-                default=1,
-            ),
-            'constraints': {},
-            'ports': {},
-            'env': {},
-            'health_checks': {},
-            'app_labels': {},
-            'container_labels': {},
-            'fetch': {},
-            'auto_port_labels': {},
-            'extra_sections': {},
-        },
+            'apps': {
+                'id': dict(
+                    required=True,
+                ),
+                'image': dict(
+                    required=True,
+                ),
+                'cpus': dict(
+                    required=True,
+                ),
+                'mem': dict(
+                    required=True,
+                ),
+                'disk': dict(
+                    required=True,
+                ),
+                'instances': dict(
+                    default=1,
+                ),
+                'constraints': {},
+                'ports': {},
+                'env': {},
+                'health_checks': {},
+                'app_labels': {},
+                'container_labels': {},
+                'fetch': {},
+                'auto_port_labels': {},
+                'extra_sections': {},
+            }
+        }
     }
 
-    def is_needed(self, config):
-        # We always (for now) want to output a Marathon config
-        return True
+#    def is_needed(self, config):
+#        # We always (for now) want to output a Marathon config
+#        return True
 
     def generate_output(self, app_vars):
         # Basic structure

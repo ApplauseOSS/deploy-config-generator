@@ -12,7 +12,7 @@ class SiteConfig(with_metaclass(Singleton, object)):
     _display = None
 
     _defaults = {
-        'default_output': 'marathon',
+        'default_output': None,
         'plugins': {},
     }
 

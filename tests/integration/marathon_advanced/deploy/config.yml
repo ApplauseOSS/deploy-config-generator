@@ -1,6 +1,7 @@
 ---
-group: some_group
-name: some_service
-cpus: ${MY_CPUS}
-mem: 1024
-disk: 10
+apps:
+  group: some_group
+  name: some_service
+  cpus: ${MY_CPUS}
+  mem: 1024
+  disk: 10

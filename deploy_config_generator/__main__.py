@@ -8,10 +8,11 @@ import pkgutil
 
 import deploy_config_generator.output as output_ns
 from deploy_config_generator.site_config import SiteConfig
+from deploy_config_generator.deploy_config import DeployConfig
 from deploy_config_generator.display import Display
 from deploy_config_generator.vars import Vars
-from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, VarsReplacementError, ConfigError
-from deploy_config_generator.utils import yaml_dump, yaml_load, show_traceback
+from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, ConfigError
+from deploy_config_generator.utils import yaml_dump, show_traceback
 
 DISPLAY = None
 
@@ -25,25 +26,6 @@ def find_deploy_dir(path):
         DISPLAY.display('Deploy dir could not be found in %s' % path)
         sys.exit(1)
     return deploy_dir
-
-
-def load_deploy_config(deploy_dir, varset):
-    try:
-        path = os.path.join(deploy_dir, 'config.yml')
-        DISPLAY.v('Loading deploy config file %s' % path)
-        yaml_content = ''
-        with open(path) as f:
-            for line in f:
-                yaml_content += varset.replace_vars(line)
-        obj = yaml_load(yaml_content)
-        # Wrap the config in a list if it's not already a list
-        # This makes it easier to process
-        if not isinstance(obj, list):
-            obj = [ obj ]
-        return obj
-    except VarsReplacementError as e:
-        DISPLAY.display('Failed to load deploy config: %s' % str(e))
-        sys.exit(1)
 
 
 def find_vars_files(path, env):
@@ -188,15 +170,22 @@ def main():
     DISPLAY.vvv()
     DISPLAY.vvv(yaml_dump(dict(varset), default_flow_style=False, indent=2))
 
-    deploy_config = load_deploy_config(deploy_dir, varset)
+    try:
+        deploy_config = DeployConfig(os.path.join(deploy_dir, 'config.yml'), varset)
+    except DeployConfigError as e:
+        DISPLAY.display('Error loading deploy config: %s' % str(e))
+        sys.exit(1)
 
     DISPLAY.vvv('Deploy config:')
     DISPLAY.vvv()
-    DISPLAY.vvv(yaml_dump(deploy_config, default_flow_style=False, indent=2))
+    DISPLAY.vvv(yaml_dump(deploy_config.get_config(), default_flow_style=False, indent=2))
 
-    for app_idx, app in enumerate(deploy_config):
-        app_validate_fields(app, app_idx, output_plugins)
-        app_render_output(app, app_idx, output_plugins)
+    for section in deploy_config.get_config():
+        for plugin in output_plugins:
+            plugin.set_section(section)
+        for app_idx, app in enumerate(deploy_config.get_config()[section]):
+            app_validate_fields(app, app_idx, output_plugins)
+            app_render_output(app, app_idx, output_plugins)
 
 
 if __name__ == '__main__':

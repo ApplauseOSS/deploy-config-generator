@@ -9,12 +9,14 @@ class OutputPlugin(OutputPluginBase):
 
     DEFAULT_CONFIG = {
         'fields': {
-            'name': {
-                'required': True,
-            },
-            'dummy': {
-                'default': False,
-            },
+            'apps': {
+                'name': {
+                    'required': True,
+                },
+                'dummy': {
+                    'default': False,
+                },
+            }
         }
     }
 
@@ -27,7 +29,7 @@ class OutputPlugin(OutputPluginBase):
 
     Site config:
 
-    {{ CONFIG.get_config() }}
+    {{ CONFIG }}
 
     App config:
 
@@ -36,7 +38,5 @@ class OutputPlugin(OutputPluginBase):
     SERVICE_NAME = {{ VARS.SERVICE_NAME | default('N/A') }}
     '''
 
-#    def is_needed(self, config):
-#        if 'dummy' in config:
-#            return True
-#        return False
+    def is_needed(self, config):
+        return False
