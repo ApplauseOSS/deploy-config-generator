@@ -1,0 +1,10 @@
+---
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        # This is already the default, but it doesn't hurt to show intent
+        parent1:
+          required: true

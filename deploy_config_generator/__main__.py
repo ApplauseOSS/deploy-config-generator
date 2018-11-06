@@ -58,25 +58,9 @@ def load_output_plugins(varset, output_dir):
 
 def app_validate_fields(app, app_index, output_plugins):
     try:
-        # Validate all fields
-        for field in app:
-            valid_field = False
-            for plugin in output_plugins:
-                if plugin.has_field(field) and plugin.is_needed(app):
-                    if plugin.is_field_locked(field):
-                        DISPLAY.display("The field '%s' has been locked by the plugin config and cannot be overridden" % field)
-                        sys.exit(1)
-                    valid_field = True
-                    break
-            if not valid_field:
-                raise DeployConfigError("field '%s' in application %d is not valid for relevant output plugins" % (field, app_index + 1))
-        # Check for required fields
         for plugin in output_plugins:
             if plugin.is_needed(app):
-                req_fields = plugin.get_required_fields()
-                for field in req_fields:
-                    if field not in app:
-                        raise DeployConfigError("required field '%s' not defined" % field)
+                plugin.validate_fields(app)
     except DeployConfigError as e:
         DISPLAY.display('Failed to validate fields in deploy config: %s' % str(e))
         sys.exit(1)
