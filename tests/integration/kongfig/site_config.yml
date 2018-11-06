@@ -1,0 +1,26 @@
+---
+plugins:
+  marathon:
+    fields:
+      apps:
+        id:
+          default: '/{{ APP.group }}/{{ APP.name }}'
+        image:
+          default: '1234567890.dkr.ecr.us-east-1.amazonaws.com/{{ APP.name }}'
+  kongfig:
+    fields:
+      apps:
+        proxies:
+          fields:
+            # Dummy flag to trigger conditional below
+            foo:
+              type: bool
+            plugins:
+              default_action: prepend
+              default:
+                - name: default_plugin
+                  # Only add plugin if condition is True
+                  condition: proxy.foo
+                  attributes:
+                    config:
+                      foo: bar

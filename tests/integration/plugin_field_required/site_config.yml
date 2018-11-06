@@ -1,4 +1,5 @@
 ---
+default_output: dummy
 plugins:
   dummy:
     # Enable 'dummy' plugin, which is disabled by default

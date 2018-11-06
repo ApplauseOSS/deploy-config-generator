@@ -1,0 +1,12 @@
+---
+apps:
+  id: some/service
+  cpus: 1
+  mem: 1024
+  disk: 10
+  image: foo/bar
+  proxies:
+    - name: some_api
+      ensure: removed
+    - name: another_api
+      foo: true
