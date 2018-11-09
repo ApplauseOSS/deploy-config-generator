@@ -1,0 +1,6 @@
+---
+test:
+  parent1:
+    - child2_2: foo
+      parent2:
+        - child3_2: bar

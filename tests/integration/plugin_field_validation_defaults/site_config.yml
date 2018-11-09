@@ -1,0 +1,23 @@
+---
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        parent1:
+          fields:
+            # Default value for parent1 -> [ child2_1 ]
+            child2_1:
+              default: override child2 value
+            parent2:
+              # Default item for parent1 -> [ parent2 ]
+              default:
+                child3_1: default3_1
+                child3_2: default3_2
+              # Append default item to end of list
+              default_action: append
+              fields:
+                # Default value for parent1 -> [ child2_1 -> [ child3_1 ] ]
+                child3_1:
+                  default: override child3 value

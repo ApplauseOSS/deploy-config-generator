@@ -1,0 +1,12 @@
+---
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        # Lock the 'dummy' field
+        dummy:
+          locked: true
+        parent1:
+          required: false

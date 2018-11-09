@@ -8,35 +8,38 @@ class OutputPlugin(OutputPluginBase):
     FILE_EXT = '.foo'
 
     DEFAULT_CONFIG = {
+        'enabled': False,
         'fields': {
-            'apps': {
-                'name': {
+            'test': {
+                'parent1': {
                     'required': True,
+                    'type': 'list',
+                    'subtype': 'dict',
+                    'fields': {
+                        'child2_1': {},
+                        'child2_2': {},
+                        'parent2': {
+                            'type': 'list',
+                            'subtype': 'dict',
+                            'fields': {
+                                'child3_1': {},
+                                'child3_2': {}
+                            }
+                        }
+                    },
                 },
                 'dummy': {
                     'default': False,
+                    'type': 'bool',
                 },
             }
         }
     }
 
     TEMPLATE = '''
-    Dummy output plugins
-
-    Vars:
-
-    {{ VARS }}
-
-    Site config:
-
-    {{ CONFIG }}
+    Dummy output plugin
 
     App config:
 
-    {{ APP }}
-
-    SERVICE_NAME = {{ VARS.SERVICE_NAME | default('N/A') }}
+    {{ APP | to_nice_json }}
     '''
-
-    def is_needed(self, config):
-        return False
