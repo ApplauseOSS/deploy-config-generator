@@ -3,6 +3,8 @@ import json
 import re
 import six
 
+OMIT_TOKEN = '__OMIT__TOKEN__'
+
 
 class Template(object):
 
@@ -53,11 +55,15 @@ class Template(object):
         if isinstance(template, dict):
             ret = {}
             for k, v in template.items():
+                if v == OMIT_TOKEN:
+                    continue
                 ret[k] = self.type_fixup(self.render_template(v, args))
             return ret
         elif isinstance(template, (list, tuple)):
             ret = []
             for i, v in enumerate(template):
+                if v == OMIT_TOKEN:
+                    continue
                 ret.append(self.type_fixup(self.render_template(v, args)))
             return ret
         elif isinstance(template, six.string_types):
@@ -100,6 +106,16 @@ def filter_to_nice_json(arg, indent=2, prefix_indent=None, **args):
     return out
 
 
+def filter_default(arg, default):
+    '''
+    Custom version of default() filter that also returns the default when arg
+    is None, in addition to when arg is undefined
+    '''
+    if arg is None or isinstance(arg, jinja2.Undefined):
+        return default
+    return arg
+
+
 @jinja2.contextfunction
 def evaluate_condition(context, condition, **kwargs):
     tmp_vars = context.get_all()
@@ -116,8 +132,10 @@ FILTERS = {
     'output_bool': filter_output_bool,
     'to_json': filter_to_json,
     'to_nice_json': filter_to_nice_json,
+    'default': filter_default,
 }
 
 GLOBALS = {
     'evaluate_condition': evaluate_condition,
+    'omit': OMIT_TOKEN,
 }

@@ -13,6 +13,14 @@ class SiteConfig(with_metaclass(Singleton, object)):
 
     _defaults = {
         'default_output': None,
+        # Directory within service dir where deploy config is located
+        'deploy_dir': 'deploy',
+        # Name of deploy config file
+        'deploy_config_file': 'config.yml',
+        # Directory within deploy dir to look for vars files
+        'vars_dir': 'var',
+        # Patterns for finding vars files
+        'vars_file_patterns': ['defaults.var', '{{ env }}.var'],
         'plugins': {},
     }
 
