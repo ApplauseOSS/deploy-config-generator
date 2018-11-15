@@ -107,7 +107,11 @@ class OutputPluginBase(object):
         # We are needed if we're the configured default plugin
         if self._site_config.default_output == self.NAME:
             return True
-        return True
+        # Check if any of our required top-level fields are provided
+        for field in self.get_required_fields():
+            if field in app:
+                return True
+        return False
 
     def merge_with_field_defaults(self, app):
         '''
@@ -142,8 +146,6 @@ class OutputPluginBase(object):
                 'APP_INDEX': index,
                 'OUTPUT_FILE': os.path.basename(path),
                 'OUTPUT_PATH': path,
-                # Plugin config
-                'CONFIG': self._plugin_config.copy(),
                 # App config
                 'APP': self.merge_with_field_defaults(app),
                 # Parsed vars
@@ -192,7 +194,8 @@ class PluginField(object):
         self._name = name
         self._parent = parent
         self._config = self.BASE_CONFIG.copy()
-        self._config.update(config)
+        if config is not None:
+            self._config.update(config)
         self.convert_fields()
 
     def __getattr__(self, key, default=None):
@@ -232,7 +235,7 @@ class PluginField(object):
                         self._config[k] = {}
                     self._config[k].update(v)
                 elif isinstance(v, list):
-                    self._config[k] = v.copy()
+                    self._config[k] = v[:]
                 else:
                     self._config[k] = v
 
@@ -305,12 +308,15 @@ class PluginField(object):
                     if new_val is not None:
                         ret.append(new_val)
         if self.default is not None:
+            def_val = self.default
+            if not isinstance(def_val, list):
+                def_val = [def_val]
             # User values go after default value
             if self.default_action == 'prepend':
-                ret.insert(0, self.default)
+                ret = def_val + ret
             # User values go before default value
             elif self.default_action == 'append':
-                ret.append(self.default)
+                ret = ret + def_val
         return ret
 
     def apply_default(self, value, use_subtype=False):
@@ -327,8 +333,14 @@ class PluginField(object):
         elif field_type == 'dict':
             # Recursively apply defaults for sub-fields
             ret = {}
-            for field in self.fields:
-                ret[field] = self.fields[field].apply_default(value.get(field, None))
+            if self.fields is not None:
+                for field in self.fields:
+                    ret[field] = self.fields[field].apply_default(value.get(field, None))
+            else:
+                if value is None:
+                    ret = self.default
+                else:
+                    ret = value.copy()
         else:
             # Use default if no value was provided
             if value is None:
