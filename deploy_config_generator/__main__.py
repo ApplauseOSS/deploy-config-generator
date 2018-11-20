@@ -5,23 +5,29 @@ import os
 import sys
 import importlib
 import pkgutil
+import glob
 
 import deploy_config_generator.output as output_ns
 from deploy_config_generator.site_config import SiteConfig
 from deploy_config_generator.deploy_config import DeployConfig
 from deploy_config_generator.display import Display
 from deploy_config_generator.vars import Vars
+from deploy_config_generator.template import Template
 from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, ConfigError
 from deploy_config_generator.utils import yaml_dump, show_traceback
 
 DISPLAY = None
+SITE_CONFIG = None
 
 
 def find_deploy_dir(path):
+    '''
+    Find directory with deploy config
+    '''
     if not os.path.isdir(path):
         DISPLAY.display('Path %s is not a directory' % path)
         sys.exit(1)
-    deploy_dir = os.path.join(path, 'deploy')
+    deploy_dir = os.path.join(path, SITE_CONFIG.deploy_dir)
     if not os.path.isdir(deploy_dir):
         DISPLAY.display('Deploy dir could not be found in %s' % path)
         sys.exit(1)
@@ -29,17 +35,28 @@ def find_deploy_dir(path):
 
 
 def find_vars_files(path, env):
+    '''
+    Find vars files that match configured patterns
+    '''
     ret = []
-    vars_dir = os.path.join(path, 'var')
-    # TODO: make vars path/files configurable via site config
-    for foo in ('defaults.var', '%s.var' % env):
-        var_file = os.path.join(vars_dir, foo)
-        if os.path.isfile(var_file):
-            ret.append(var_file)
+    # Evaluate templates in list of patterns
+    template = Template()
+    tmp_vars = dict(env=env)
+    patterns = template.render_template(SITE_CONFIG.vars_file_patterns, tmp_vars)
+    # Find files matching list of patterns
+    vars_dir = os.path.join(path, SITE_CONFIG.vars_dir)
+    for pattern in patterns:
+        matches = glob.glob(os.path.join(vars_dir, pattern))
+        for var_file in matches:
+            if os.path.isfile(var_file):
+                ret.append(var_file)
     return ret
 
 
 def load_output_plugins(varset, output_dir):
+    '''
+    Find, import, and instantiate all output plugins
+    '''
     plugins = []
     for finder, name, ispkg in pkgutil.iter_modules(output_ns.__path__, output_ns.__name__ + '.'):
         try:
@@ -77,7 +94,7 @@ def app_render_output(app, app_index, output_plugins):
 
 
 def main():
-    global DISPLAY
+    global DISPLAY, SITE_CONFIG
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -117,18 +134,18 @@ def main():
         DISPLAY.vv('%s: %s' % (arg, getattr(args, arg)))
     DISPLAY.vv()
 
-    config = SiteConfig()
+    SITE_CONFIG = SiteConfig()
     if args.config:
         try:
-            config.load(args.config)
+            SITE_CONFIG.load(args.config)
         except ConfigError as e:
             DISPLAY.display('Failed to load site config: %s' % str(e))
             sys.exit(1)
 
-    DISPLAY.vvv('Site config:')
-    DISPLAY.vvv()
-    DISPLAY.vvv(yaml_dump(config.get_config()))
-    DISPLAY.vvv()
+    DISPLAY.vvvv('Site config:')
+    DISPLAY.vvvv()
+    DISPLAY.vvvv(yaml_dump(SITE_CONFIG.get_config()))
+    DISPLAY.vvvv()
 
     varset = Vars()
     # Load env vars
@@ -149,20 +166,20 @@ def main():
         DISPLAY.v('Loading vars from %s' % vars_file)
         varset.read_vars_file(vars_file)
 
-    DISPLAY.vvv()
-    DISPLAY.vvv('Vars:')
-    DISPLAY.vvv()
-    DISPLAY.vvv(yaml_dump(dict(varset), default_flow_style=False, indent=2))
+    DISPLAY.vvvv()
+    DISPLAY.vvvv('Vars:')
+    DISPLAY.vvvv()
+    DISPLAY.vvvv(yaml_dump(dict(varset), default_flow_style=False, indent=2))
 
     try:
-        deploy_config = DeployConfig(os.path.join(deploy_dir, 'config.yml'), varset)
+        deploy_config = DeployConfig(os.path.join(deploy_dir, SITE_CONFIG.deploy_config_file), varset)
     except DeployConfigError as e:
         DISPLAY.display('Error loading deploy config: %s' % str(e))
         sys.exit(1)
 
-    DISPLAY.vvv('Deploy config:')
-    DISPLAY.vvv()
-    DISPLAY.vvv(yaml_dump(deploy_config.get_config(), default_flow_style=False, indent=2))
+    DISPLAY.vvvv('Deploy config:')
+    DISPLAY.vvvv()
+    DISPLAY.vvvv(yaml_dump(deploy_config.get_config(), default_flow_style=False, indent=2))
 
     for section in deploy_config.get_config():
         for plugin in output_plugins:

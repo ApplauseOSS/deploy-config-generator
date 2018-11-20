@@ -74,16 +74,23 @@ class OutputPluginBase(object):
     def set_section(self, section):
         '''
         Sets the active section of the deploy config
+
         This is used to figure out which set of fields to process
         '''
         self._section = section
 
     def has_field(self, field):
+        '''
+        Check if a field exists in the current section for this plugin
+        '''
         if self._section in self._fields and field in self._fields[self._section]:
             return True
         return False
 
     def get_required_fields(self):
+        '''
+        Return a list of fields in the current section with required=True
+        '''
         ret = []
         if self._section in self._fields:
             for k, v in self._fields[self._section].items():
@@ -92,12 +99,18 @@ class OutputPluginBase(object):
         return ret
 
     def is_field_locked(self, field):
+        '''
+        Check if a field has been marked as 'locked' (cannot be overridden by user)
+        '''
         if self._section in self._fields and field in self._fields[self._section]:
             if self._fields[self._section][field].locked:
                 return True
         return False
 
     def is_needed(self, app):
+        '''
+        Determine whether this plugin is needed based on the provided deploy config
+        '''
         # We aren't needed if we're marked as disabled (enabled: False)
         if self._plugin_config.get('enabled', True) is False:
             return False
@@ -111,6 +124,7 @@ class OutputPluginBase(object):
         for field in self.get_required_fields():
             if field in app:
                 return True
+        # If nothing above matched, then we're probably not needed
         return False
 
     def merge_with_field_defaults(self, app):
@@ -124,6 +138,9 @@ class OutputPluginBase(object):
         return ret
 
     def validate_fields(self, app):
+        '''
+        Validate the provided app config against plugin field definitions
+        '''
         # Check that all required fields are provided
         req_fields = self.get_required_fields()
         for field in req_fields:
@@ -137,6 +154,9 @@ class OutputPluginBase(object):
                 self._fields[self._section][field].validate(value)
 
     def generate(self, app, index):
+        '''
+        Write out the generated config to disk
+        '''
         try:
             path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
             # Build vars for template
@@ -160,11 +180,23 @@ class OutputPluginBase(object):
             raise DeployConfigGenerationError(str(e))
 
     def generate_output(self, app_vars):
+        '''
+        Generate output content
+
+        By default, this renders the Jinja template defined in the 'TEMPLATE'
+        class var. However, it can be overridden by an output plugin to provide
+        a custom method for generating the output.
+        '''
         output = self._template.render_template(inspect.cleandoc(self.TEMPLATE), app_vars)
         return output
 
 
 class PluginField(object):
+
+    '''
+    Class representing a field from a deploy config that's supported by an output
+    plugin
+    '''
 
     _name = None
     _config = None
@@ -213,6 +245,9 @@ class PluginField(object):
     __repr__ = __str__
 
     def convert_fields(self):
+        '''
+        Replace items in 'fields' dict with PluginField objects
+        '''
         if self._config['fields'] is not None:
             for k, v in self._config['fields'].items():
                 self._config['fields'][k] = PluginField(k, v, parent=self)
@@ -242,6 +277,7 @@ class PluginField(object):
     def get_full_name(self):
         '''
         Construct full name of field from parent(s)
+
         This is used when generating exceptions
         '''
         field_name = self._name
@@ -298,7 +334,7 @@ class PluginField(object):
 
     def apply_default_list(self, value, field_type):
         '''
-        Apply default values for a list
+        Apply default values for a list (helper function)
         '''
         ret = []
         if self.subtype is not None:
@@ -321,7 +357,7 @@ class PluginField(object):
 
     def apply_default(self, value, use_subtype=False):
         '''
-        Apply default values
+        Apply default values from the field config
         '''
         ret = None
         field_type = self.type
@@ -334,6 +370,8 @@ class PluginField(object):
             # Recursively apply defaults for sub-fields
             ret = {}
             if self.fields is not None:
+                if value is None:
+                    value = {}
                 for field in self.fields:
                     ret[field] = self.fields[field].apply_default(value.get(field, None))
             else:

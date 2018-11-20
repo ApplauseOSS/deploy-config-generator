@@ -1,3 +1,5 @@
+import re
+
 from deploy_config_generator.utils import json_dump
 from deploy_config_generator.output import OutputPluginBase
 
@@ -29,22 +31,114 @@ class OutputPlugin(OutputPluginBase):
                 'instances': dict(
                     default=1,
                 ),
-                'constraints': {},
-                'ports': {},
+                'constraints': dict(
+                    type='list',
+                ),
+                'ports': dict(
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        container_port=dict(
+                            type='int',
+                            required=True,
+                        ),
+                        host_port=dict(
+                            type='int',
+                            default=0,
+                        ),
+                        service_port=dict(
+                            type='int',
+                            default=0,
+                        ),
+                        protocol=dict(
+                            type='str',
+                            default='tcp',
+                        ),
+                        labels=dict(
+                            type='list',
+                            subtype='dict',
+                            fields=dict(
+                                name={},
+                                value={},
+                                condition={},
+                            ),
+                        ),
+                    ),
+                ),
                 'env': {},
-                'health_checks': {},
-                'app_labels': {},
+                'health_checks': dict(
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        port_index=dict(
+                            type='int',
+                        ),
+                        protocol=dict(
+                            default='MESOS_HTTP',
+                        ),
+                        grace_period_seconds=dict(
+                            type='int',
+                        ),
+                        interval_seconds=dict(
+                            type='int',
+                        ),
+                        timeout_seconds=dict(
+                            type='int',
+                        ),
+                        max_consecutive_failures=dict(
+                            type='int',
+                        ),
+                        command=dict(
+                            type='str',
+                        ),
+                        path=dict(
+                            type='str',
+                        ),
+                    ),
+                ),
+                'labels': {},
                 'container_labels': {},
-                'fetch': {},
-                'auto_port_labels': {},
-                'extra_sections': {},
+                'fetch': dict(
+                    type='list',
+                    subtype='dict',
+                ),
+                'upgrade_strategy': dict(
+                    type='dict',
+                    fields=dict(
+                        minimum_health_capacity=dict(
+                            type='float',
+                        ),
+                        maximum_over_capacity=dict(
+                            type='float',
+                        ),
+                    ),
+                ),
+                'unreachable_strategy': dict(
+                    type='dict',
+                    fields=dict(
+                        inactive_after_seconds=dict(
+                            type='int',
+                        ),
+                        expunge_after_seconds=dict(
+                            type='int',
+                        ),
+                    ),
+                ),
             }
         }
     }
 
-#    def is_needed(self, config):
-#        # We always (for now) want to output a Marathon config
-#        return True
+    def underscore_to_camelcase(self, value):
+        '''
+        Convert field name with underscores to camel case
+
+        This converts 'foo_bar_baz' (the standard for this app) to
+        'fooBarBaz' (the standard for Marathon)
+        '''
+        def replacer(match):
+            # Grab the last character of the match and upper-case it
+            return match.group(0)[-1].upper()
+        return re.sub(r'_[a-z]', replacer, value)
 
     def generate_output(self, app_vars):
         # Basic structure
@@ -69,7 +163,7 @@ class OutputPlugin(OutputPluginBase):
             },
         }
         # Constraints
-        if app_vars['APP']['constraints'] is not None:
+        if app_vars['APP']['constraints']:
             data['constraints'] = app_vars['APP']['constraints']
         # Ports
         self.build_port_mappings(app_vars, data)
@@ -82,13 +176,12 @@ class OutputPlugin(OutputPluginBase):
         self.build_fetch_config(app_vars, data)
         # Health checks
         self.build_health_checks(app_vars, data)
+        # Upgrade/unreachable strategies
+        self.build_upgrade_strategy(app_vars, data)
+        self.build_unreachable_strategy(app_vars, data)
         # Labels
-        if app_vars['APP']['app_labels'] is not None:
-            data['labels'] = app_vars['APP']['app_labels']
-        # Extra sections
-        if app_vars['APP']['extra_sections'] is not None:
-            for k, v in app_vars['APP']['extra_sections'].items():
-                data[k] = v
+        if app_vars['APP']['labels'] is not None:
+            data['labels'] = app_vars['APP']['labels']
 
         output = json_dump(self._template.render_template(data, app_vars))
         return output
@@ -105,77 +198,79 @@ class OutputPlugin(OutputPluginBase):
             data['container']['docker']['parameters'] = container_parameters
 
     def build_port_mappings(self, app_vars, data):
-        if app_vars['APP']['ports'] is not None:
-            tmp_vars = app_vars.copy()
-            port_mappings = []
-            for port_index, port in enumerate(app_vars['APP']['ports']):
-                tmp_vars.update(dict(port=port, port_index=port_index))
-                tmp_port = {
-                    "containerPort": '{{ port.container_port | output_int }}',
-                    "hostPort": '{{ port.host_port | default(0) | output_int }}',
-                    "servicePort": '{{ port.service_port | default(0) | output_int }}',
-                    "protocol": "{{ port.protocol | default('tcp') }}",
-                }
-                port_labels = {}
-                for label_index, label in enumerate(app_vars['APP']['auto_port_labels']):
-                    tmp_vars.update(dict(label=label, label_index=label_index))
-                    if not ('condition' in label) or self._template.evaluate_condition(label['condition'], tmp_vars):
-                        port_labels[self._template.render_template(label['name'], tmp_vars)] = self._template.render_template(label['value'], tmp_vars)
-                if port_labels:
-                    tmp_port['labels'] = port_labels
-                tmp_port = self._template.render_template(tmp_port, tmp_vars)
-                port_mappings.append(tmp_port)
-            if port_mappings:
-                data['container']['docker']['portMappings'] = port_mappings
+        port_mappings = []
+        tmp_vars = app_vars.copy()
+        for port_index, port in enumerate(app_vars['APP']['ports']):
+            tmp_vars.update(dict(port=port, port_index=port_index))
+            tmp_port = {
+                "protocol": port['protocol'],
+            }
+            for field in ('container_port', 'host_port', 'service_port'):
+                if port[field] is not None:
+                    tmp_port[field] = int(port[field])
+            # Port labels
+            port_labels = {}
+            for label_index, label in enumerate(port['labels']):
+                tmp_vars.update(dict(label=label, label_index=label_index))
+                if 'condition' not in label or self._template.evaluate_condition(label['condition'], tmp_vars):
+                    port_labels[self._template.render_template(label['name'], tmp_vars)] = self._template.render_template(label['value'], tmp_vars)
+            if port_labels:
+                tmp_port['labels'] = port_labels
+            # Render templates now so that loop vars can be used
+            tmp_port = self._template.render_template(tmp_port, tmp_vars)
+            port_mappings.append(tmp_port)
+        if port_mappings:
+            data['container']['docker']['portMappings'] = port_mappings
 
     def build_fetch_config(self, app_vars, data):
-        if app_vars['APP']['fetch'] is not None:
-            tmp_vars = app_vars.copy()
-            fetch_config = []
-            for fetch_index, fetch in enumerate(app_vars['APP']['fetch']):
-                tmp_vars.update(dict(fetch=fetch, fetch_index=fetch_index))
-                if not ('condition' in fetch) or self._template.evaluate_condition(fetch['condition'], tmp_vars):
-                    tmp_fetch = {}
-                    tmp_fetch.update(fetch)
-                    if 'condition' in tmp_fetch:
-                        del tmp_fetch['condition']
-                    fetch_config.append(tmp_fetch)
-            if fetch_config:
-                data['fetch'] = fetch_config
+        fetch_config = []
+        tmp_vars = app_vars.copy()
+        for fetch_index, fetch in enumerate(app_vars['APP']['fetch']):
+            tmp_vars.update(dict(fetch=fetch, fetch_index=fetch_index))
+            if not ('condition' in fetch) or self._template.evaluate_condition(fetch['condition'], tmp_vars):
+                tmp_fetch = fetch.copy()
+                if 'condition' in tmp_fetch:
+                    del tmp_fetch['condition']
+                fetch_config.append(tmp_fetch)
+        if fetch_config:
+            data['fetch'] = fetch_config
 
     def build_health_checks(self, app_vars, data):
-        health_checks_config = []
         health_checks = []
-        # Health checks from ports
-        if app_vars['APP']['ports'] is not None:
-            for port_index, port in enumerate(app_vars['APP']['ports']):
-                if 'health_check' in port:
-                    health_checks.append(port['health_check'])
-                    health_checks[-1]['port_index'] = port_index
-        # Other health checks
-        if app_vars['APP']['health_checks'] is not None:
-            health_checks.extend(app_vars['APP']['health_checks'])
-        for check_index, check in enumerate(health_checks):
-            # TODO: make these parameters configurable
-            tmp_check = {
-                "gracePeriodSeconds": 30,
-                "intervalSeconds": 5,
-                "timeoutSeconds": 10,
-                "maxConsecutiveFailures": 10
-            }
-            if 'endpoint' in check:
-                tmp_check.update(dict(
-                    path=check['endpoint'],
-                    protocol=(check['type'] if 'type' in check else 'MESOS_HTTP'),
-                    portIndex=check['port_index']
-                ))
-            elif 'command' in check:
+        tmp_vars = app_vars.copy()
+        for check_index, check in enumerate(app_vars['APP']['health_checks']):
+            tmp_vars.update(dict(check=check, check_index=check_index))
+            tmp_check = {}
+            for field in ('grace_period_seconds', 'interval_seconds', 'timeout_seconds', 'max_consecutive_failures', 'path', 'port_index', 'protocol'):
+                if check[field] is not None:
+                    tmp_check[self.underscore_to_camelcase(field)] = check[field]
+            if check['command'] is not None:
                 tmp_check.update(dict(
                     protocol='COMMAND',
                     command=dict(
                         value=check['command']
                     )
                 ))
-            health_checks_config.append(tmp_check)
-        if health_checks_config:
-            data['healthChecks'] = health_checks_config
+            # Render templates now so that loop vars can be used
+            tmp_check = self._template.render_template(tmp_check, tmp_vars)
+            health_checks.append(tmp_check)
+        if health_checks:
+            data['healthChecks'] = health_checks
+
+    def build_upgrade_strategy(self, app_vars, data):
+        strategy = {}
+        app_vars_section = app_vars['APP']['upgrade_strategy']
+        for field in ('minimum_health_capacity', 'maximum_over_capacity'):
+            if app_vars_section[field] is not None:
+                strategy[self.underscore_to_camelcase(field)] = float(app_vars_section[field])
+        if strategy:
+            data['upgradeStrategy'] = strategy
+
+    def build_unreachable_strategy(self, app_vars, data):
+        strategy = {}
+        app_vars_section = app_vars['APP']['unreachable_strategy']
+        for field in ('inactive_after_seconds', 'expunge_after_seconds'):
+            if app_vars_section[field] is not None:
+                strategy[self.underscore_to_camelcase(field)] = int(app_vars_section[field])
+        if strategy:
+            data['unreachableStrategy'] = strategy
