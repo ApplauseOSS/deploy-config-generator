@@ -35,6 +35,17 @@ class OutputPlugin(OutputPluginBase):
                 'volumes': {},
                 'max_launch_delay': {},
                 'schedules': {},
+                'restart': dict(
+                    type='dict',
+                    fields=dict(
+                        policy=dict(
+                            required=True,
+                        ),
+                        active_deadline_seconds=dict(
+                            type='int',
+                        ),
+                    ),
+                ),
             }
         }
     }
@@ -66,6 +77,8 @@ class OutputPlugin(OutputPluginBase):
         self.build_artifacts_config(app_vars, data)
         # Schedules
         self.build_schedules_config(app_vars, data)
+        # Restart policy
+        self.build_restart_policy(app_vars, data)
         # Max launch delay
         if app_vars['APP']['max_launch_delay'] is not None:
             data['run']['maxLaunchDelay'] = int(app_vars['APP']['max_launch_delay'])
@@ -75,6 +88,16 @@ class OutputPlugin(OutputPluginBase):
 
         output = json_dump(self._template.render_template(data, app_vars))
         return output
+
+    def build_restart_policy(self, app_vars, data):
+        if app_vars['APP']['restart']:
+            tmp_restart = {}
+            if app_vars['APP']['restart']['policy'] is not None:
+                tmp_restart['policy'] = app_vars['APP']['restart']['policy']
+            if app_vars['APP']['restart']['active_deadline_seconds'] is not None:
+                tmp_restart['activeDeadlineSeconds'] = int(app_vars['APP']['restart']['active_deadline_seconds'])
+            if tmp_restart:
+                data['run']['restart'] = tmp_restart
 
     def build_artifacts_config(self, app_vars, data):
         if app_vars['APP']['artifacts'] is not None:

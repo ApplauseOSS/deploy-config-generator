@@ -85,6 +85,9 @@ class OutputPlugin(OutputPluginBase):
                         timeout_seconds=dict(
                             type='int',
                         ),
+                        delay_seconds=dict(
+                            type='int',
+                        ),
                         max_consecutive_failures=dict(
                             type='int',
                         ),
@@ -207,7 +210,7 @@ class OutputPlugin(OutputPluginBase):
             }
             for field in ('container_port', 'host_port', 'service_port'):
                 if port[field] is not None:
-                    tmp_port[field] = int(port[field])
+                    tmp_port[self.underscore_to_camelcase(field)] = int(port[field])
             # Port labels
             port_labels = {}
             for label_index, label in enumerate(port['labels']):
@@ -241,7 +244,8 @@ class OutputPlugin(OutputPluginBase):
         for check_index, check in enumerate(app_vars['APP']['health_checks']):
             tmp_vars.update(dict(check=check, check_index=check_index))
             tmp_check = {}
-            for field in ('grace_period_seconds', 'interval_seconds', 'timeout_seconds', 'max_consecutive_failures', 'path', 'port_index', 'protocol'):
+            for field in ('grace_period_seconds', 'interval_seconds', 'timeout_seconds', 'delay_seconds',
+                          'max_consecutive_failures', 'path', 'port_index', 'protocol'):
                 if check[field] is not None:
                     tmp_check[self.underscore_to_camelcase(field)] = check[field]
             if check['command'] is not None:

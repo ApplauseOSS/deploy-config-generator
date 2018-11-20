@@ -59,7 +59,7 @@ class IntegrationTests(Command):
 
 setup(
     name='applause-deploy-config-generator',
-    version='0.1.0',
+    version='0.2.0',
     url='https://github.com/ApplauseAQI/applause-deploy-config-generator',
     license='Applause',
     description='Utility to generate service deploy configurations',
@@ -73,7 +73,7 @@ setup(
         'deploy_config_generator.output',
     ],
     install_requires=[
-        'Jinja2>=2.7',
+        'Jinja2>=2.8',
         'PyYAML',
         'six',
     ],

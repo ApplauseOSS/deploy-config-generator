@@ -135,6 +135,7 @@ class OutputPluginBase(object):
         # Apply defaults
         for field, value in self._fields[self._section].items():
             ret[field] = value.apply_default(app.get(field, None))
+            ret[field] = value.apply_transform(ret.get(field, None))
         return ret
 
     def validate_fields(self, app):
@@ -160,7 +161,6 @@ class OutputPluginBase(object):
         try:
             path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
             # Build vars for template
-            # changes
             app_vars = {
                 'PLUGIN_NAME': self.NAME,
                 'APP_INDEX': index,
@@ -211,12 +211,18 @@ class PluginField(object):
         'locked': False,
         # Expected type for field
         'type': None,
+        # Transformation (for strings)
+        # This should be a dict containing one of the following keys:
+        # * prefix - prefix to add to value
+        # * suffix - suffix to add to value
+        'transform': None,
         # Expected type for sub-items (for lists)
         'subtype': None,
-        # How to combine defaults (for lists)
+        # How to combine defaults
         # * None - no combining, user value replaces default
         # * 'append' - default value is included at end of list
         # * 'prepend' - default value is included at beginning of list
+        # * 'merge' - user value is merged with default value (for dicts)
         'default_action': None,
         # Field definitions (for dicts)
         'fields': None,
@@ -309,6 +315,8 @@ class PluginField(object):
         '''
         Validate passed value against field config
         '''
+        if value is None:
+            return
         value_type = self.validate_check_type(value)
         field_type = self.type
         if use_subtype:
@@ -318,7 +326,12 @@ class PluginField(object):
         if field_type is None:
             return
         if value_type != field_type:
-            raise DeployConfigError("value for field '%s' is wrong type, expected '%s' and got: %s" % (self.get_full_name(), field_type, value_type))
+            # TODO: replace this with the ability to specify multiple types for a field
+            # Hack to allow an int value to satisfy a float
+            if field_type == 'float' and value_type == 'int':
+                pass
+            else:
+                raise DeployConfigError("value for field '%s' is wrong type, expected '%s' and got: %s" % (self.get_full_name(), field_type, value_type))
         if field_type == 'list' and self.subtype is not None:
             # Validate each list item separately if a field subtype is specified
             for value_item in value:
@@ -331,6 +344,40 @@ class PluginField(object):
                     if k not in self.fields:
                         raise DeployConfigError("unknown key in field '%s': %s" % (self.get_full_name(), k))
                     self.fields[k].validate(v)
+
+    def apply_transform(self, value):
+        '''
+        Apply transformations to string values
+        '''
+        if value is None:
+            return value
+        value_type = self.validate_check_type(value)
+        ret = None
+        if value_type == 'list':
+            # Apply transformations to all items in the list
+            ret = []
+            for value_item in value:
+                ret.append(self.apply_transform(value_item))
+        elif value_type == 'dict':
+            ret = {}
+            if self.fields is not None:
+                # Recursively apply transformations to sub-fields
+                for field in self.fields:
+                    if field in value:
+                        ret[field] = self.fields[field].apply_transform(value[field])
+            else:
+                ret = value
+        elif value_type == 'str':
+            if isinstance(self.transform, dict):
+                if 'prefix' in self.transform:
+                    ret = self.transform['prefix'] + value
+                elif 'suffix' in self.transform:
+                    ret = value + self.transform['suffix']
+            else:
+                ret = value
+        else:
+            ret = value
+        return ret
 
     def apply_default_list(self, value, field_type):
         '''
@@ -353,6 +400,8 @@ class PluginField(object):
             # User values go before default value
             elif self.default_action == 'append':
                 ret = ret + def_val
+            elif not ret:
+                ret = self.default
         return ret
 
     def apply_default(self, value, use_subtype=False):
@@ -378,7 +427,11 @@ class PluginField(object):
                 if value is None:
                     ret = self.default
                 else:
-                    ret = value.copy()
+                    if self.default_action == 'merge':
+                        ret = self.default.copy()
+                        ret.update(value)
+                    else:
+                        ret = value.copy()
         else:
             # Use default if no value was provided
             if value is None:

@@ -43,7 +43,7 @@ class Template(object):
                 if value_type == 'float':
                     return float(matches.group(2))
                 if value_type == 'bool':
-                    if value.lower() == 'true':
+                    if matches.group(2).lower() == 'true':
                         return True
                     return False
         return value
