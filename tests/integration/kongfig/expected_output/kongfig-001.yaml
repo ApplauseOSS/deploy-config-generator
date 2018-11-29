@@ -1,7 +1,0 @@
-apis:
-- {ensure: removed, name: some_api}
-- name: another_api
-  plugins:
-  - attributes:
-      config: {foo: bar}
-    name: default_plugin

@@ -1,12 +1,12 @@
 from deploy_config_generator.output import OutputPluginBase
-from deploy_config_generator.utils import yaml_dump
+from deploy_config_generator.utils import json_dump
 
 
 class OutputPlugin(OutputPluginBase):
 
     NAME = 'kongfig'
     DESCR = 'Kongfig output plugin'
-    FILE_EXT = '.yaml'
+    FILE_EXT = '.json'
 
     DEFAULT_CONFIG = {
         'fields': {
@@ -35,6 +35,7 @@ class OutputPlugin(OutputPluginBase):
                                 'attributes': {
                                     'type': 'dict',
                                 },
+                                'condition': dict(),
                             }
                         },
                     },
@@ -78,5 +79,5 @@ class OutputPlugin(OutputPluginBase):
                     tmp_api['plugins'] = plugins
             data['apis'].append(tmp_api)
 
-        output = yaml_dump(self._template.render_template(data, app_vars))
+        output = json_dump(self._template.render_template(data, app_vars))
         return output
