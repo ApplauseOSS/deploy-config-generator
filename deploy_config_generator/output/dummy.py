@@ -1,3 +1,6 @@
+import inspect
+
+from deploy_config_generator.utils import json_dump
 from deploy_config_generator.output import OutputPluginBase
 
 
@@ -40,6 +43,10 @@ class OutputPlugin(OutputPluginBase):
     Dummy output plugin
 
     App config:
-
-    {{ APP | to_nice_json }}
     '''
+
+    def generate_output(self, app_vars):
+        output = inspect.cleandoc(self.TEMPLATE)
+        output += "\n\n"
+        output += json_dump(self._template.render_template(app_vars['APP'], app_vars))
+        return output

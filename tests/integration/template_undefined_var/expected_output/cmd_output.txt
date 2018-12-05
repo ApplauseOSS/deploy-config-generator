@@ -1,0 +1,1 @@
+Failed to generate deploy config: undefined value: 'dict object' has no attribute 'BAD_VAR' in template: {{ VARS.BAD_VAR }}
