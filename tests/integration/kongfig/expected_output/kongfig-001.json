@@ -14,6 +14,9 @@
             }
           },
           "name": "default_plugin"
+        },
+        {
+          "name": "test"
         }
       ]
     }
