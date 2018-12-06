@@ -1,0 +1,12 @@
+---
+default_output: dummy
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        parent1:
+          required: false
+        some_field:
+          default: '{{ VARS.BAD_VAR | default("foo") }}'

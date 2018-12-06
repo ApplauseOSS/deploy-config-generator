@@ -49,3 +49,10 @@ class ConfigError(Exception):
     '''
     Exception wrapper class used when loading the site config
     '''
+
+
+class TemplateUndefinedError(Exception):
+
+    '''
+    Exception wrapper class used for undefined var errors when templating
+    '''

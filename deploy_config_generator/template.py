@@ -3,6 +3,8 @@ import json
 import re
 import six
 
+from deploy_config_generator.errors import TemplateUndefinedError
+
 OMIT_TOKEN = '__OMIT__TOKEN__'
 
 
@@ -10,8 +12,9 @@ class Template(object):
 
     def __init__(self):
         # Setup custom Jinja2 Environment instance with our own 'finalize' function,
-        # filters, and top-level functions
-        self._env = jinja2.Environment(finalize=self.finalize)
+        # filters, and top-level functions. We use StrictUndefined to raise an exception
+        # when accessing an undefined var, so that we can report it to the user
+        self._env = jinja2.Environment(finalize=self.finalize, undefined=jinja2.StrictUndefined)
         self._env.filters.update(FILTERS)
         self._env.globals.update(GLOBALS)
 
@@ -25,6 +28,7 @@ class Template(object):
         if isinstance(value, six.string_types):
             if '{{' in value or '{%' in value:
                 return context.environment.from_string(value).render(context)
+
         return value
 
     def type_fixup(self, value):
@@ -67,7 +71,10 @@ class Template(object):
                 ret.append(self.type_fixup(self.render_template(v, args)))
             return ret
         elif isinstance(template, six.string_types):
-            return self._env.from_string(template).render(**args)
+            try:
+                return self._env.from_string(template).render(**args)
+            except jinja2.exceptions.UndefinedError as e:
+                raise TemplateUndefinedError('undefined value: %s in template: %s' % (str(e), template))
         else:
             return template
 
@@ -111,7 +118,7 @@ def filter_default(arg, default):
     Custom version of default() filter that also returns the default when arg
     is None, in addition to when arg is undefined
     '''
-    if arg is None or isinstance(arg, jinja2.Undefined):
+    if arg is None or isinstance(arg, (jinja2.Undefined, jinja2.StrictUndefined)):
         return default
     return arg
 
