@@ -99,8 +99,12 @@ class OutputPlugin(OutputPluginBase):
                         ),
                     ),
                 ),
-                'labels': {},
-                'container_labels': {},
+                'labels': dict(
+                    type='list',
+                ),
+                'container_labels': dict(
+                    type='list',
+                ),
                 'fetch': dict(
                     type='list',
                     subtype='dict',
@@ -183,7 +187,7 @@ class OutputPlugin(OutputPluginBase):
         self.build_upgrade_strategy(app_vars, data)
         self.build_unreachable_strategy(app_vars, data)
         # Labels
-        if app_vars['APP']['labels'] is not None:
+        if app_vars['APP']['labels']:
             data['labels'] = app_vars['APP']['labels']
 
         output = json_dump(self._template.render_template(data, app_vars))
