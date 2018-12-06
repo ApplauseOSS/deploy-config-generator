@@ -9,4 +9,9 @@ apps:
     - name: some_api
       ensure: removed
     - name: another_api
+      # Trigger conditional for default plugin config
       foo: true
+      # Provide a plugin to make sure that the defaults are properly prepended
+      # to our custom value
+      plugins:
+        - name: test

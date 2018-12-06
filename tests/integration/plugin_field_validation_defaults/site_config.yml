@@ -21,3 +21,10 @@ plugins:
                 # Default value for parent1 -> [ child2_1 -> [ child3_1 ] ]
                 child3_1:
                   default: override child3 value
+        # Create field to test default prepending without subtype
+        list_test1:
+          type: list
+          default_action: prepend
+          default:
+            - foo
+            - bar

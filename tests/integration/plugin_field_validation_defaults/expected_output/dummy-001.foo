@@ -3,18 +3,23 @@ Dummy output plugin
 App config:
 
 {
-  "dummy": false, 
+  "dummy": false,
+  "list_test1": [
+    "foo",
+    "bar",
+    "baz"
+  ],
   "parent1": [
     {
-      "child2_1": "override child2 value", 
-      "child2_2": "foo", 
+      "child2_1": "override child2 value",
+      "child2_2": "foo",
       "parent2": [
         {
-          "child3_1": "override child3 value", 
+          "child3_1": "override child3 value",
           "child3_2": "bar"
-        }, 
+        },
         {
-          "child3_1": "default3_1", 
+          "child3_1": "default3_1",
           "child3_2": "default3_2"
         }
       ]

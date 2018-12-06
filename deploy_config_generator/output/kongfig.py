@@ -65,7 +65,11 @@ class OutputPlugin(OutputPluginBase):
             if proxy['plugins']:
                 plugins = []
                 for plugin in proxy['plugins']:
-                    tmp_plugin = plugin.copy()
+                    tmp_plugin = dict()
+                    # Strip out null values
+                    for field in plugin:
+                        if plugin[field] is not None:
+                            tmp_plugin[field] = plugin[field]
                     tmp_vars.update(dict(plugin=plugin))
                     if 'condition' in tmp_plugin:
                         # Only include plugin if conditional evaluates to True

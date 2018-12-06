@@ -392,7 +392,7 @@ class PluginField(object):
                         ret.append(new_val)
         else:
             if value:
-                ret = value.copy()
+                ret = value[:]
         if self.default is not None:
             def_val = self.default
             if not isinstance(def_val, list):
