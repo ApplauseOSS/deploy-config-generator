@@ -28,7 +28,6 @@ class OutputPluginBase(object):
         self._vars = varset
         self._output_dir = output_dir
         self._display = Display()
-        self._display.v('Loading plugin %s' % self.NAME)
         self._template = Template()
         self._site_config = SiteConfig()
         self.build_config()

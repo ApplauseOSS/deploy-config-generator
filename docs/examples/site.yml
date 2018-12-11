@@ -2,17 +2,17 @@
 plugins:
   marathon:
     fields:
-      image:
-        default: 1234567890.dkr.ecr.us-east-1.amazonaws.com/myprefix/{{ APP.group }}{{ (':' ~ VARS.IMAGE_TAG) if VARS.IMAGE_TAG is defined else '' }}
-      cpus:
-        default: 0.5
-      mem:
-        default: 512
-      disk:
-        default: 10
-      instances:
-        default: 3
-      constraints:
-        default:
-          - [ "@zone", "GROUP_BY", "3" ]
-
+      apps:
+        image:
+          default: 1234567890.dkr.ecr.us-east-1.amazonaws.com/myprefix/{{ APP.group }}{{ (':' ~ VARS.IMAGE_TAG) if VARS.IMAGE_TAG is defined else '' }}
+        cpus:
+          default: 0.5
+        mem:
+          default: 512
+        disk:
+          default: 10
+        instances:
+          default: 3
+        constraints:
+          default:
+            - [ "@zone", "GROUP_BY", "3" ]

@@ -62,6 +62,7 @@ def load_output_plugins(varset, output_dir):
         try:
             mod = importlib.import_module(name)
             cls = getattr(mod, 'OutputPlugin')
+            DISPLAY.v('Loading plugin %s' % cls.NAME)
             plugins.append(cls(varset, output_dir))
         except ConfigError as e:
             DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
