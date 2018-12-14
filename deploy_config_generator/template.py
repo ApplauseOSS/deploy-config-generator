@@ -10,7 +10,9 @@ OMIT_TOKEN = '__OMIT__TOKEN__'
 
 class Template(object):
 
-    def __init__(self):
+    def __init__(self, recursive=True):
+        # Whether to recursively resolve vars
+        self._recursive = recursive
         # Setup custom Jinja2 Environment instance with our own 'finalize' function,
         # filters, and top-level functions. We use StrictUndefined to raise an exception
         # when accessing an undefined var, so that we can report it to the user
@@ -25,7 +27,7 @@ class Template(object):
         us to do recursive templating of vars (vars referencing other vars)
         '''
         # If the value appears to contain a template, render it and return the result
-        if isinstance(value, six.string_types):
+        if self._recursive and isinstance(value, six.string_types):
             if '{{' in value or '{%' in value:
                 return context.environment.from_string(value).render(context)
 
@@ -123,6 +125,10 @@ def filter_default(arg, default):
     return arg
 
 
+def filter_regex_replace(arg, pattern, replacement):
+    return re.sub(pattern, replacement, str(arg))
+
+
 @jinja2.contextfunction
 def evaluate_condition(context, condition, **kwargs):
     tmp_vars = context.get_all()
@@ -140,6 +146,7 @@ FILTERS = {
     'to_json': filter_to_json,
     'to_nice_json': filter_to_nice_json,
     'default': filter_default,
+    'regex_replace': filter_regex_replace,
 }
 
 GLOBALS = {

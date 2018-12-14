@@ -15,6 +15,7 @@ class OutputPlugin(OutputPluginBase):
         'fields': {
             'test': {
                 'parent1': {
+                    'description': 'Used for tests',
                     'required': True,
                     'type': 'list',
                     'subtype': 'dict',
@@ -34,6 +35,7 @@ class OutputPlugin(OutputPluginBase):
                 'dummy': {
                     'default': False,
                     'type': 'bool',
+                    'description': 'Dummy field',
                 },
             }
         }

@@ -15,9 +15,11 @@ class OutputPlugin(OutputPluginBase):
             'apps': {
                 'id': dict(
                     required=True,
+                    description='Unique ID for app in Marathon',
                 ),
                 'image': dict(
                     required=True,
+                    description='Docker image to use',
                 ),
                 'cpus': dict(
                     required=True,
@@ -35,12 +37,14 @@ class OutputPlugin(OutputPluginBase):
                     type='list',
                 ),
                 'ports': dict(
+                    description='List of port definitions',
                     type='list',
                     subtype='dict',
                     fields=dict(
                         container_port=dict(
                             type='int',
                             required=True,
+                            description='Port that the service is listening on inside the container',
                         ),
                         host_port=dict(
                             type='int',
@@ -55,17 +59,24 @@ class OutputPlugin(OutputPluginBase):
                             default='tcp',
                         ),
                         labels=dict(
+                            description='List of label name/value pairs to apply to port',
                             type='list',
                             subtype='dict',
                             fields=dict(
                                 name={},
                                 value={},
-                                condition={},
+                                condition=dict(
+                                    description=('Condition to evaluate before applying label. The vars `port` (current port definition) '
+                                                 'and `port_index` (index of current port defintion in list) are available'),
+                                ),
                             ),
                         ),
                     ),
                 ),
-                'env': {},
+                'env': dict(
+                    description='Environment variables to pass to the container',
+                    type='dict',
+                ),
                 'health_checks': dict(
                     type='list',
                     subtype='dict',

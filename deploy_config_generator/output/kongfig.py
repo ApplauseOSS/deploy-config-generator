@@ -12,6 +12,7 @@ class OutputPlugin(OutputPluginBase):
         'fields': {
             'apps': {
                 'proxies': {
+                    'description': 'List of Kong API proxy definitions',
                     'required': True,
                     'type': 'list',
                     'subtype': 'dict',
