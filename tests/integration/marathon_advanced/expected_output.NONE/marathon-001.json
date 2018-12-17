@@ -1,4 +1,7 @@
 {
+  "acceptedResourceRoles": [
+    "*"
+  ],
   "container": {
     "docker": {
       "forcePullImage": true,
@@ -14,5 +17,9 @@
   "disk": 10,
   "id": "/some_group/some_service",
   "instances": 1,
+  "labels": {
+    "bar": "baz",
+    "foo": "bar"
+  },
   "mem": 1024
 }
