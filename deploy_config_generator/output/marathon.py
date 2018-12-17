@@ -22,9 +22,11 @@ class OutputPlugin(OutputPluginBase):
                     description='Docker image to use',
                 ),
                 'cpus': dict(
+                    type='float',
                     required=True,
                 ),
                 'mem': dict(
+                    type='int',
                     required=True,
                 ),
                 'disk': dict(
@@ -34,6 +36,13 @@ class OutputPlugin(OutputPluginBase):
                     default=1,
                 ),
                 'constraints': dict(
+                    type='list',
+                ),
+                'args': dict(
+                    type='list',
+                    description='Arguments to pass to container',
+                ),
+                'accepted_resource_roles': dict(
                     type='list',
                 ),
                 'ports': dict(
@@ -73,6 +82,27 @@ class OutputPlugin(OutputPluginBase):
                         ),
                     ),
                 ),
+                'port_definitions': dict(
+                    description='List of port definitions (for HOST networking mode)',
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        port=dict(
+                            type='int',
+                            required=True,
+                        ),
+                        protocol=dict(
+                            type='str',
+                        ),
+                        name=dict(
+                            type='str',
+                        ),
+                    ),
+                ),
+                'require_ports': dict(
+                    description='Whether to require that ports specified in `port_definitions` are available (for HOST networking mode)',
+                    type='bool',
+                ),
                 'env': dict(
                     description='Environment variables to pass to the container',
                     type='dict',
@@ -111,7 +141,7 @@ class OutputPlugin(OutputPluginBase):
                     ),
                 ),
                 'labels': dict(
-                    type='list',
+                    type='dict',
                 ),
                 'container_labels': dict(
                     type='list',
@@ -141,6 +171,13 @@ class OutputPlugin(OutputPluginBase):
                             type='int',
                         ),
                     ),
+                ),
+                'docker_network': dict(
+                    default='BRIDGE',
+                ),
+                'docker_privileged': dict(
+                    type='bool',
+                    default=False,
                 ),
             }
         }
@@ -173,8 +210,8 @@ class OutputPlugin(OutputPluginBase):
                 # TODO: make various attributes configurable
                 "docker": {
                     "image": "{{ APP.image }}",
-                    "network": "BRIDGE",
-                    "privileged": False,
+                    "network": "{{ APP.docker_network }}",
+                    "privileged": "{{ APP.docker_privileged | output_bool }}",
                     "parameters": [],
                     "forcePullImage": True
                 }
@@ -185,6 +222,7 @@ class OutputPlugin(OutputPluginBase):
             data['constraints'] = app_vars['APP']['constraints']
         # Ports
         self.build_port_mappings(app_vars, data)
+        self.build_port_definitions(app_vars, data)
         # Container labels
         self.build_container_labels(app_vars, data)
         # Environment
@@ -197,9 +235,10 @@ class OutputPlugin(OutputPluginBase):
         # Upgrade/unreachable strategies
         self.build_upgrade_strategy(app_vars, data)
         self.build_unreachable_strategy(app_vars, data)
-        # Labels
-        if app_vars['APP']['labels']:
-            data['labels'] = app_vars['APP']['labels']
+        # Misc attributes
+        for field in ('labels', 'args', 'accepted_resource_roles'):
+            if app_vars['APP'][field]:
+                data[self.underscore_to_camelcase(field)] = app_vars['APP'][field]
 
         output = json_dump(self._template.render_template(data, app_vars))
         return output
@@ -239,6 +278,23 @@ class OutputPlugin(OutputPluginBase):
             port_mappings.append(tmp_port)
         if port_mappings:
             data['container']['docker']['portMappings'] = port_mappings
+
+    def build_port_definitions(self, app_vars, data):
+        port_definitions = []
+        tmp_vars = app_vars.copy()
+        for port_index, port in enumerate(app_vars['APP']['port_definitions']):
+            tmp_vars.update(dict(port=port, port_index=port_index))
+            tmp_port = {
+                "port": int(port['port']),
+            }
+            for field in ('name', 'protocol'):
+                if port[field] is not None:
+                    tmp_port[self.underscore_to_camelcase(field)] = port[field]
+            port_definitions.append(tmp_port)
+        if port_definitions:
+            data['portDefinitions'] = port_definitions
+        if app_vars['APP']['require_ports'] is not None:
+            data['requirePorts'] = app_vars['APP']['require_ports']
 
     def build_fetch_config(self, app_vars, data):
         fetch_config = []

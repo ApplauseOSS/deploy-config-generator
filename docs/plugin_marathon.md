@@ -12,10 +12,14 @@ Marathon output plugin
 
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
+`accepted_resource_roles`|`list`|no||
+`args`|`list`|no||Arguments to pass to container
 `constraints`|`list`|no||
 `container_labels`|`list`|no||
-`cpus`||yes||
+`cpus`|`float`|yes||
 `disk`||yes||
+`docker_network`||no|`BRIDGE`|
+`docker_privileged`|`bool`|no|`False`|
 `env`|`dict`|no||Environment variables to pass to the container
 `fetch`|`list` (of `dict`)|no||
 `health_checks`|`list` (of `dict`)|no||
@@ -31,8 +35,12 @@ Name | Type | Required | Default | Description
 `id`||yes||Unique ID for app in Marathon
 `image`||yes||Docker image to use
 `instances`||no|`1`|
-`labels`|`list`|no||
-`mem`||yes||
+`labels`|`dict`|no||
+`mem`|`int`|yes||
+`port_definitions`|`list` (of `dict`)|no||List of port definitions (for HOST networking mode)
+`port_definitions . name`|`str`|no||
+`port_definitions . port`|`int`|yes||
+`port_definitions . protocol`|`str`|no||
 `ports`|`list` (of `dict`)|no||List of port definitions
 `ports . container_port`|`int`|yes||Port that the service is listening on inside the container
 `ports . host_port`|`int`|no|`0`|
@@ -42,6 +50,7 @@ Name | Type | Required | Default | Description
 `ports . labels . value`||no||
 `ports . protocol`|`str`|no|`tcp`|
 `ports . service_port`|`int`|no|`0`|
+`require_ports`|`bool`|no||Whether to require that ports specified in `port_definitions` are available (for HOST networking mode)
 `unreachable_strategy`|`dict`|no||
 `unreachable_strategy . expunge_after_seconds`|`int`|no||
 `unreachable_strategy . inactive_after_seconds`|`int`|no||

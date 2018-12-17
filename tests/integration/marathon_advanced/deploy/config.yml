@@ -5,3 +5,8 @@ apps:
   cpus: ${MY_CPUS}
   mem: 1024
   disk: 10
+  accepted_resource_roles:
+    - '*'
+  labels:
+    foo: bar
+    bar: baz
