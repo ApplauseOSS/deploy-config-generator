@@ -2,6 +2,7 @@
   "acceptedResourceRoles": [
     "*"
   ],
+  "cmd": "echo",
   "container": {
     "docker": {
       "forcePullImage": true,

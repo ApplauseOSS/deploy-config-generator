@@ -103,6 +103,9 @@ class OutputPlugin(OutputPluginBase):
                     description='Whether to require that ports specified in `port_definitions` are available (for HOST networking mode)',
                     type='bool',
                 ),
+                'cmd': dict(
+                    description='Command to execute (optional)',
+                ),
                 'env': dict(
                     description='Environment variables to pass to the container',
                     type='dict',
@@ -236,7 +239,7 @@ class OutputPlugin(OutputPluginBase):
         self.build_upgrade_strategy(app_vars, data)
         self.build_unreachable_strategy(app_vars, data)
         # Misc attributes
-        for field in ('labels', 'args', 'accepted_resource_roles'):
+        for field in ('labels', 'args', 'cmd', 'accepted_resource_roles'):
             if app_vars['APP'][field]:
                 data[self.underscore_to_camelcase(field)] = app_vars['APP'][field]
 

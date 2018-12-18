@@ -14,6 +14,7 @@ Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
 `accepted_resource_roles`|`list`|no||
 `args`|`list`|no||Arguments to pass to container
+`cmd`||no||Command to execute (optional)
 `constraints`|`list`|no||
 `container_labels`|`list`|no||
 `cpus`|`float`|yes||
