@@ -272,7 +272,7 @@ class OutputPlugin(OutputPluginBase):
             port_labels = {}
             for label_index, label in enumerate(port['labels']):
                 tmp_vars.update(dict(label=label, label_index=label_index))
-                if 'condition' not in label or self._template.evaluate_condition(label['condition'], tmp_vars):
+                if not ('condition' in label) or self._template.evaluate_condition(label['condition'], tmp_vars):
                     port_labels[self._template.render_template(label['name'], tmp_vars)] = self._template.render_template(label['value'], tmp_vars)
             if port_labels:
                 tmp_port['labels'] = port_labels
