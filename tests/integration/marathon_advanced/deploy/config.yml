@@ -7,6 +7,7 @@ apps:
   disk: 10
   accepted_resource_roles:
     - '*'
+  cmd: echo
   labels:
     foo: bar
     bar: baz
