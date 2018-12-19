@@ -152,6 +152,24 @@ class OutputPlugin(OutputPluginBase):
                 'fetch': dict(
                     type='list',
                     subtype='dict',
+                    fields=dict(
+                        uri=dict(
+                            type='str',
+                        ),
+                        executable=dict(
+                            type='bool',
+                        ),
+                        extract=dict(
+                            type='bool',
+                        ),
+                        cache=dict(
+                            type='bool',
+                        ),
+                        condition=dict(
+                            description=('Condition to evaluate before applying fetch config. The vars `fetch` (current fetch definition) '
+                                         'and `fetch_index` (index of current fetch defintion in list) are available'),
+                        ),
+                    ),
                 ),
                 'upgrade_strategy': dict(
                     type='dict',
@@ -272,7 +290,7 @@ class OutputPlugin(OutputPluginBase):
             port_labels = {}
             for label_index, label in enumerate(port['labels']):
                 tmp_vars.update(dict(label=label, label_index=label_index))
-                if not ('condition' in label) or self._template.evaluate_condition(label['condition'], tmp_vars):
+                if label['condition'] is None or self._template.evaluate_condition(label['condition'], tmp_vars):
                     port_labels[self._template.render_template(label['name'], tmp_vars)] = self._template.render_template(label['value'], tmp_vars)
             if port_labels:
                 tmp_port['labels'] = port_labels
@@ -304,10 +322,11 @@ class OutputPlugin(OutputPluginBase):
         tmp_vars = app_vars.copy()
         for fetch_index, fetch in enumerate(app_vars['APP']['fetch']):
             tmp_vars.update(dict(fetch=fetch, fetch_index=fetch_index))
-            if not ('condition' in fetch) or self._template.evaluate_condition(fetch['condition'], tmp_vars):
-                tmp_fetch = fetch.copy()
-                if 'condition' in tmp_fetch:
-                    del tmp_fetch['condition']
+            if fetch['condition'] is None or self._template.evaluate_condition(fetch['condition'], tmp_vars):
+                tmp_fetch = {}
+                for field in ('uri', 'executable', 'cache', 'extract'):
+                    if fetch[field] is not None:
+                        tmp_fetch[field] = fetch[field]
                 fetch_config.append(tmp_fetch)
         if fetch_config:
             data['fetch'] = fetch_config
