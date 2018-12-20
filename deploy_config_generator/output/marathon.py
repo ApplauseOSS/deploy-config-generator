@@ -76,7 +76,7 @@ class OutputPlugin(OutputPluginBase):
                                 value={},
                                 condition=dict(
                                     description=('Condition to evaluate before applying label. The vars `port` (current port definition) '
-                                                 'and `port_index` (index of current port defintion in list) are available'),
+                                                 'and `port_index` (index of current port definition in list) are available'),
                                 ),
                             ),
                         ),
@@ -96,6 +96,19 @@ class OutputPlugin(OutputPluginBase):
                         ),
                         name=dict(
                             type='str',
+                        ),
+                        labels=dict(
+                            description='List of label name/value pairs to apply to port',
+                            type='list',
+                            subtype='dict',
+                            fields=dict(
+                                name={},
+                                value={},
+                                condition=dict(
+                                    description=('Condition to evaluate before applying label. The vars `port` (current port definition) '
+                                                 'and `port_index` (index of current port definition in list) are available'),
+                                ),
+                            ),
                         ),
                     ),
                 ),
@@ -311,6 +324,16 @@ class OutputPlugin(OutputPluginBase):
             for field in ('name', 'protocol'):
                 if port[field] is not None:
                     tmp_port[self.underscore_to_camelcase(field)] = port[field]
+            # Port labels
+            port_labels = {}
+            for label_index, label in enumerate(port['labels']):
+                tmp_vars.update(dict(label=label, label_index=label_index))
+                if label['condition'] is None or self._template.evaluate_condition(label['condition'], tmp_vars):
+                    port_labels[self._template.render_template(label['name'], tmp_vars)] = self._template.render_template(label['value'], tmp_vars)
+            if port_labels:
+                tmp_port['labels'] = port_labels
+            # Render templates now so that loop vars can be used
+            tmp_port = self._template.render_template(tmp_port, tmp_vars)
             port_definitions.append(tmp_port)
         if port_definitions:
             data['portDefinitions'] = port_definitions
