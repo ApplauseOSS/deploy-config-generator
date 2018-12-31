@@ -14,5 +14,5 @@
   "disk": 10,
   "id": "some/service",
   "instances": 1,
-  "mem": 1024
+  "mem": 1024.0
 }
