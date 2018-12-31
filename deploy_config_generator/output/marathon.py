@@ -26,7 +26,7 @@ class OutputPlugin(OutputPluginBase):
                     required=True,
                 ),
                 'mem': dict(
-                    type='int',
+                    type='float',
                     required=True,
                 ),
                 'disk': dict(
@@ -234,7 +234,7 @@ class OutputPlugin(OutputPluginBase):
         data = {
             "id": "{{ APP.id }}",
             "cpus": '{{ APP.cpus | output_float }}',
-            "mem": '{{ APP.mem | output_int }}',
+            "mem": '{{ APP.mem | output_float }}',
             "disk": '{{ APP.disk | output_int }}',
             "instances": '{{ APP.instances | output_int }}',
             # TODO: add support for container types other than 'DOCKER'
