@@ -11,3 +11,4 @@ apps:
   labels:
     foo: bar
     bar: baz
+    extra: "not to\n be trimmed\n"

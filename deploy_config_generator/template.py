@@ -16,7 +16,7 @@ class Template(object):
         # Setup custom Jinja2 Environment instance with our own 'finalize' function,
         # filters, and top-level functions. We use StrictUndefined to raise an exception
         # when accessing an undefined var, so that we can report it to the user
-        self._env = jinja2.Environment(finalize=self.finalize, undefined=jinja2.StrictUndefined)
+        self._env = jinja2.Environment(finalize=self.finalize, undefined=jinja2.StrictUndefined, keep_trailing_newline=True)
         self._env.filters.update(FILTERS)
         self._env.globals.update(GLOBALS)
 
