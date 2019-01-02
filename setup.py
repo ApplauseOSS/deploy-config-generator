@@ -59,7 +59,7 @@ class IntegrationTests(Command):
 
 setup(
     name='applause-deploy-config-generator',
-    version='0.3.8',
+    version='0.4.0',
     url='https://github.com/ApplauseAQI/applause-deploy-config-generator',
     license='Applause',
     description='Utility to generate service deploy configurations',

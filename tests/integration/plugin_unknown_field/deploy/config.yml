@@ -1,0 +1,8 @@
+---
+test:
+  dummy: True
+  no_such_field: I should fail
+  parent1:
+    - child2_1: foo
+      child2_2: bar
+      child2_3: I should also fail
