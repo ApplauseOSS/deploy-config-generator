@@ -20,6 +20,7 @@
   "instances": 1,
   "labels": {
     "bar": "baz",
+    "extra": "not to\n be trimmed\n",
     "foo": "bar"
   },
   "mem": 1024.0
