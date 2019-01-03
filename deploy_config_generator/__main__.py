@@ -76,9 +76,19 @@ def load_output_plugins(varset, output_dir):
 
 def app_validate_fields(app, app_index, output_plugins):
     try:
+        unmatched = None
         for plugin in output_plugins:
             if plugin.is_needed(app):
-                plugin.validate_fields(app)
+                plugin_unmatched = plugin.validate_fields(app)
+                if unmatched is not None:
+                    # Set to intersection of previous unmatched and current unmatched
+                    # The idea is to end up with a list of fields that were unmatched in all
+                    # active output plugins
+                    unmatched = list(set(unmatched) & set(plugin_unmatched))
+                else:
+                    unmatched = plugin_unmatched
+        if unmatched:
+            raise DeployConfigError('found the following unknown fields: %s' % ', '.join(sorted(unmatched)))
     except DeployConfigError as e:
         DISPLAY.display('Failed to validate fields in deploy config: %s' % str(e))
         sys.exit(1)

@@ -147,11 +147,16 @@ class OutputPluginBase(object):
             if field not in app:
                 raise DeployConfigError("required field '%s' not defined" % field)
         # Check field/subfield types and if field is locked
+        unmatched = []
         for field, value in app.items():
             if self.has_field(field):
                 if self.is_field_locked(field):
                     raise DeployConfigError("the field '%s' has been locked by the plugin config and cannot be overridden" % field)
-                self._fields[self._section][field].validate(value)
+                field_unmatched = self._fields[self._section][field].validate(value)
+                unmatched.extend(field_unmatched)
+            else:
+                unmatched.append(field)
+        return unmatched
 
     def generate(self, app, index):
         '''
@@ -316,6 +321,7 @@ class PluginField(object):
         '''
         if value is None:
             return
+        unmatched = []
         value_type = self.validate_check_type(value)
         field_type = self.type
         if use_subtype:
@@ -323,7 +329,7 @@ class PluginField(object):
             field_type = self.subtype
         # Nothing to validate if no field type is specified
         if field_type is None:
-            return
+            return unmatched
         if value_type != field_type:
             # TODO: replace this with the ability to specify multiple types for a field
             # Hack to allow an int value to satisfy a float
@@ -335,14 +341,18 @@ class PluginField(object):
             # Validate each list item separately if a field subtype is specified
             for value_item in value:
                 # Use field's subtype for list items
-                self.validate(value_item, use_subtype=True)
+                item_unmatched = self.validate(value_item, use_subtype=True)
+                unmatched.extend(item_unmatched)
         else:
             # Recursively validate sub-field values
             if field_type == 'dict' and self.fields is not None:
                 for k, v in value.items():
                     if k not in self.fields:
-                        raise DeployConfigError("unknown key in field '%s': %s" % (self.get_full_name(), k))
-                    self.fields[k].validate(v)
+                        unmatched.append('%s.%s' % (self.get_full_name(), k))
+                        continue
+                    field_unmatched = self.fields[k].validate(v)
+                    unmatched.extend(field_unmatched)
+        return unmatched
 
     def apply_transform(self, value):
         '''
