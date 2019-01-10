@@ -1,0 +1,1 @@
+Failed to validate fields in deploy config: no output plugins were available for provided fields
