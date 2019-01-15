@@ -6,6 +6,7 @@ Utility for generating deployment configs for an Applause service
 * [The dirty details](#the-dirty-details)
   * [Site config](#site-config)
     * [Global options](#global-options)
+  * [Variables](#variables)
   * [Deploy config](#deploy-config)
   * [Plugins](#plugins)
 * [Development](#development)
@@ -76,7 +77,22 @@ Name | Default | Description
 `deploy_dir` | `deploy` | Directory within service dir where deploy config is located
 `deploy_config_file` | `config.yml` | Name of deploy config file
 `vars_dir` | `var` | Directory within deploy dir to look for vars files
-`vars_file_patterns` | `['defaults.var', '{{ env }}.var']` | Patterns for finding vars files
+`local_vars_file_patterns` | `['local.var']` | Patterns for finding "local" vars files
+`defaults_vars_file_patterns` | `['defaults.var']` | Patterns for finding "defaults" vars files
+`env_vars_file_patterns` | `['{{ env }}.var', 'env_{{ env }}.var']` | Patterns for finding env-specific vars files
+`use_env_vars` | `True` | Whether to read vars from environment
+
+### Variables
+
+Variables are read from shell-compatible `.var` files (by default) located in the deploy directory. Variable
+definitions referencing other variables (using the `$FOO` or `${FOO}` notation) are supported, except for with the
+"local" vars file. Vars are read in the following order.
+
+* "local" vars file(s) - used as stand-in values when vars that normally come from the environment
+  are not present
+* vars from environment - useful for running in a CI job
+* "defaults" vars file(s) - default values for all environments
+* env-specific vars files - values specific to a particular application environment
 
 ### Deploy config
 
