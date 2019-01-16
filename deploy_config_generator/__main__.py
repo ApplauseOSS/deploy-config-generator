@@ -34,23 +34,42 @@ def find_deploy_dir(path):
     return deploy_dir
 
 
-def find_vars_files(path, env):
+def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH'):
+    vars_path = os.path.join(deploy_dir, SITE_CONFIG.vars_dir)
+
+    # Used for replacing vars in file patterns
+    template = Template()
+    tmp_vars = dict(env=env)
+
+    # Load "local" vars
+    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.local_vars_file_patterns, tmp_vars), allow_var_references=False)
+
+    # Load env vars
+    if SITE_CONFIG.use_env_vars:
+        DISPLAY.v('Loading vars from environment')
+        varset.update(os.environ)
+
+    # Load "defaults" vars
+    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.defaults_vars_file_patterns, tmp_vars))
+
+    # Load env-specific vars
+    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.env_vars_file_patterns, tmp_vars))
+
+
+def load_vars_files(varset, vars_dir, patterns, allow_var_references=True):
     '''
     Find vars files that match configured patterns
     '''
-    ret = []
-    # Evaluate templates in list of patterns
-    template = Template()
-    tmp_vars = dict(env=env)
-    patterns = template.render_template(SITE_CONFIG.vars_file_patterns, tmp_vars)
+    vars_files = []
     # Find files matching list of patterns
-    vars_dir = os.path.join(path, SITE_CONFIG.vars_dir)
     for pattern in patterns:
         matches = glob.glob(os.path.join(vars_dir, pattern))
         for var_file in matches:
             if os.path.isfile(var_file):
-                ret.append(var_file)
-    return ret
+                vars_files.append(var_file)
+    for vars_file in vars_files:
+        DISPLAY.v('Loading vars from %s' % vars_file)
+        varset.read_vars_file(vars_file, allow_var_references=allow_var_references)
 
 
 def load_output_plugins(varset, output_dir):
@@ -128,8 +147,7 @@ def main():
     )
     parser.add_argument(
         '-e', '--env',
-        help="Environment to generate deploy configs for (defaults to 'local')",
-        default='local'
+        help="Environment to generate deploy configs for",
     )
     parser.add_argument(
         '-o', '--output-dir',
@@ -163,8 +181,6 @@ def main():
     DISPLAY.vvvv()
 
     varset = Vars()
-    # Load env vars
-    varset.update(os.environ)
 
     output_plugins = load_output_plugins(varset, args.output_dir)
 
@@ -175,11 +191,12 @@ def main():
     DISPLAY.vvv()
 
     deploy_dir = find_deploy_dir(args.path)
-    vars_files = find_vars_files(deploy_dir, args.env)
 
-    for vars_file in vars_files:
-        DISPLAY.v('Loading vars from %s' % vars_file)
-        varset.read_vars_file(vars_file)
+    try:
+        load_vars(varset, deploy_dir, args.env)
+    except Exception as e:
+        DISPLAY.display('Error loading vars: %s' % str(e))
+        sys.exit(1)
 
     DISPLAY.vvvv()
     DISPLAY.vvvv('Vars:')

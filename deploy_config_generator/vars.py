@@ -17,11 +17,11 @@ class Vars(dict):
     def clear(self):
         self.clear()
 
-    def read_vars_file(self, path):
+    def read_vars_file(self, path, allow_var_references=True):
         with open(path, 'r') as f:
-            self.read_vars(f)
+            self.read_vars(f, path=path, allow_var_references=allow_var_references)
 
-    def read_vars(self, fh, path=None):
+    def read_vars(self, fh, path=None, allow_var_references=True):
             lexer = shlex.shlex(fh, posix=True)
             VAR_END_TOKENS = BASE_VAR_END_TOKENS + (lexer.eof, )
             # Don't consider newlines or spaces as whitespace, as we need to
@@ -44,7 +44,10 @@ class Vars(dict):
                             if token in ('\r', '\n'):
                                 lineno = lexer.lineno - 1
                             raise VarsParseError("Did not find expected token '=' after var name", path=path, line=lineno)
-                        self[var_name] = self.replace_vars(var_value)
+                        try:
+                            self[var_name] = self.replace_vars(var_value, allow_var_references=allow_var_references)
+                        except Exception as e:
+                            raise VarsParseError(str(e), path=path, line=(lexer.lineno - 1))
                         var_name = var_value = None
                         found_equals = False
                     if token == lexer.eof:
@@ -65,8 +68,10 @@ class Vars(dict):
                 else:
                     var_value += token
 
-    def replace_vars(self, value):
+    def replace_vars(self, value, allow_var_references=True):
         def replace_var(match):
+            if not allow_var_references:
+                raise VarsReplacementError("Found variable reference where not allowed")
             try:
                 return self[match.group(1)]
             except KeyError:
