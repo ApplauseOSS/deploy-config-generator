@@ -52,6 +52,9 @@ class Template(object):
                     if matches.group(2).lower() == 'true':
                         return True
                     return False
+                if value_type == 'complex':
+                    # Parse python complex type from serialized format
+                    return eval(matches.group(2))
         return value
 
     def render_template(self, template, args):
@@ -102,6 +105,10 @@ def filter_output_bool(arg):
     return '__bool__' + str(arg) + '__bool__'
 
 
+def filter_output_complex(arg):
+    return '__complex__' + str(arg) + '__complex__'
+
+
 def filter_to_json(arg, **args):
     return json.dumps(arg, sort_keys=True, **args)
 
@@ -143,6 +150,7 @@ FILTERS = {
     'output_int': filter_output_int,
     'output_float': filter_output_float,
     'output_bool': filter_output_bool,
+    'output_complex': filter_output_complex,
     'to_json': filter_to_json,
     'to_nice_json': filter_to_nice_json,
     'default': filter_default,
