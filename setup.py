@@ -82,9 +82,7 @@ setup(
             # Blame Andrew's lack of imagination
             'applause-deploy-config-generator = deploy_config_generator.__main__:main',
             # Blame Chris
-            'dcos-confabulator = deploy_config_generator.__main__:main',
-            # Blame Jason
-            'dcos-wombat = deploy_config_generator.__main__:main',
+            'app-config = deploy_config_generator.__main__:main',
         ]
     },
     cmdclass={
