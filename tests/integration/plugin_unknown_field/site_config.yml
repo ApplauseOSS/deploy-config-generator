@@ -4,3 +4,11 @@ plugins:
   dummy:
     # Enable 'dummy' plugin, which is disabled by default
     enabled: true
+  # Add a dummy field under the 'test' header for the marathon plugin to
+  # test missing fields across plugins
+  marathon:
+    fields:
+      test:
+        dummy:
+          required: true
+          type: bool

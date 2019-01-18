@@ -56,6 +56,9 @@ class OutputPluginBase(object):
                 if k == 'fields':
                     for section in v:
                         for field_name, field in v[section].items():
+                            # Create section if it doesn't exist
+                            if section not in self._fields:
+                                self._fields[section] = {}
                             # Update existing field config or create new
                             if field_name in self._fields[section]:
                                 self._fields[section][field_name].update_config(field)

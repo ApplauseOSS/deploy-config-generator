@@ -95,21 +95,39 @@ def load_output_plugins(varset, output_dir):
 
 def app_validate_fields(app, app_index, output_plugins):
     try:
-        unmatched = None
+        unmatched = {}
         plugins_used = []
         for plugin in output_plugins:
             if plugin.is_needed(app):
                 plugins_used.append(plugin.NAME)
                 plugin_unmatched = plugin.validate_fields(app)
-                if unmatched is not None:
-                    # Set to intersection of previous unmatched and current unmatched
-                    # The idea is to end up with a list of fields that were unmatched in all
-                    # active output plugins
-                    unmatched = list(set(unmatched) & set(plugin_unmatched))
-                else:
-                    unmatched = plugin_unmatched
-        if unmatched:
-            raise DeployConfigError('found the following unknown fields: %s' % ', '.join(sorted(unmatched)))
+                unmatched[plugin.NAME] = plugin_unmatched
+        # Compare unmatched from all plugins and compile final list
+        # We are looking for fields that were unmatched by all active plugins,
+        # with the added twist that we need to match what may be an unmatched
+        # sub-field in one plugin and a top-level field in another.
+        final_unmatched = []
+        for plugin in unmatched:
+            for entry in unmatched[plugin]:
+                entry_keep = True
+                # Check entry against unmatched entries from other plugins
+                for plugin2 in unmatched:
+                    if plugin2 == plugin:
+                        continue
+                    plugin2_matched = False
+                    for entry2 in unmatched[plugin2]:
+                        # Check for exact match or a parent/sub-field match
+                        if entry2 == entry or entry.startswith('%s.' % entry2):
+                            plugin2_matched = True
+                            break
+                    if not plugin2_matched:
+                        entry_keep = False
+                        break
+                # Add entry to final list if it existed for all plugins
+                if entry_keep and entry not in final_unmatched:
+                    final_unmatched.append(entry)
+        if final_unmatched:
+            raise DeployConfigError('found the following unknown fields: %s' % ', '.join(sorted(final_unmatched)))
         if not plugins_used:
             raise DeployConfigError('no output plugins were available for provided fields')
     except DeployConfigError as e:
