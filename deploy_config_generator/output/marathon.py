@@ -130,6 +130,9 @@ class OutputPlugin(OutputPluginBase):
                         port_index=dict(
                             type='int',
                         ),
+                        port=dict(
+                            type='int',
+                        ),
                         protocol=dict(
                             default='MESOS_HTTP',
                         ),
@@ -213,6 +216,41 @@ class OutputPlugin(OutputPluginBase):
                     type='bool',
                     default=False,
                 ),
+                'volumes': dict(
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        container_path=dict(
+                            type='str',
+                        ),
+                        host_path=dict(
+                            type='str',
+                        ),
+                        mode=dict(
+                            type='str',
+                        ),
+                        persistent=dict(
+                            type='dict',
+                            fields=dict(
+                                type=dict(
+                                    type='str',
+                                ),
+                                size=dict(
+                                    type='float',
+                                ),
+                                profile_name=dict(
+                                    type='str',
+                                ),
+                                max_size=dict(
+                                    type='float',
+                                ),
+                                constraints=dict(
+                                    type='list',
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
             }
         }
     }
@@ -259,6 +297,8 @@ class OutputPlugin(OutputPluginBase):
         self.build_port_definitions(app_vars, data)
         # Container labels
         self.build_container_labels(app_vars, data)
+        # Volumes
+        self.build_volumes(app_vars, data)
         # Environment
         if app_vars['APP']['env'] is not None:
             data['env'] = app_vars['APP']['env']
@@ -287,6 +327,26 @@ class OutputPlugin(OutputPluginBase):
                 }
                 container_parameters.append(tmp_param)
             data['container']['docker']['parameters'] = container_parameters
+
+    def build_volumes(self, app_vars, data):
+        if app_vars['APP']['volumes']:
+            volumes = []
+            for volume_index, volume in enumerate(app_vars['APP']['volumes']):
+                tmp_volume = {}
+                for field in ('container_path', 'host_path', 'mode'):
+                    if volume[field] is not None:
+                        tmp_volume[self.underscore_to_camelcase(field)] = volume[field]
+                if volume['persistent']:
+                    tmp_persistent = {}
+                    for field in ('type', 'size', 'profile_name', 'max_size'):
+                        if volume['persistent'][field] is not None:
+                            tmp_persistent[self.underscore_to_camelcase(field)] = volume['persistent'][field]
+                    if volume['persistent']['constraints']:
+                        tmp_persistent['constraints'] = volume['persistent']['constraints']
+                    if tmp_persistent:
+                        tmp_volume['persistent'] = tmp_persistent
+                volumes.append(tmp_volume)
+            data['container']['volumes'] = volumes
 
     def build_port_mappings(self, app_vars, data):
         port_mappings = []
@@ -361,7 +421,7 @@ class OutputPlugin(OutputPluginBase):
             tmp_vars.update(dict(check=check, check_index=check_index))
             tmp_check = {}
             for field in ('grace_period_seconds', 'interval_seconds', 'timeout_seconds', 'delay_seconds',
-                          'max_consecutive_failures', 'path', 'port_index', 'protocol'):
+                          'max_consecutive_failures', 'path', 'port_index', 'port', 'protocol'):
                 if check[field] is not None:
                     tmp_check[self.underscore_to_camelcase(field)] = check[field]
             if check['command'] is not None:
