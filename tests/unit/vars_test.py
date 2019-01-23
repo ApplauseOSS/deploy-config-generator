@@ -77,6 +77,16 @@ class TestVars (unittest.TestCase):
 
         self.assertEqual(dict(my_vars), { 'TEST': 'foo=bar', 'TEST1': 'foo1', 'TEST2': 'foo2' })
 
+    def test_var_quoting(self):
+        vars_content = r'''
+        SOME_VAR="[{\"name\":\"foo\",\"id\":\"bar\"}]"
+        ANOTHER_VAR='foo \"bar\" baz'
+        '''
+        my_vars = Vars()
+        my_vars.read_vars(self.wrap_file(vars_content))
+
+        self.assertEqual(dict(my_vars), { 'SOME_VAR': '[{"name":"foo","id":"bar"}]', 'ANOTHER_VAR': r'foo \"bar\" baz' })
+
     def test_var_replacement(self):
         vars_content = '''
         FOO=bar
@@ -84,11 +94,15 @@ class TestVars (unittest.TestCase):
         BAZ=${BAR}
         SOME_VAR="foo ${FOO} $BAR baz"
         ANOTHER_VAR="foo ${FOO baz"
+        YET_ANOTHER_VAR='foo $BAR ${BAR} baz'
         '''
         my_vars = Vars()
         my_vars.read_vars(self.wrap_file(vars_content))
 
-        self.assertEqual(dict(my_vars), { 'FOO': 'bar', 'BAR': 'bar', 'BAZ': 'bar', 'SOME_VAR': 'foo bar bar baz', 'ANOTHER_VAR': 'foo ${FOO baz' })
+        self.assertEqual(
+            dict(my_vars),
+            { 'FOO': 'bar', 'BAR': 'bar', 'BAZ': 'bar', 'SOME_VAR': 'foo bar bar baz', 'ANOTHER_VAR': 'foo ${FOO baz', 'YET_ANOTHER_VAR': 'foo $BAR ${BAR} baz' }
+        )
 
     def test_var_replacement_between_files(self):
         vars_content1 = '''
@@ -116,7 +130,7 @@ class TestVars (unittest.TestCase):
         FOO="bar
         '''
         my_vars = Vars()
-        with self.assertRaisesRegex(VarsParseError, 'line 1: No closing quotation'):
+        with self.assertRaisesRegex(VarsParseError, 'line 1: Did not find expected closing quote `"`'):
             my_vars.read_vars(self.wrap_file(vars_content))
 
     def test_parse_errors_3(self):
