@@ -13,7 +13,7 @@ from deploy_config_generator.deploy_config import DeployConfig
 from deploy_config_generator.display import Display
 from deploy_config_generator.vars import Vars
 from deploy_config_generator.template import Template
-from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, ConfigError
+from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, ConfigError, VarsReplacementError
 from deploy_config_generator.utils import yaml_dump, show_traceback
 
 DISPLAY = None
@@ -223,8 +223,12 @@ def main():
 
     try:
         deploy_config = DeployConfig(os.path.join(deploy_dir, SITE_CONFIG.deploy_config_file), varset)
+        deploy_config.set_config(varset.replace_vars(deploy_config.get_config()))
     except DeployConfigError as e:
         DISPLAY.display('Error loading deploy config: %s' % str(e))
+        sys.exit(1)
+    except VarsReplacementError as e:
+        DISPLAY.display('Error loading deploy config: variable replacement error: %s' % str(e))
         sys.exit(1)
 
     DISPLAY.vvvv('Deploy config:')
