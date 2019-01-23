@@ -78,9 +78,12 @@ class Vars(dict):
                 raise VarsReplacementError("Unknown variable '%s'" % match.group(1))
 
         ret = value
+        # Common regex for var name
+        # Must start with letter/underscore and contain only letter/number/underscore
+        re_var_name = r'([A-Za-z_][A-Za-z0-9_]+)'
         # Replace bracketed vars
-        ret = re.sub(r'\$\{([A-Za-z0-9_]+)\}', replace_var, ret)
+        ret = re.sub(r'\$\{%s\}' % (re_var_name), replace_var, ret)
         # Replace non-bracketed vars
-        ret = re.sub(r'\$([A-Za-z0-9_]+)', replace_var, ret)
+        ret = re.sub(r'\$%s' % (re_var_name), replace_var, ret)
 
         return ret
