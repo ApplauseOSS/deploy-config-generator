@@ -300,12 +300,17 @@ class PluginField(object):
             parent = parent._parent
         return field_name
 
-    def validate_check_type(self, value):
+    def convert_bool(self, value):
+        if value in ('true', 'True', 'yes', 'on'):
+            return True
+        if value in ('false', 'False', 'no', 'off'):
+            return False
+        return None
+
+    def validate_check_type(self, value, expected_type=None):
         '''
         Determine the type of the passed value
         '''
-        if isinstance(value, six.string_types):
-            return 'str'
         if isinstance(value, list):
             return 'list'
         if isinstance(value, dict):
@@ -316,6 +321,19 @@ class PluginField(object):
             return 'int'
         if isinstance(value, float):
             return 'float'
+        if isinstance(value, six.string_types):
+            # Values from variables always come in as a string, so we need special
+            # logic to determine their actual type based on the field type
+            try:
+                if expected_type == 'float' and float(value):
+                    return 'float'
+                if expected_type == 'int' and int(value):
+                    return 'int'
+                if expected_type == 'bool' and self.convert_bool(value) is not None:
+                    return 'bool'
+            except Exception:
+                pass
+            return 'str'
         raise DeployConfigError('unsupported type: %s' % type(value))
 
     def validate(self, value, use_subtype=False):
@@ -325,7 +343,6 @@ class PluginField(object):
         if value is None:
             return
         unmatched = []
-        value_type = self.validate_check_type(value)
         field_type = self.type
         if use_subtype:
             # Use the field subtype
@@ -333,6 +350,7 @@ class PluginField(object):
         # Nothing to validate if no field type is specified
         if field_type is None:
             return unmatched
+        value_type = self.validate_check_type(value, field_type)
         if value_type != field_type:
             # TODO: replace this with the ability to specify multiple types for a field
             # Hack to allow an int value to satisfy a float
@@ -355,21 +373,25 @@ class PluginField(object):
                         continue
                     field_unmatched = self.fields[k].validate(v)
                     unmatched.extend(field_unmatched)
+
         return unmatched
 
-    def apply_transform(self, value):
+    def apply_transform(self, value, use_subtype=False):
         '''
         Apply transformations to string values
         '''
         if value is None:
             return value
+        field_type = self.type
+        if use_subtype:
+            field_type = self.subtype
         value_type = self.validate_check_type(value)
         ret = None
         if value_type == 'list':
             # Apply transformations to all items in the list
             ret = []
             for value_item in value:
-                ret.append(self.apply_transform(value_item))
+                ret.append(self.apply_transform(value_item, use_subtype=True))
         elif value_type == 'dict':
             ret = {}
             if self.fields is not None:
@@ -380,7 +402,16 @@ class PluginField(object):
             else:
                 ret = value
         elif value_type == 'str':
-            if isinstance(self.transform, dict):
+            # Convert types for values that came in from a variable (which always
+            # produces a string)
+            if field_type == 'bool':
+                # Convert values to boolean if they're expected to be boolean
+                ret = self.convert_bool(value)
+            elif field_type == 'float':
+                ret = float(value)
+            elif field_type == 'int':
+                ret = int(value)
+            elif isinstance(self.transform, dict):
                 if 'prefix' in self.transform:
                     ret = self.transform['prefix'] + value
                 elif 'suffix' in self.transform:
@@ -388,7 +419,12 @@ class PluginField(object):
             else:
                 ret = value
         else:
-            ret = value
+            if field_type == 'float' and value_type == 'int':
+                # An int can satisfy a 'float' field, but we want to make sure
+                # that it's a float for output
+                ret = float(value)
+            else:
+                ret = value
         return ret
 
     def apply_default_list(self, value, field_type):

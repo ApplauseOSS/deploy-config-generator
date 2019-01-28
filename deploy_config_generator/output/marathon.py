@@ -31,9 +31,11 @@ class OutputPlugin(OutputPluginBase):
                 ),
                 'disk': dict(
                     required=True,
+                    type='int',
                 ),
                 'instances': dict(
                     default=1,
+                    type='int',
                 ),
                 'constraints': dict(
                     type='list',
@@ -270,20 +272,20 @@ class OutputPlugin(OutputPluginBase):
     def generate_output(self, app_vars):
         # Basic structure
         data = {
-            "id": "{{ APP.id }}",
-            "cpus": '{{ APP.cpus | output_float }}',
-            "mem": '{{ APP.mem | output_float }}',
-            "disk": '{{ APP.disk | output_int }}',
-            "instances": '{{ APP.instances | output_int }}',
+            "id": app_vars['APP']['id'],
+            "cpus": app_vars['APP']['cpus'],
+            "mem": app_vars['APP']['mem'],
+            "disk": app_vars['APP']['disk'],
+            "instances": app_vars['APP']['instances'],
             # TODO: add support for container types other than 'DOCKER'
             "container": {
                 "type": "DOCKER",
                 "volumes": [],
                 # TODO: make various attributes configurable
                 "docker": {
-                    "image": "{{ APP.image }}",
-                    "network": "{{ APP.docker_network }}",
-                    "privileged": "{{ APP.docker_privileged | output_bool }}",
+                    "image": app_vars['APP']['image'],
+                    "network": app_vars['APP']['docker_network'],
+                    "privileged": app_vars['APP']['docker_privileged'],
                     "parameters": [],
                     "forcePullImage": True
                 }

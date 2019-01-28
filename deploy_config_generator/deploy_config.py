@@ -1,5 +1,5 @@
 from deploy_config_generator.display import Display
-from deploy_config_generator.errors import DeployConfigError, VarsReplacementError
+from deploy_config_generator.errors import DeployConfigError
 from deploy_config_generator.utils import yaml_load
 
 # TODO: build this dynamically from output plugins
@@ -21,18 +21,15 @@ class DeployConfig(object):
     def get_config(self):
         return self._data
 
+    def set_config(self, config):
+        self._data = config
+
     def load(self, path):
         self._path = path
         try:
             self._display.v('Loading deploy config file %s' % path)
-            yaml_content = ''
             with open(path) as f:
-                for line_idx, line in enumerate(f):
-                    try:
-                        yaml_content += self._vars.replace_vars(line)
-                    except VarsReplacementError as e:
-                        raise DeployConfigError('variable replacement error: %s' % str(e), path=path, line=line_idx + 1)
-            self._data = yaml_load(yaml_content)
+                self._data = yaml_load(f.read())
             if not isinstance(self._data, dict):
                 raise DeployConfigError('YAML file should contain a top-level dict', path=path)
             for k, v in self._data.items():
