@@ -214,6 +214,7 @@ def main():
         load_vars(varset, deploy_dir, args.env)
     except Exception as e:
         DISPLAY.display('Error loading vars: %s' % str(e))
+        show_traceback(DISPLAY.get_verbosity())
         sys.exit(1)
 
     DISPLAY.vvvv()
@@ -226,9 +227,11 @@ def main():
         deploy_config.set_config(varset.replace_vars(deploy_config.get_config()))
     except DeployConfigError as e:
         DISPLAY.display('Error loading deploy config: %s' % str(e))
+        show_traceback(DISPLAY.get_verbosity())
         sys.exit(1)
     except VarsReplacementError as e:
         DISPLAY.display('Error loading deploy config: variable replacement error: %s' % str(e))
+        show_traceback(DISPLAY.get_verbosity())
         sys.exit(1)
 
     DISPLAY.vvvv('Deploy config:')

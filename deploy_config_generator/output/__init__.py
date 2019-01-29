@@ -325,9 +325,9 @@ class PluginField(object):
             # Values from variables always come in as a string, so we need special
             # logic to determine their actual type based on the field type
             try:
-                if expected_type == 'float' and float(value):
+                if expected_type == 'float' and float(value) is not None:
                     return 'float'
-                if expected_type == 'int' and int(value):
+                if expected_type == 'int' and int(value) is not None:
                     return 'int'
                 if expected_type == 'bool' and self.convert_bool(value) is not None:
                     return 'bool'
