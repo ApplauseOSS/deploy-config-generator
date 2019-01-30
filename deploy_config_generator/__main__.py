@@ -186,6 +186,15 @@ def main():
     DISPLAY.vv()
 
     SITE_CONFIG = SiteConfig()
+    if args.config is None:
+        # Possible config locations
+        config_paths = [
+            os.path.join(os.environ.get('HOME', None), '.applause-deploy-config-generator-site.yml'),
+        ]
+        for path in config_paths:
+            if os.path.exists(path):
+                args.config = path
+                break
     if args.config:
         try:
             SITE_CONFIG.load(args.config)
