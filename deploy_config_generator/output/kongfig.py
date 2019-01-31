@@ -39,6 +39,51 @@ class OutputPlugin(OutputPluginBase):
                                 'condition': dict(),
                             }
                         },
+                        'consumers': {
+                            'type': 'list',
+                            'subtype': 'dict',
+                            'fields': {
+                                'username': {
+                                    'type': 'str',
+                                    'required': True,
+                                },
+                                'custom_id': {
+                                    'type': 'str'
+                                },
+                                'ensure': {
+                                    'type': 'str',
+                                },
+                                'credentials': {
+                                    'type': 'list',
+                                    'subtype': 'dict',
+                                    'fields': {
+                                        'name': {
+                                            'type': 'str',
+                                            'required': True,
+                                        },
+                                        'ensure': {
+                                            'type': 'str',
+                                        },
+                                        'attributes': {
+                                            'type': 'dict',
+                                        }
+                                    }
+                                },
+                                'acls': {
+                                    'type': 'list',
+                                    'subtype': 'dict',
+                                    'fields': {
+                                        'group': {
+                                            'type': 'str',
+                                            'required': True,
+                                        },
+                                        'ensure': {
+                                            'type': 'str',
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                 },
             }
@@ -82,6 +127,28 @@ class OutputPlugin(OutputPluginBase):
                         plugins.append(tmp_plugin)
                 if plugins:
                     tmp_api['plugins'] = plugins
+            # Consumers
+            if proxy['consumers']:
+                consumers = []
+                for consumer in proxy['consumers']:
+                    tmp_consumer = dict()
+                    # Strip out null values in consumers
+                    for field in consumer:
+                        if consumer[field] is not None:
+                            tmp_consumer[field] = consumer[field]
+
+                    # filter out null values in credentials
+                    if consumer['credentials']:
+                        tmp_consumer['credentials'] = [dict((k, v) for k, v in creds.items() if v is not None) for creds in consumer['credentials']]
+
+                    # filter out null values in acls
+                    if consumer['acls']:
+                        tmp_consumer['acls'] = [dict((k, v) for k, v in creds.items() if v is not None) for creds in consumer['acls']]
+
+                    tmp_vars.update(dict(consumer=consumer))
+                    consumers.append(tmp_consumer)
+                if consumers:
+                    tmp_api['consumers'] = consumers
             data['apis'].append(tmp_api)
 
         output = json_dump(self._template.render_template(data, app_vars))
