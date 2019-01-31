@@ -149,6 +149,8 @@ class OutputPlugin(OutputPluginBase):
                     consumers.append(tmp_consumer)
                 if consumers:
                     tmp_api['consumers'] = consumers
+            # Render templates now so that loop vars can be used
+            tmp_api = self._template.render_template(tmp_api, tmp_vars)
             data['apis'].append(tmp_api)
 
         output = json_dump(self._template.render_template(data, app_vars))
