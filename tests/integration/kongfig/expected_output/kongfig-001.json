@@ -19,6 +19,48 @@
           "name": "test"
         }
       ]
+    },
+    {
+      "consumers": [
+        {
+          "acls": [
+            {
+              "group": "allowed_api_consumers"
+            },
+            {
+              "ensure": "removed",
+              "group": "other_consumer_group"
+            }
+          ],
+          "credentials": [
+            {
+              "attributes": {
+                "key": "ABC123"
+              },
+              "name": "key-auth"
+            },
+            {
+              "ensure": "removed",
+              "name": "basic-auth"
+            }
+          ],
+          "username": "api_consumer"
+        }
+      ],
+      "name": "api_with_consumer",
+      "plugins": [
+        {
+          "attributes": {
+            "config": {
+              "whitelist": "allowed_api_consumers"
+            }
+          },
+          "name": "acl"
+        },
+        {
+          "name": "key-auth"
+        }
+      ]
     }
   ]
 }

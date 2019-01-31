@@ -15,3 +15,22 @@ apps:
       # to our custom value
       plugins:
         - name: test
+    - name: api_with_consumer
+      plugins:
+        - name: acl
+          attributes:
+            config:
+              whitelist: allowed_api_consumers
+        - name: key-auth
+      consumers:
+        - username: api_consumer
+          credentials:
+            - name: key-auth
+              attributes:
+                key: ABC123
+            - name: basic-auth
+              ensure: removed
+          acls:
+            - group: allowed_api_consumers
+            - group: other_consumer_group
+              ensure: removed
