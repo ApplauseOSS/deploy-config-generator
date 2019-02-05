@@ -1,0 +1,8 @@
+Dummy output plugin
+
+App config:
+
+{
+  "dummy": true,
+  "parent1": []
+}

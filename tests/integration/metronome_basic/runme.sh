@@ -12,6 +12,6 @@ mkdir tmp
 
 set -x
 
-python -m deploy_config_generator -v -o tmp .
+python -m deploy_config_generator -c /dev/null -v -o tmp .
 
 diff -wru expected_output tmp

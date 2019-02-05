@@ -12,6 +12,7 @@ class DeployConfig(object):
     _data = None
     _vars = None
     _path = None
+    _version = None
 
     def __init__(self, path, varset):
         self._vars = varset
@@ -24,6 +25,9 @@ class DeployConfig(object):
     def set_config(self, config):
         self._data = config
 
+    def get_version(self):
+        return self._version
+
     def load(self, path):
         self._path = path
         try:
@@ -32,6 +36,9 @@ class DeployConfig(object):
                 self._data = yaml_load(f.read())
             if not isinstance(self._data, dict):
                 raise DeployConfigError('YAML file should contain a top-level dict', path=path)
+            if 'version' in self._data:
+                self._version = self._data['version']
+                del self._data['version']
             for k, v in self._data.items():
                 if k not in VALID_SECTIONS:
                     raise DeployConfigError("section name '%s' is not recognized" % k)

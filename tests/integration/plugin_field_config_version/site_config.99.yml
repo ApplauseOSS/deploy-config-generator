@@ -1,0 +1,10 @@
+---
+default_config_version: 1
+default_output: dummy
+plugins:
+  dummy:
+    enabled: true
+    fields:
+      test:
+        dummy:
+          min_version: 99

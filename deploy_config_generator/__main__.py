@@ -72,7 +72,7 @@ def load_vars_files(varset, vars_dir, patterns, allow_var_references=True):
         varset.read_vars_file(vars_file, allow_var_references=allow_var_references)
 
 
-def load_output_plugins(varset, output_dir):
+def load_output_plugins(varset, output_dir, config_version):
     '''
     Find, import, and instantiate all output plugins
     '''
@@ -82,7 +82,7 @@ def load_output_plugins(varset, output_dir):
             mod = importlib.import_module(name)
             cls = getattr(mod, 'OutputPlugin')
             DISPLAY.v('Loading plugin %s' % cls.NAME)
-            plugins.append(cls(varset, output_dir))
+            plugins.append(cls(varset, output_dir, config_version))
         except ConfigError as e:
             DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
             sys.exit(1)
@@ -209,14 +209,6 @@ def main():
 
     varset = Vars()
 
-    output_plugins = load_output_plugins(varset, args.output_dir)
-
-    DISPLAY.vvv('Available output plugins:')
-    DISPLAY.vvv()
-    for plugin in output_plugins:
-        DISPLAY.vvv('- %s (%s)' % (plugin.NAME, plugin.DESCR or 'No description'))
-    DISPLAY.vvv()
-
     deploy_dir = find_deploy_dir(args.path)
 
     try:
@@ -246,6 +238,15 @@ def main():
     DISPLAY.vvvv('Deploy config:')
     DISPLAY.vvvv()
     DISPLAY.vvvv(yaml_dump(deploy_config.get_config(), default_flow_style=False, indent=2))
+
+    deploy_config_version = deploy_config.get_version() or SITE_CONFIG.default_config_version
+    output_plugins = load_output_plugins(varset, args.output_dir, deploy_config_version)
+
+    DISPLAY.vvv('Available output plugins:')
+    DISPLAY.vvv()
+    for plugin in output_plugins:
+        DISPLAY.vvv('- %s (%s)' % (plugin.NAME, plugin.DESCR or 'No description'))
+    DISPLAY.vvv()
 
     for section in deploy_config.get_config():
         for plugin in output_plugins:
