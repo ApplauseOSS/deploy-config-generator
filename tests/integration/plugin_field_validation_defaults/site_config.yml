@@ -6,6 +6,7 @@ plugins:
     fields:
       test:
         parent1:
+          required: true
           fields:
             # Default value for parent1 -> [ child2_1 ]
             child2_1:

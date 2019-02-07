@@ -21,15 +21,17 @@ class OutputPluginBase(object):
     _section = None
     _plugin_config = None
     _fields = None
+    _config_version = None
 
     DEFAULT_CONFIG = {}
 
-    def __init__(self, varset, output_dir):
+    def __init__(self, varset, output_dir, config_version):
         self._vars = varset
         self._output_dir = output_dir
         self._display = Display()
         self._template = Template()
         self._site_config = SiteConfig()
+        self._config_version = config_version
         self.build_config()
 
     def build_config(self):
@@ -43,7 +45,7 @@ class OutputPluginBase(object):
         for section in self._fields:
             section_fields = self._fields[section]
             for k, v in section_fields.items():
-                section_fields[k] = PluginField(k, v)
+                section_fields[k] = PluginField(k, v, self._config_version)
         self.build_config_site()
 
     def build_config_site(self):
@@ -63,7 +65,7 @@ class OutputPluginBase(object):
                             if field_name in self._fields[section]:
                                 self._fields[section][field_name].update_config(field)
                             else:
-                                self._fields[section][field_name] = PluginField(field_name, field)
+                                self._fields[section][field_name] = PluginField(field_name, field, self._config_version)
                 else:
                     if k in self._plugin_config:
                         if isinstance(v, (list, dict)):
@@ -86,7 +88,8 @@ class OutputPluginBase(object):
         Check if a field exists in the current section for this plugin
         '''
         if self._section in self._fields and field in self._fields[self._section]:
-            return True
+            if self._fields[self._section][field].is_valid_for_config_version():
+                return True
         return False
 
     def get_required_fields(self):
@@ -96,7 +99,7 @@ class OutputPluginBase(object):
         ret = []
         if self._section in self._fields:
             for k, v in self._fields[self._section].items():
-                if v.required and v.default is None:
+                if v.required and v.default is None and v.is_valid_for_config_version():
                     ret.append(k)
         return ret
 
@@ -208,6 +211,7 @@ class PluginField(object):
     _name = None
     _config = None
     _parent = None
+    _config_version = None
 
     BASE_CONFIG = {
         # Whether field is required
@@ -231,13 +235,17 @@ class PluginField(object):
         # * 'prepend' - default value is included at beginning of list
         # * 'merge' - user value is merged with default value (for dicts)
         'default_action': None,
+        # Minimum/maximum config version that field is valid for
+        'min_version': None,
+        'max_version': None,
         # Field definitions (for dicts)
         'fields': None,
     }
 
-    def __init__(self, name, config, parent=None):
+    def __init__(self, name, config, config_version, parent=None):
         self._name = name
         self._parent = parent
+        self._config_version = config_version
         self._config = self.BASE_CONFIG.copy()
         if config is not None:
             self._config.update(config)
@@ -257,13 +265,27 @@ class PluginField(object):
 
     __repr__ = __str__
 
+    def is_valid_for_config_version(self):
+        '''
+        Compare min/max version for field to config version
+        '''
+        if self._config_version is None:
+            return True
+        if self._config['min_version'] is not None:
+            if float(self._config_version) < float(self._config['min_version']):
+                return False
+        if self._config['max_version'] is not None:
+            if float(self._config_version) > float(self._config['max_version']):
+                return False
+        return True
+
     def convert_fields(self):
         '''
         Replace items in 'fields' dict with PluginField objects
         '''
         if self._config['fields'] is not None:
             for k, v in self._config['fields'].items():
-                self._config['fields'][k] = PluginField(k, v, parent=self)
+                self._config['fields'][k] = PluginField(k, v, self._config_version, parent=self)
 
     def update_config(self, config):
         '''
@@ -276,7 +298,7 @@ class PluginField(object):
                     if field_name in self.fields:
                         self.fields[field_name].update_config(field)
                     else:
-                        self.fields[field_name] = PluginField(field_name, field, parent=self)
+                        self.fields[field_name] = PluginField(field_name, field, self._config_version, parent=self)
             else:
                 if isinstance(v, dict):
                     if self._config[k] is None:
@@ -368,7 +390,7 @@ class PluginField(object):
             # Recursively validate sub-field values
             if field_type == 'dict' and self.fields is not None:
                 for k, v in value.items():
-                    if k not in self.fields:
+                    if k not in self.fields or not self.fields[k].is_valid_for_config_version():
                         unmatched.append('%s.%s' % (self.get_full_name(), k))
                         continue
                     field_unmatched = self.fields[k].validate(v)

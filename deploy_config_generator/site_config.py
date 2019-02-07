@@ -25,6 +25,9 @@ class SiteConfig(with_metaclass(Singleton, object)):
         'env_vars_file_patterns': ['{{ env }}.var', 'env_{{ env }}.var'],
         # Whether to use vars from environment
         'use_env_vars': True,
+        # Deploy config version to assume if none is provided (defaults to latest)
+        'default_config_version': '1',
+        # Plugin-specific options
         'plugins': {},
     }
 
@@ -68,6 +71,11 @@ class SiteConfig(with_metaclass(Singleton, object)):
             self._display.v('Loading site config from %s' % path)
             with open(path) as f:
                 data = yaml_load(f)
+            # Handle empty site config file
+            # This is mostly here to allow doing '-c /dev/null' in the integration
+            # tests to prevent them from picking up the user site config
+            if data is None:
+                data = {}
             if not isinstance(data, dict):
                 raise ConfigError('config file should be formatted as YAML dict')
             self._path = path

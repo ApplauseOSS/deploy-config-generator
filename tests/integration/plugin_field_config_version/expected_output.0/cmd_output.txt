@@ -1,0 +1,8 @@
+Loading site config from site_config.0.yml
+Loading vars from environment
+Loading deploy config file ./deploy/config.yml
+Loading plugin dummy
+Loading plugin kongfig
+Loading plugin marathon
+Loading plugin metronome
+Failed to validate fields in deploy config: found the following unknown fields: dummy
