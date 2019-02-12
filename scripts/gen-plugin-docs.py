@@ -63,7 +63,7 @@ def load_output_plugins(varset):
         try:
             mod = importlib.import_module(name)
             cls = getattr(mod, 'OutputPlugin')
-            plugins.append(cls(varset, ''))
+            plugins.append(cls(varset, '', None))
         except Exception as e:
             show_traceback(DISPLAY.get_verbosity())
             DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))

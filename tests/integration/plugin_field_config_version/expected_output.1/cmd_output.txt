@@ -1,8 +1,0 @@
-Loading site config from site_config.1.yml
-Loading vars from environment
-Loading deploy config file ./deploy/config.yml
-Loading plugin dummy
-Loading plugin kongfig
-Loading plugin marathon
-Loading plugin metronome
-Writing output file tmp.1/dummy-001.foo
