@@ -125,6 +125,21 @@ class OutputPlugin(OutputPluginBase):
                     description='Environment variables to pass to the container',
                     type='dict',
                 ),
+                'secrets': dict(
+                    description='List of secrets from the DC/OS secret store',
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        name=dict(
+                            required=True,
+                            description='Name of secret to expose for env/volumes',
+                        ),
+                        source=dict(
+                            required=True,
+                            description='Name of secret in DC/OS secret store',
+                        ),
+                    ),
+                ),
                 'health_checks': dict(
                     type='list',
                     subtype='dict',
@@ -304,6 +319,8 @@ class OutputPlugin(OutputPluginBase):
         # Environment
         if app_vars['APP']['env'] is not None:
             data['env'] = app_vars['APP']['env']
+        # Secrets
+        self.build_secrets(app_vars, data)
         # Fetch config
         self.build_fetch_config(app_vars, data)
         # Health checks
@@ -329,6 +346,18 @@ class OutputPlugin(OutputPluginBase):
                 }
                 container_parameters.append(tmp_param)
             data['container']['docker']['parameters'] = container_parameters
+
+    def build_secrets(self, app_vars, data):
+        if app_vars['APP']['secrets']:
+            secrets = {}
+            for secret_index, secret in enumerate(app_vars['APP']['secrets']):
+                tmp_secret = {
+                    'source': secret['source']
+                }
+                if tmp_secret:
+                    secrets[secret['name']] = tmp_secret
+            if secrets:
+                data['secrets'] = secrets
 
     def build_volumes(self, app_vars, data):
         if app_vars['APP']['volumes']:

@@ -1,0 +1,7 @@
+---
+secrets:
+  - name: db_password
+    terraform_output: some_db_instance_password
+  - name: generated_admin_password
+  - name: ssl_cert
+    type: certificate

@@ -3,7 +3,7 @@ from deploy_config_generator.errors import DeployConfigError
 from deploy_config_generator.utils import yaml_load
 
 # TODO: build this dynamically from output plugins
-VALID_SECTIONS = ('apps', 'jobs', 'test')
+VALID_SECTIONS = ('apps', 'jobs', 'secrets', 'test')
 
 
 class DeployConfig(object):
