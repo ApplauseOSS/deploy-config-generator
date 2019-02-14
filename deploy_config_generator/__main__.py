@@ -208,6 +208,7 @@ def main():
     DISPLAY.vvvv()
 
     varset = Vars()
+    varset['env'] = args.env
 
     deploy_dir = find_deploy_dir(args.path)
 
