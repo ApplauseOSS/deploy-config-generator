@@ -37,6 +37,9 @@ class OutputPlugin(OutputPluginBase):
                                     'type': 'dict',
                                 },
                                 'condition': dict(),
+                                'enabled': dict(
+                                    type='bool',
+                                ),
                             }
                         },
                         'consumers': {
