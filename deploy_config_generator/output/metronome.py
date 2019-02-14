@@ -30,7 +30,9 @@ class OutputPlugin(OutputPluginBase):
                 'docker_image': {},
                 'artifacts': {},
                 'labels': {},
-                'env': {},
+                'env': dict(
+                    type='dict',
+                ),
                 'user': {},
                 'volumes': {},
                 'max_launch_delay': {},
@@ -43,6 +45,21 @@ class OutputPlugin(OutputPluginBase):
                         ),
                         active_deadline_seconds=dict(
                             type='int',
+                        ),
+                    ),
+                ),
+                'secrets': dict(
+                    description='List of secrets from the DC/OS secret store',
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        name=dict(
+                            required=True,
+                            description='Name of secret to expose for env/volumes',
+                        ),
+                        source=dict(
+                            required=True,
+                            description='Name of secret in DC/OS secret store',
                         ),
                     ),
                 ),
@@ -73,6 +90,8 @@ class OutputPlugin(OutputPluginBase):
         # Environment vars
         if app_vars['APP']['env'] is not None:
             data['run']['env'] = app_vars['APP']['env']
+        # Secrets
+        self.build_secrets(app_vars, data)
         # Artifacts
         self.build_artifacts_config(app_vars, data)
         # Schedules
@@ -88,6 +107,18 @@ class OutputPlugin(OutputPluginBase):
 
         output = json_dump(self._template.render_template(data, app_vars))
         return output
+
+    def build_secrets(self, app_vars, data):
+        if app_vars['APP']['secrets']:
+            secrets = {}
+            for secret_index, secret in enumerate(app_vars['APP']['secrets']):
+                tmp_secret = {
+                    'source': secret['source']
+                }
+                if tmp_secret:
+                    secrets[secret['name']] = tmp_secret
+            if secrets:
+                data['run']['secrets'] = secrets
 
     def build_restart_policy(self, app_vars, data):
         if app_vars['APP']['restart']:
