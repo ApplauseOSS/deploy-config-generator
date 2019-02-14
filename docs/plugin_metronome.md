@@ -18,7 +18,7 @@ Name | Type | Required | Default | Description
 `description`||no||
 `disk`||yes||
 `docker_image`||no||
-`env`||no||
+`env`|`dict`|no||
 `id`||yes||
 `labels`||no||
 `max_launch_delay`||no||
@@ -27,6 +27,9 @@ Name | Type | Required | Default | Description
 `restart . active_deadline_seconds`|`int`|no||
 `restart . policy`||yes||
 `schedules`||no||
+`secrets`|`list` (of `dict`)|no||List of secrets from the DC/OS secret store
+`secrets . name`||yes||Name of secret to expose for env/volumes
+`secrets . source`||yes||Name of secret in DC/OS secret store
 `user`||no||
 `volumes`||no||
 
