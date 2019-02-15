@@ -30,6 +30,7 @@ Name | Type | Required | Default | Description
 `proxies . plugins`|`list` (of `dict`)|no||
 `proxies . plugins . attributes`|`dict`|no||
 `proxies . plugins . condition`||no||
+`proxies . plugins . enabled`|`bool`|no||
 `proxies . plugins . name`||yes||
 
 
