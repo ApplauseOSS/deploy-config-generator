@@ -1,0 +1,7 @@
+Dummy2 output plugin
+
+App config:
+
+{
+  "dummy2": true
+}

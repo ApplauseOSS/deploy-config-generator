@@ -81,6 +81,7 @@ Name | Default | Description
 `defaults_vars_file_patterns` | `['defaults.var']` | Patterns for finding "defaults" vars files
 `env_vars_file_patterns` | `['{{ env }}.var', 'env_{{ env }}.var']` | Patterns for finding env-specific vars files
 `use_env_vars` | `True` | Whether to read vars from environment
+`plugin_dirs` | `[]` | Additional dirs where plugins can be found
 
 ### Variables
 

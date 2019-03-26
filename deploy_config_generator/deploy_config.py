@@ -2,9 +2,6 @@ from deploy_config_generator.display import Display
 from deploy_config_generator.errors import DeployConfigError
 from deploy_config_generator.utils import yaml_load
 
-# TODO: build this dynamically from output plugins
-VALID_SECTIONS = ('apps', 'jobs', 'secrets', 'test')
-
 
 class DeployConfig(object):
 
@@ -40,8 +37,6 @@ class DeployConfig(object):
                 self._version = self._data['version']
                 del self._data['version']
             for k, v in self._data.items():
-                if k not in VALID_SECTIONS:
-                    raise DeployConfigError("section name '%s' is not recognized" % k)
                 # Wrap the config in a list if it's not already a list
                 # This makes it easier to process
                 if not isinstance(v, list):
@@ -50,3 +45,8 @@ class DeployConfig(object):
             raise
         except Exception as e:
             raise DeployConfigError('unexpected exception: %s' % str(e))
+
+    def validate_sections(self, valid_sections):
+        for section in self._data:
+            if section not in valid_sections:
+                raise DeployConfigError("section name '%s' is not valid for available plugins" % section)

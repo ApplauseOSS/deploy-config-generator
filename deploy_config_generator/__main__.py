@@ -77,19 +77,22 @@ def load_output_plugins(varset, output_dir, config_version):
     Find, import, and instantiate all output plugins
     '''
     plugins = []
-    for finder, name, ispkg in pkgutil.iter_modules(output_ns.__path__, output_ns.__name__ + '.'):
-        try:
-            mod = importlib.import_module(name)
-            cls = getattr(mod, 'OutputPlugin')
-            DISPLAY.v('Loading plugin %s' % cls.NAME)
-            plugins.append(cls(varset, output_dir, config_version))
-        except ConfigError as e:
-            DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
-            sys.exit(1)
-        except Exception as e:
-            show_traceback(DISPLAY.get_verbosity())
-            DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
-            sys.exit(1)
+    for plugin_dir in (output_ns.__path__ + SITE_CONFIG.plugin_dirs):
+        sys.path.insert(0, plugin_dir)
+        for finder, name, ispkg in pkgutil.iter_modules([plugin_dir]):
+            try:
+                mod = importlib.import_module(name)
+                cls = getattr(mod, 'OutputPlugin')
+                DISPLAY.v('Loading plugin %s' % cls.NAME)
+                plugins.append(cls(varset, output_dir, config_version))
+            except ConfigError as e:
+                DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
+                sys.exit(1)
+            except Exception as e:
+                show_traceback(DISPLAY.get_verbosity())
+                DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
+                sys.exit(1)
+        sys.path.pop(0)
     return plugins
 
 
@@ -245,9 +248,17 @@ def main():
 
     DISPLAY.vvv('Available output plugins:')
     DISPLAY.vvv()
+    valid_sections = []
     for plugin in output_plugins:
         DISPLAY.vvv('- %s (%s)' % (plugin.NAME, plugin.DESCR or 'No description'))
+        valid_sections += plugin._fields.keys()
     DISPLAY.vvv()
+
+    try:
+        deploy_config.validate_sections(valid_sections)
+    except DeployConfigError as e:
+        DISPLAY.display('Error validating deploy config: %s' % str(e))
+        sys.exit(1)
 
     for section in deploy_config.get_config():
         for plugin in output_plugins:
