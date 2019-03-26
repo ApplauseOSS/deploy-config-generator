@@ -85,7 +85,7 @@ def yaml_dump(value, **kwargs):
 
 
 def yaml_load(value, **kwargs):
-    return yaml.load(value, **kwargs)
+    return yaml.safe_load(value, **kwargs)
 
 
 def json_dump(value, sort_keys=True, indent=2, separators=(',', ': '), **kwargs):

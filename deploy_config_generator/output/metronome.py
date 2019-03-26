@@ -111,11 +111,14 @@ class OutputPlugin(OutputPluginBase):
     def build_secrets(self, app_vars, data):
         if app_vars['APP']['secrets']:
             secrets = {}
+            tmp_vars = app_vars.copy()
             for secret_index, secret in enumerate(app_vars['APP']['secrets']):
+                tmp_vars.update(dict(secret=secret, secret_index=secret_index))
                 tmp_secret = {
                     'source': secret['source']
                 }
                 if tmp_secret:
+                    tmp_secret = self._template.render_template(tmp_secret, tmp_vars)
                     secrets[secret['name']] = tmp_secret
             if secrets:
                 data['run']['secrets'] = secrets
