@@ -1,3 +1,5 @@
+import os.path
+
 from six import with_metaclass
 
 from deploy_config_generator.display import Display
@@ -27,6 +29,8 @@ class SiteConfig(with_metaclass(Singleton, object)):
         'use_env_vars': True,
         # Deploy config version to assume if none is provided (defaults to latest)
         'default_config_version': '1',
+        # Additional plugins dirs
+        'plugin_dirs': [],
         # Plugin-specific options
         'plugins': {},
     }
@@ -79,6 +83,14 @@ class SiteConfig(with_metaclass(Singleton, object)):
             if not isinstance(data, dict):
                 raise ConfigError('config file should be formatted as YAML dict')
             self._path = path
+            # Special case for plugin dirs
+            if 'plugin_dirs' in data:
+                if not isinstance(data['plugin_dirs'], list):
+                    data['plugin_dirs'] = [data['plugin_dirs']]
+                for idx, entry in enumerate(data['plugin_dirs']):
+                    if not entry.startswith('/'):
+                        # Normalize path based on location of site config
+                        data['plugin_dirs'][idx] = os.path.realpath(os.path.join(os.path.dirname(self._path), entry))
             self._config.update(data)
         except Exception as e:
             raise ConfigError(str(e))
