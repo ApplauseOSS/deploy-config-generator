@@ -120,7 +120,6 @@ The following output plugins are available:
 * [`marathon`](docs/plugin_marathon.md)
 * [`metronome`](docs/plugin_metronome.md)
 * [`kongfig`](docs/plugin_kongfig.md)
-* [`dcos_secrets`](docs/plugin_dcos_secrets.md)
 * [`dummy`](docs/plugin_dummy.md)
 
 ## Development

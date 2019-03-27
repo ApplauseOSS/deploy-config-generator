@@ -78,6 +78,7 @@ def load_output_plugins(varset, output_dir, config_version):
     '''
     plugins = []
     for plugin_dir in (output_ns.__path__ + SITE_CONFIG.plugin_dirs):
+        DISPLAY.vv('Looking in plugin dir %s' % plugin_dir)
         sys.path.insert(0, plugin_dir)
         for finder, name, ispkg in pkgutil.iter_modules([plugin_dir]):
             try:
