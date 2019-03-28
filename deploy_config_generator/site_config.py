@@ -82,7 +82,7 @@ class SiteConfig(with_metaclass(Singleton, object)):
                 data = {}
             if not isinstance(data, dict):
                 raise ConfigError('config file should be formatted as YAML dict')
-            self._path = path
+            self._path = os.path.realpath(path)
             # Special case for plugin dirs
             if 'plugin_dirs' in data:
                 if not isinstance(data['plugin_dirs'], list):
@@ -90,7 +90,7 @@ class SiteConfig(with_metaclass(Singleton, object)):
                 for idx, entry in enumerate(data['plugin_dirs']):
                     if not entry.startswith('/'):
                         # Normalize path based on location of site config
-                        data['plugin_dirs'][idx] = os.path.realpath(os.path.join(os.path.dirname(self._path), entry))
+                        data['plugin_dirs'][idx] = os.path.join(os.path.dirname(self._path), entry)
             self._config.update(data)
         except Exception as e:
             raise ConfigError(str(e))
