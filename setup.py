@@ -61,7 +61,7 @@ setup(
     name='applause-deploy-config-generator',
     version='0.11.1',
     url='https://github.com/ApplauseAQI/applause-deploy-config-generator',
-    license='Applause',
+    license='MIT',
     description='Utility to generate service deploy configurations',
     author='Applause',
     author_email='ops@applause.com',
