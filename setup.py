@@ -58,12 +58,18 @@ class IntegrationTests(Command):
                 print('SUCCESS')
 
 
+# Read the README.md content for the long description
+with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md')) as f:
+    long_description = f.read()
+
 setup(
     name='deploy-config-generator',
     version='1.0.0',
     url='https://github.com/ApplauseOSS/deploy-config-generator',
     license='MIT',
     description='Utility to generate service deploy configurations',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Applause',
     author_email='ops@applause.com',
     test_suite='tests.unit',
