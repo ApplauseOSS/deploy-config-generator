@@ -1,6 +1,6 @@
-# applause-deploy-config-generator
+# deploy-config-generator
 
-Utility for generating deployment configs for an Applause service
+Utility for generating deployment configs for a service
 
 * [Basic usage](#basic-usage)
 * [The dirty details](#the-dirty-details)
@@ -18,25 +18,25 @@ Utility for generating deployment configs for an Applause service
 The below command will generate the required deployment config files for the specified service in the current directory.
 
 ```bash
-$ applause-deploy-config-generator path/to/service/repo
+$ deploy-config-generator path/to/service/repo
 ```
 
 You can specify the output directory using the `--output-dir` option.
 
 ```bash
-$ applause-deploy-config-generator path/to/service/repo --output-dir /tmp
+$ deploy-config-generator path/to/service/repo --output-dir /tmp
 ```
 
 You can increase the verbosity level to see what the script is doing.
 
 ```bash
-$ applause-deploy-config-generator path/to/service/repo -vvv
+$ deploy-config-generator path/to/service/repo -vvv
 ```
 
 You can specify the path to a site config file.
 
 ```bash
-$ applause-deploy-config-generator path/to/service/repo --config path/to/site/config.yml
+$ deploy-config-generator path/to/service/repo --config path/to/site/config.yml
 ```
 
 ## The dirty details

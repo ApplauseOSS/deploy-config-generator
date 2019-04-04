@@ -9,11 +9,12 @@ import sys
 import subprocess
 
 
-class UploadToInternalRepoCommand(upload):
+class ReleaseToPyPICommand(upload):
+
     def finalize_options(self):
-        self.repository = os.environ.get('APPLAUSE_REPO_URL', 'https://repo.applause.com/repository/pypi-internal/')
-        self.username = os.environ['APPLAUSE_REPO_USER_NAME']
-        self.password = os.environ['APPLAUSE_REPO_PASSWORD']
+        self.repository = os.environ['PYPI_URL']
+        self.username = os.environ['PYPI_USERNAME']
+        self.password = os.environ['PYPI_PASSWORD']
 
 
 class IntegrationTests(Command):
@@ -58,9 +59,9 @@ class IntegrationTests(Command):
 
 
 setup(
-    name='applause-deploy-config-generator',
-    version='0.11.1',
-    url='https://github.com/ApplauseAQI/applause-deploy-config-generator',
+    name='deploy-config-generator',
+    version='1.0.0',
+    url='https://github.com/ApplauseOSS/deploy-config-generator',
     license='MIT',
     description='Utility to generate service deploy configurations',
     author='Applause',
@@ -79,14 +80,12 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            # Blame Andrew's lack of imagination
-            'applause-deploy-config-generator = deploy_config_generator.__main__:main',
-            # Blame Chris
+            'deploy-config-generator = deploy_config_generator.__main__:main',
             'app-config = deploy_config_generator.__main__:main',
         ]
     },
     cmdclass={
-        'upload_to_nexus': UploadToInternalRepoCommand,
+        'release_to_pypi': ReleaseToPyPICommand,
         'integration': IntegrationTests,
     }
 )
