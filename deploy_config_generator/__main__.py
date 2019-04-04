@@ -193,7 +193,7 @@ def main():
     if args.config is None:
         # Possible config locations
         config_paths = [
-            os.path.join(os.environ.get('HOME', None), '.applause-deploy-config-generator-site.yml'),
+            os.path.join(os.environ.get('HOME', None), '.deploy-config-generator-site.yml'),
         ]
         for path in config_paths:
             if os.path.exists(path):
