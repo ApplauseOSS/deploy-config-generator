@@ -1,20 +1,11 @@
 from __future__ import print_function
 
 from setuptools import setup
-from setuptools.command.upload import upload
 from distutils.cmd import Command
 
 import os
 import sys
 import subprocess
-
-
-class ReleaseToPyPICommand(upload):
-
-    def finalize_options(self):
-        self.repository = os.environ['PYPI_URL']
-        self.username = os.environ['PYPI_USERNAME']
-        self.password = os.environ['PYPI_PASSWORD']
 
 
 class IntegrationTests(Command):
@@ -64,7 +55,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'))
 
 setup(
     name='deploy-config-generator',
-    version='1.0.1',
+    version='1.0.2',
     url='https://github.com/ApplauseOSS/deploy-config-generator',
     license='MIT',
     description='Utility to generate service deploy configurations',
@@ -91,7 +82,6 @@ setup(
         ]
     },
     cmdclass={
-        'release_to_pypi': ReleaseToPyPICommand,
         'integration': IntegrationTests,
     }
 )
