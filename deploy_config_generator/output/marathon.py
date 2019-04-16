@@ -233,6 +233,18 @@ class OutputPlugin(OutputPluginBase):
                     type='bool',
                     default=False,
                 ),
+                'docker_parameters': dict(
+                    type='list',
+                    subtype='dict',
+                    fields=dict(
+                        key=dict(
+                            type='str'
+                        ),
+                        value=dict(
+                            type='str'
+                        ),
+                    ),
+                ),
                 'volumes': dict(
                     type='list',
                     subtype='dict',
@@ -301,7 +313,7 @@ class OutputPlugin(OutputPluginBase):
                     "image": app_vars['APP']['image'],
                     "network": app_vars['APP']['docker_network'],
                     "privileged": app_vars['APP']['docker_privileged'],
-                    "parameters": [],
+                    "parameters": app_vars['APP']['docker_parameters'],
                     "forcePullImage": True
                 }
             },
@@ -345,7 +357,7 @@ class OutputPlugin(OutputPluginBase):
                     "value": label
                 }
                 container_parameters.append(tmp_param)
-            data['container']['docker']['parameters'] = container_parameters
+            data['container']['docker']['parameters'] += container_parameters
 
     def build_secrets(self, app_vars, data):
         if app_vars['APP']['secrets']:
