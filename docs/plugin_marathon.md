@@ -20,6 +20,9 @@ Name | Type | Required | Default | Description
 `cpus`|`float`|yes||
 `disk`|`int`|yes||
 `docker_network`||no|`BRIDGE`|
+`docker_parameters`|`list` (of `dict`)|no||
+`docker_parameters . key`|`str`|no||
+`docker_parameters . value`|`str`|no||
 `docker_privileged`|`bool`|no|`False`|
 `env`|`dict`|no||Environment variables to pass to the container
 `fetch`|`list` (of `dict`)|no||
