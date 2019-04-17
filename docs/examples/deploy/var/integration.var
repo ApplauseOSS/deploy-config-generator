@@ -1,0 +1,2 @@
+# These variables will be used with the tool is run with '-e integration'
+RACK_ENV=integration

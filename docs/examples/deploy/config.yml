@@ -1,0 +1,95 @@
+apps:
+  - name: web
+    cpus: ${WEB_CPUS}
+    disk: ${WEB_DISK}
+    mem: ${WEB_MEM}
+    instances: ${WEB_INSTANCES}
+    ports:
+      - container_port: ${WEB_PORT}
+        vip_port: 80
+    health_checks:
+      - port_index: 0
+        path: /health
+        grace_period_seconds: 30
+        interval_seconds: 5
+        timeout_seconds: 3
+        max_consecutive_failures: 10
+    env:
+      APP: web
+      PORT: "${WEB_PORT}"
+      WORKERS: "${WEB_WORKERS}"
+      RACK_ENV: "${RACK_ENV}"
+    upgrade_strategy:
+      minimum_health_capacity: 0.5
+      maximum_over_capacity: 1
+    unreachable_strategy:
+      inactive_after_seconds: 30
+      expunge_after_seconds: 60
+    container_labels:
+      - some_container_label
+      - another_container_label
+    proxies:
+      - name: my_application_endpoint
+        attributes:
+          hosts:
+            - "${EXAMPLE_SERVICE_FQDN}"
+          methods:
+            - GET
+      - name: old_proxy_endpoint_that_i_want_to_be_removed
+        ensure: "removed"
+      - name: my_application_endpoint2
+        attributes:
+          hosts:
+            - "${EXAMPLE_SERVICE_FQDN}"
+          uris:
+            - "/secure"
+  - name: background
+    cpus: ${BACKGROUND_CPUS}
+    disk: ${BACKGROUND_DISK}
+    mem: ${BACKGROUND_MEM}
+    instances: ${BACKGROUND_INSTANCES}
+    health_checks:
+      - command: ./healthcheck.sh
+        delay_seconds: 15
+        interval_seconds: 30
+        max_consecutive_failures: 3
+        timeout_seconds: 5
+        grace_period_seconds: 30
+    upgrade_strategy:
+      minimum_health_capacity: 0.5
+      maximum_over_capacity: 0
+    unreachable_strategy:
+      inactive_after_seconds: 30
+      expunge_after_seconds: 60
+    env:
+      APP: background
+      INTERVAL: "${BACKGROUND_INTERVAL}"
+jobs:
+  - name: scheduled-job
+    description: "First example job for ${SERVICE_NAME}"
+    cpus: ${JOB_CPUS}
+    mem: ${JOB_MEM}
+    disk: ${JOB_DISK}
+    cmd: "echo 'I say Hello!'"
+    env:
+      SERVICE_NAME: "${SERVICE_NAME}"
+      OTHER_ENV_VAR: SOME_VALUE
+    restart:
+      active_deadline_seconds: 120
+      policy: NEVER
+    schedules:
+      - id: default
+        enabled: true
+        cron: '0 * * * *'
+  - name: maintenance-job
+    description: "Second example job for ${SERVICE_NAME}"
+    cpus: ${JOB_CPUS}
+    mem: ${JOB_MEM}
+    disk: ${JOB_DISK}
+    cmd: "echo 'I say something else! This gets executed in the Docker container!'"
+    env:
+      SERVICE_NAME: "${SERVICE_NAME}"
+      OTHER_ENV_VAR: SOME_VALUE
+    restart:
+      active_deadline_seconds: 120
+      policy: ON_FAILURE

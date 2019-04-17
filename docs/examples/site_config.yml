@@ -1,0 +1,189 @@
+---
+plugins:
+  marathon:
+    fields:
+      apps:
+        # Build 'id' field from 'group' and 'name' fields defined below
+        id:
+          default: '{{ APP.group }}/{{ APP.name }}'
+        # Add custom 'name' field
+        name:
+          required: true
+        # Add custom 'group' field with default of SERVICE_NAME var
+        group:
+          required: true
+          default: '{{ VARS.SERVICE_NAME }}'
+        image:
+          # Use DOCKER_IMAGE var if available, otherwise use "group" and known prefix
+          # Note: the hyphens in the jinja tags strip newlines within the template, and
+          # the |- strips off the trailing newline in the YAML block
+          default: |-
+            {%- if VARS.DOCKER_IMAGE is defined -%}
+            {{ VARS.DOCKER_IMAGE }}
+            {%- else -%}
+            1234567890.dkr.ecr.us-east-1.amazonaws.com/{{ APP.group }}{{ ( ':' ~ VARS.IMAGE_TAG ) if VARS.IMAGE_TAG is defined else '' }}
+            {%- endif -%}
+        # Set reasonable defaults for 'cpus', 'mem', and 'disk'
+        cpus:
+          default: 0.5
+        mem:
+          default: 512
+        disk:
+          default: 10
+        instances:
+          default: 3
+        # Default constraints make sure service instances are spread out across availability zones
+        # The use of fault domain detection is a DC/OS Enterprise feature
+        #constraints:
+        #  default:
+        #    - [ "@region", "IS", "aws/us-east-1" ]
+        #    - [ "@zone", "GROUP_BY", "3" ]
+        ports:
+          fields:
+            # Add custom 'vip_port' field for use below
+            vip_port:
+              type: int
+            # Automatic port labels when a VIP port is defined
+            labels:
+              default_action: prepend
+              default:
+                - name: VIP_{{ port_index }}
+                  value: /{{ APP.id }}:{{ port.vip_port }}
+                  condition: port.vip_port
+        port_definitions:
+          fields:
+            # Add custom 'vip_port' field for use below
+            vip_port:
+              type: int
+            # Automatic port labels when a VIP port is defined
+            labels:
+              default_action: prepend
+              default:
+                - name: VIP_{{ port_index }}
+                  value: /{{ APP.id }}:{{ port.vip_port }}
+                  condition: port.vip_port
+        # Automatically add labels for service group/name
+        container_labels:
+          default_action: prepend
+          default:
+            - service={{ APP.group }}
+            - service_component={{ APP.name }}
+        # Provide fetch config for ECR auth with ecr-login
+        fetch:
+          locked: true
+          default:
+            - uri: "{{ VARS.DOCKER_CREDENTIALS_URI }}"
+              extract: true
+              executable: false
+              cache: false
+              condition: VARS.DOCKER_CREDENTIALS_URI is defined and not APP.no_fetch
+        # Provide method for disabling default fetch config
+        # We need an explicit flag, because the deploy tool can't tell the difference
+        # between an explicit empty list provided and no value provided at all
+        no_fetch:
+          type: bool
+          default: false
+        upgrade_strategy:
+          fields:
+            minimum_health_capacity:
+              default: 1
+            maximum_over_capacity:
+              default: 1
+        # Automatically prefix secrets names with service name
+        # This is a DC/OS Enterprise feature
+        secrets:
+          fields:
+            source:
+              default: '{{ secret.name }}'
+              transform:
+                prefix: '{{ VARS.SERVICE_NAME }}/'
+  metronome:
+    fields:
+      jobs:
+        # Build job ID from 'group' and 'name' below
+        id:
+          default: '{{ APP.group }}.{{ APP.name }}'
+        # Add custom 'group' and 'name' fields
+        name:
+          required: true
+        group:
+          required: true
+          default: '{{ VARS.SERVICE_NAME }}'
+        # Require job description
+        description:
+          required: true
+        # Use DOCKER_IMAGE var or build reasonable default
+        docker_image:
+          default: |-
+            {%- if VARS.DOCKER_IMAGE is defined -%}
+            {{ VARS.DOCKER_IMAGE }}
+            {%- else -%}
+            1234567890.dkr.ecr.us-east-1.amazonaws.com/{{ APP.group }}{{ ( ':' ~ VARS.IMAGE_TAG ) if VARS.IMAGE_TAG is defined else '' }}
+            {%- endif -%}
+        # Provide artifacts config for ECR auth with ecr-login
+        artifacts:
+          locked: true
+          default:
+            - uri: "{{ VARS.DOCKER_CREDENTIALS_URI }}"
+              extract: true
+              executable: false
+              cache: false
+              condition: VARS.DOCKER_CREDENTIALS_URI is defined
+        # Automatically label jobs with service name
+        labels:
+          default:
+            service_name: '{{ VARS.SERVICE_NAME }}'
+        # Automatically prefix secrets names with service name
+        # This is a DC/OS Enterprise feature
+        secrets:
+          fields:
+            source:
+              default: '{{ secret.name }}'
+              transform:
+                prefix: '{{ VARS.SERVICE_NAME }}/'
+  kongfig:
+    fields:
+      apps:
+        # The group/name fields are "dummy" fields to capture the values used for Marathon
+        group:
+          default: '{{ VARS.SERVICE_NAME }}'
+        name:
+        # API proxies for the app
+        proxies:
+          fields:
+            # Automatically prefix API name with service name to prevent conflicts
+            name:
+              transform:
+                prefix: '{{ VARS.SERVICE_NAME }}_'
+            # Default attributes to be merged with user-provided attributes
+            attributes:
+              default_action: merge
+              default:
+                strip_uri: true
+                preserve_host: true
+                upstream_url: "{{ VARS.LINKERD_URL }}"
+            # Extra parameter to support automatic redirection via https plugin below
+            redirect_https:
+              type: bool
+            # Extra parameter to allow overriding the target app
+            target_app:
+              default: "{{ VARS.KONG_TARGET_APP if VARS.KONG_TARGET_APP is defined else (APP.group ~ '/' ~ APP.name).split('/') | reverse | join('.') }}"
+            plugins:
+              default_action: prepend
+              default:
+                # Add header required for linkerd to route requests
+                - name: "request-transformer"
+                  attributes:
+                    config:
+                      remove:
+                        headers:
+                          - "X-Target-App"
+                      append:
+                        headers:
+                          # There's no space after the colon to match the previous behavior
+                          - "X-Target-App:{{ proxy.target_app }}"
+                - name: https
+                  condition: proxy.redirect_https
+                  attributes:
+                    config:
+                      redirect_to_https: true
