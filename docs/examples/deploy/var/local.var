@@ -1,0 +1,5 @@
+# Vars in this file are ones that are expected to be provided in the environment
+# when deploy-config-generator is run. This allows the tool to be run locally
+# when you expect certain vars to be provided by your CI pipeline
+SERVICE_NAME=example-service
+LINKERD_URL=LINKERD_URL

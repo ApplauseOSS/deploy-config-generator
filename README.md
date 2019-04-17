@@ -21,6 +21,12 @@ The below command will generate the required deployment config files for the spe
 $ deploy-config-generator path/to/service/repo
 ```
 
+You can specify the environment to generate configuration for.
+
+```bash
+$ deploy-config-generator path/to/service/repo -e stage
+```
+
 You can specify the output directory using the `--output-dir` option.
 
 ```bash
