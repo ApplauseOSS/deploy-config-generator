@@ -1,0 +1,4 @@
+---
+test:
+  dummy: True
+  some_field: deploy config 1

@@ -1,6 +1,7 @@
 from deploy_config_generator.display import Display
 from deploy_config_generator.errors import DeployConfigError
 from deploy_config_generator.utils import yaml_load
+from deploy_config_generator.template import Template
 
 
 class DeployConfig(object):
@@ -50,3 +51,31 @@ class DeployConfig(object):
         for section in self._data:
             if section not in valid_sections:
                 raise DeployConfigError("section name '%s' is not valid for available plugins" % section)
+
+    def apply_default_apps(self, default_apps):
+        # These annoying names are to prevent conflicts with fields in the default app definitions
+        PLACEMENT_KEY = 'default_placement'
+        CONDITION_KEY = 'default_condition'
+        for section in default_apps:
+            if section not in self._data:
+                self._data[section] = []
+            insert_idx = 0
+            for app in default_apps[section]:
+                placement = app.get(PLACEMENT_KEY, 'before')
+                if PLACEMENT_KEY in app:
+                    del app[PLACEMENT_KEY]
+                if CONDITION_KEY in app:
+                    condition = app[CONDITION_KEY]
+                    del app[CONDITION_KEY]
+                    template = Template()
+                    tmp_vars = dict(VARS=dict(self._vars))
+                    # Continue to next item if we have a condition and it evaluated to False
+                    if not template.evaluate_condition(condition, tmp_vars):
+                        continue
+                if placement in ('before', 'pre'):
+                    self._data[section].insert(insert_idx, app)
+                    insert_idx += 1
+                elif placement in ('after', 'post'):
+                    self._data[section].append(app)
+                else:
+                    raise DeployConfigError('invalid default app placement: %s' % placement)

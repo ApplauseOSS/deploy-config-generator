@@ -256,6 +256,7 @@ def main():
     DISPLAY.vvv()
 
     try:
+        deploy_config.apply_default_apps(SITE_CONFIG.default_apps)
         deploy_config.validate_sections(valid_sections)
     except DeployConfigError as e:
         DISPLAY.display('Error validating deploy config: %s' % str(e))
