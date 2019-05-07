@@ -1,0 +1,9 @@
+Dummy output plugin
+
+App config:
+
+{
+  "dummy": true,
+  "parent1": [],
+  "some_field": "before 1"
+}

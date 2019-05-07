@@ -97,6 +97,14 @@ def load_output_plugins(varset, output_dir, config_version):
     return plugins
 
 
+def apply_default_apps(config, section):
+    if 'default_pre' in SITE_CONFIG.get_config() and section in SITE_CONFIG.default_pre:
+        config = SITE_CONFIG.default_pre[section] + config
+    if 'default_post' in SITE_CONFIG.get_config() and section in SITE_CONFIG.default_post:
+        config = config + SITE_CONFIG.default_post[section]
+    return config
+
+
 def app_validate_fields(app, app_index, output_plugins):
     try:
         unmatched = {}
@@ -262,9 +270,11 @@ def main():
         sys.exit(1)
 
     for section in deploy_config.get_config():
+        section_config = deploy_config.get_config()[section]
+        section_config = apply_default_apps(section_config, section)
         for plugin in output_plugins:
             plugin.set_section(section)
-        for app_idx, app in enumerate(deploy_config.get_config()[section]):
+        for app_idx, app in enumerate(section_config):
             app_validate_fields(app, app_idx, output_plugins)
             app_render_output(app, app_idx, output_plugins)
 

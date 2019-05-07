@@ -33,6 +33,9 @@ class SiteConfig(with_metaclass(Singleton, object)):
         'plugin_dirs': [],
         # Plugin-specific options
         'plugins': {},
+        # Default apps
+        'default_pre': {},
+        'default_post': {},
     }
 
     def __init__(self):
@@ -91,6 +94,14 @@ class SiteConfig(with_metaclass(Singleton, object)):
                     if not entry.startswith('/'):
                         # Normalize path based on location of site config
                         data['plugin_dirs'][idx] = os.path.join(os.path.dirname(self._path), entry)
+            # Special case for default apps
+            for key in ('default_pre', 'default_post'):
+                if key in data:
+                    if not isinstance(data[key], dict):
+                        raise ConfigError('"%s" key expects a dict, got: %s' % (key, type(data[key])))
+                    for section, v in data[key].items():
+                        if not isinstance(v, list):
+                            raise ConfigError('"%s" key expects a dict with section names and a list of default apps' % key)
             self._config.update(data)
         except Exception as e:
             raise ConfigError(str(e))

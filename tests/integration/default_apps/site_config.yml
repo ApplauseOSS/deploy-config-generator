@@ -1,0 +1,22 @@
+---
+default_output: dummy
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        some_field:
+          type: str
+# Apps to add before those defined in the deploy config
+default_pre:
+  test:
+    - some_field: before 1
+      dummy: true
+# Apps to add after those defined in the deploy config
+default_post:
+  test:
+    - some_field: after 1
+      dummy: true
+    - some_field: after 2
+      dummy: true
