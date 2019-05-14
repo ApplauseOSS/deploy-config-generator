@@ -68,8 +68,10 @@ class OutputPluginBase(object):
                                 self._fields[section][field_name] = PluginField(field_name, field, self._config_version)
                 else:
                     if k in self._plugin_config:
-                        if isinstance(v, (list, dict)):
+                        if isinstance(v, dict):
                             self._plugin_config[k] = v.copy()
+                        elif isinstance(v, list):
+                            self._plugin_config[k] = v[:]
                         else:
                             self._plugin_config[k] = v
                     else:
