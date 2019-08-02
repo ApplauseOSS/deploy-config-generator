@@ -229,6 +229,23 @@ class OutputPlugin(OutputPluginBase):
                 'docker_network': dict(
                     default='BRIDGE',
                 ),
+                'networks': dict(
+                    type='list',
+                    description='List of networks. This param overrides the "docker_network" param',
+                    subtype='dict',
+                    fields=dict(
+                        name=dict(
+                            type='str',
+                        ),
+                        mode=dict(
+                            type='str',
+                            required=True,
+                        ),
+                        labels=dict(
+                            type='dict',
+                        ),
+                    ),
+                ),
                 'docker_privileged': dict(
                     type='bool',
                     default=False,
@@ -311,7 +328,6 @@ class OutputPlugin(OutputPluginBase):
                 # TODO: make various attributes configurable
                 "docker": {
                     "image": app_vars['APP']['image'],
-                    "network": app_vars['APP']['docker_network'],
                     "privileged": app_vars['APP']['docker_privileged'],
                     "parameters": app_vars['APP']['docker_parameters'],
                     "forcePullImage": True
@@ -326,6 +342,8 @@ class OutputPlugin(OutputPluginBase):
         self.build_port_definitions(app_vars, data)
         # Container labels
         self.build_container_labels(app_vars, data)
+        # Networks
+        self.build_networks(app_vars, data)
         # Volumes
         self.build_volumes(app_vars, data)
         # Environment
@@ -373,6 +391,25 @@ class OutputPlugin(OutputPluginBase):
                     secrets[secret['name']] = tmp_secret
             if secrets:
                 data['secrets'] = secrets
+
+    def build_networks(self, app_vars, data):
+        networks = []
+        # The 'networks' param overrides the 'docker_network' param, so look for it first
+        if app_vars['APP']['networks']:
+            for net in app_vars['APP']['networks']:
+                networks.append(net)
+        else:
+            # Translate 'docker_network' value to new-style network
+            tmp_network = {}
+            if app_vars['APP']['docker_network'].lower() == 'bridge':
+                tmp_network['mode'] = 'container/bridge'
+            elif app_vars['APP']['docker_network'].lower() == 'host':
+                tmp_network['mode'] = 'host'
+            else:
+                # TODO: do something meaningful for unknown network mode
+                pass
+            networks.append(tmp_network)
+        data['networks'] = networks
 
     def build_volumes(self, app_vars, data):
         if app_vars['APP']['volumes']:

@@ -7,7 +7,6 @@
     "docker": {
       "forcePullImage": true,
       "image": "1234567890.dkr.ecr.us-east-1.amazonaws.com/some_service",
-      "network": "BRIDGE",
       "parameters": [],
       "privileged": false
     },
@@ -23,5 +22,10 @@
     "extra": "not to\n be trimmed\n",
     "foo": "bar"
   },
-  "mem": 1024.0
+  "mem": 1024.0,
+  "networks": [
+    {
+      "mode": "container/bridge"
+    }
+  ]
 }

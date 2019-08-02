@@ -3,7 +3,6 @@
     "docker": {
       "forcePullImage": true,
       "image": "foo/bar",
-      "network": "BRIDGE",
       "parameters": [],
       "privileged": false
     },
@@ -14,5 +13,10 @@
   "disk": 10,
   "id": "some/service",
   "instances": 1,
-  "mem": 1024.0
+  "mem": 1024.0,
+  "networks": [
+    {
+      "mode": "container/bridge"
+    }
+  ]
 }
