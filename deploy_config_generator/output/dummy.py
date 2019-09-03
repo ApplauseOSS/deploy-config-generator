@@ -33,7 +33,6 @@ class OutputPlugin(OutputPluginBase):
                     },
                 },
                 'dummy': {
-                    'default': False,
                     'type': 'bool',
                     'description': 'Dummy field',
                     'required': True,

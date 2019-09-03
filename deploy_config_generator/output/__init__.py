@@ -24,6 +24,7 @@ class OutputPluginBase(object):
     _config_version = None
 
     DEFAULT_CONFIG = {}
+    PRIORITY = 1
 
     def __init__(self, varset, output_dir, config_version):
         self._vars = varset
@@ -33,6 +34,26 @@ class OutputPluginBase(object):
         self._site_config = SiteConfig()
         self._config_version = config_version
         self.build_config()
+
+    # Comparison functions for sorting plugins
+    # Sort first by priority and then by name (for consistency)
+    def __lt__(self, other):
+        return (self.PRIORITY < other.PRIORITY or (self.PRIORITY == other.PRIORITY and self.NAME < other.NAME))
+
+    def __gt__(self, other):
+        return (self.PRIORITY > other.PRIORITY or (self.PRIORITY == other.PRIORITY and self.NAME > other.NAME))
+
+    def __le__(self, other):
+        return (self.PRIORITY <= other.PRIORITY or (self.PRIORITY == other.PRIORITY and self.NAME <= other.NAME))
+
+    def __ge__(self, other):
+        return (self.PRIORITY >= other.PRIORITY or (self.PRIORITY == other.PRIORITY and self.NAME >= other.NAME))
+
+    def __eq__(self, other):
+        return (self.PRIORITY == other.PRIORITY or (self.PRIORITY == other.PRIORITY and self.NAME == other.NAME))
+
+    def __ne__(self, other):
+        return (self.PRIORITY != other.PRIORITY or (self.PRIORITY == other.PRIORITY and self.NAME != other.NAME))
 
     def build_config(self):
         '''
@@ -166,27 +187,34 @@ class OutputPluginBase(object):
                 unmatched.append(field)
         return unmatched
 
-    def generate(self, app, index):
+    def generate(self, config):
         '''
         Write out the generated config to disk
         '''
         try:
-            path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
-            # Build vars for template
-            app_vars = {
-                'PLUGIN_NAME': self.NAME,
-                'APP_INDEX': index,
-                'OUTPUT_FILE': os.path.basename(path),
-                'OUTPUT_PATH': path,
-                # App config
-                'APP': self.merge_with_field_defaults(app),
-                # Parsed vars
-                'VARS': dict(self._vars),
-            }
-            output = self.generate_output(app_vars)
-            self._display.v('Writing output file %s' % path)
-            with open(path, 'w') as f:
-                f.write(output)
+            for section in config:
+                if section in self._fields:
+                    self.set_section(section)
+                    for idx, app in enumerate(config[section]):
+                        # We want a 1-based index for the output files
+                        index = idx + 1
+                        if self.is_needed(app):
+                            path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
+                            # Build vars for template
+                            app_vars = {
+                                'PLUGIN_NAME': self.NAME,
+                                'APP_INDEX': index,
+                                'OUTPUT_FILE': os.path.basename(path),
+                                'OUTPUT_PATH': path,
+                                # App config
+                                'APP': self.merge_with_field_defaults(app),
+                                # Parsed vars
+                                'VARS': dict(self._vars),
+                            }
+                            output = self.generate_output(app_vars)
+                            self._display.v('Writing output file %s' % path)
+                            with open(path, 'w') as f:
+                                f.write(output)
         except Exception as e:
             show_traceback(self._display.get_verbosity())
             raise DeployConfigGenerationError(str(e))

@@ -1,0 +1,9 @@
+---
+plugin_dirs: plugins
+plugins:
+  dummy:
+    enabled: true
+    fields:
+      test:
+        # Create field for the 'dummy2' plugin to populate
+        var_from_dummy2:

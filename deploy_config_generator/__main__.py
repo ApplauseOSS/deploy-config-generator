@@ -94,7 +94,9 @@ def load_output_plugins(varset, output_dir, config_version):
                 DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
                 sys.exit(1)
         sys.path.pop(0)
-    return plugins
+    # Return list of plugins sorted by priority (highest to lowest) and name (Z-A, because
+    # we reverse the sort)
+    return sorted(plugins, reverse=True)
 
 
 def app_validate_fields(app, app_index, output_plugins):
@@ -136,16 +138,6 @@ def app_validate_fields(app, app_index, output_plugins):
             raise DeployConfigError('no output plugins were available for provided fields')
     except DeployConfigError as e:
         DISPLAY.display('Failed to validate fields in deploy config: %s' % str(e))
-        sys.exit(1)
-
-
-def app_render_output(app, app_index, output_plugins):
-    try:
-        for plugin in output_plugins:
-            if plugin.is_needed(app):
-                plugin.generate(app, app_index + 1)
-    except DeployConfigGenerationError as e:
-        DISPLAY.display('Failed to generate deploy config: %s' % str(e))
         sys.exit(1)
 
 
@@ -262,12 +254,22 @@ def main():
         DISPLAY.display('Error validating deploy config: %s' % str(e))
         sys.exit(1)
 
+    # TODO: do validation before running each plugin so that it doesn't complain about
+    # values populated by wrapper plugins. This is not straightforward, since it breaks
+    # the existing code that reports on unknown fields
     for section in deploy_config.get_config():
         for plugin in output_plugins:
             plugin.set_section(section)
         for app_idx, app in enumerate(deploy_config.get_config()[section]):
             app_validate_fields(app, app_idx, output_plugins)
-            app_render_output(app, app_idx, output_plugins)
+
+    try:
+        for plugin in output_plugins:
+            DISPLAY.vvv('Generating output using %s plugin' % plugin.NAME)
+            plugin.generate(deploy_config.get_config())
+    except DeployConfigGenerationError as e:
+        DISPLAY.display('Failed to generate deploy config: %s' % str(e))
+        sys.exit(1)
 
 
 if __name__ == '__main__':
