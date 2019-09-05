@@ -5,6 +5,8 @@ plugins:
     enabled: true
     fields:
       test:
+        dummy:
+          default: false
         parent1:
           required: true
           fields:

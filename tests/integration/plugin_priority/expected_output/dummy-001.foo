@@ -1,0 +1,9 @@
+Dummy output plugin
+
+App config:
+
+{
+  "dummy": true,
+  "parent1": [],
+  "var_from_dummy2": "foo"
+}
