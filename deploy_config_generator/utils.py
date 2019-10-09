@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import json
+import re
 import traceback
 import yaml
 
@@ -81,7 +82,7 @@ def show_traceback(verbosity=0):
 
 
 def yaml_dump(value, **kwargs):
-    return yaml.safe_dump(value, **kwargs)
+    return yaml.safe_dump(value, default_flow_style=False, **kwargs)
 
 
 def yaml_load(value, **kwargs):
@@ -107,3 +108,16 @@ def dict_merge(dict_to, dict_from, depth=None):
         else:
             dict_to[k] = dict_from[k]
     return dict_to
+
+
+def underscore_to_camelcase(value):
+    '''
+    Convert field name with underscores to camel case
+
+    This converts 'foo_bar_baz' (the standard for this app) to
+    'fooBarBaz' (the standard for Marathon and Kubernetes)
+    '''
+    def replacer(match):
+        # Grab the last character of the match and upper-case it
+        return match.group(0)[-1].upper()
+    return re.sub(r'_[a-z]', replacer, value)

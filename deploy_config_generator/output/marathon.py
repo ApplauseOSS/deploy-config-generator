@@ -1,6 +1,4 @@
-import re
-
-from deploy_config_generator.utils import json_dump
+from deploy_config_generator.utils import json_dump, underscore_to_camelcase
 from deploy_config_generator.output import OutputPluginBase
 
 
@@ -301,18 +299,6 @@ class OutputPlugin(OutputPluginBase):
         }
     }
 
-    def underscore_to_camelcase(self, value):
-        '''
-        Convert field name with underscores to camel case
-
-        This converts 'foo_bar_baz' (the standard for this app) to
-        'fooBarBaz' (the standard for Marathon)
-        '''
-        def replacer(match):
-            # Grab the last character of the match and upper-case it
-            return match.group(0)[-1].upper()
-        return re.sub(r'_[a-z]', replacer, value)
-
     def generate_output(self, app_vars):
         # Basic structure
         data = {
@@ -361,7 +347,7 @@ class OutputPlugin(OutputPluginBase):
         # Misc attributes
         for field in ('labels', 'args', 'cmd', 'accepted_resource_roles'):
             if app_vars['APP'][field]:
-                data[self.underscore_to_camelcase(field)] = app_vars['APP'][field]
+                data[underscore_to_camelcase(field)] = app_vars['APP'][field]
 
         output = json_dump(self._template.render_template(data, app_vars))
         return output
@@ -418,12 +404,12 @@ class OutputPlugin(OutputPluginBase):
                 tmp_volume = {}
                 for field in ('container_path', 'host_path', 'mode'):
                     if volume[field] is not None:
-                        tmp_volume[self.underscore_to_camelcase(field)] = volume[field]
+                        tmp_volume[underscore_to_camelcase(field)] = volume[field]
                 if volume['persistent']:
                     tmp_persistent = {}
                     for field in ('type', 'size', 'profile_name', 'max_size'):
                         if volume['persistent'][field] is not None:
-                            tmp_persistent[self.underscore_to_camelcase(field)] = volume['persistent'][field]
+                            tmp_persistent[underscore_to_camelcase(field)] = volume['persistent'][field]
                     if volume['persistent']['constraints']:
                         tmp_persistent['constraints'] = volume['persistent']['constraints']
                     if tmp_persistent:
@@ -441,7 +427,7 @@ class OutputPlugin(OutputPluginBase):
             }
             for field in ('container_port', 'host_port', 'service_port'):
                 if port[field] is not None:
-                    tmp_port[self.underscore_to_camelcase(field)] = int(port[field])
+                    tmp_port[underscore_to_camelcase(field)] = int(port[field])
             # Port labels
             port_labels = {}
             for label_index, label in enumerate(port['labels']):
@@ -466,7 +452,7 @@ class OutputPlugin(OutputPluginBase):
             }
             for field in ('name', 'protocol'):
                 if port[field] is not None:
-                    tmp_port[self.underscore_to_camelcase(field)] = port[field]
+                    tmp_port[underscore_to_camelcase(field)] = port[field]
             # Port labels
             port_labels = {}
             for label_index, label in enumerate(port['labels']):
@@ -506,7 +492,7 @@ class OutputPlugin(OutputPluginBase):
             for field in ('grace_period_seconds', 'interval_seconds', 'timeout_seconds', 'delay_seconds',
                           'max_consecutive_failures', 'path', 'port_index', 'port', 'protocol'):
                 if check[field] is not None:
-                    tmp_check[self.underscore_to_camelcase(field)] = check[field]
+                    tmp_check[underscore_to_camelcase(field)] = check[field]
             if check['command'] is not None:
                 tmp_check.update(dict(
                     protocol='COMMAND',
@@ -525,7 +511,7 @@ class OutputPlugin(OutputPluginBase):
         app_vars_section = app_vars['APP']['upgrade_strategy']
         for field in ('minimum_health_capacity', 'maximum_over_capacity'):
             if app_vars_section[field] is not None:
-                strategy[self.underscore_to_camelcase(field)] = float(app_vars_section[field])
+                strategy[underscore_to_camelcase(field)] = float(app_vars_section[field])
         if strategy:
             data['upgradeStrategy'] = strategy
 
@@ -534,6 +520,6 @@ class OutputPlugin(OutputPluginBase):
         app_vars_section = app_vars['APP']['unreachable_strategy']
         for field in ('inactive_after_seconds', 'expunge_after_seconds'):
             if app_vars_section[field] is not None:
-                strategy[self.underscore_to_camelcase(field)] = int(app_vars_section[field])
+                strategy[underscore_to_camelcase(field)] = int(app_vars_section[field])
         if strategy:
             data['unreachableStrategy'] = strategy

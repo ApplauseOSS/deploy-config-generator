@@ -218,7 +218,7 @@ def main():
     DISPLAY.vvvv()
     DISPLAY.vvvv('Vars:')
     DISPLAY.vvvv()
-    DISPLAY.vvvv(yaml_dump(dict(varset), default_flow_style=False, indent=2))
+    DISPLAY.vvvv(yaml_dump(dict(varset), indent=2))
 
     try:
         deploy_config = DeployConfig(os.path.join(deploy_dir, SITE_CONFIG.deploy_config_file), varset)
@@ -234,7 +234,7 @@ def main():
 
     DISPLAY.vvvv('Deploy config:')
     DISPLAY.vvvv()
-    DISPLAY.vvvv(yaml_dump(deploy_config.get_config(), default_flow_style=False, indent=2))
+    DISPLAY.vvvv(yaml_dump(deploy_config.get_config(), indent=2))
 
     deploy_config_version = deploy_config.get_version() or SITE_CONFIG.default_config_version
     output_plugins = load_output_plugins(varset, args.output_dir, deploy_config_version)
