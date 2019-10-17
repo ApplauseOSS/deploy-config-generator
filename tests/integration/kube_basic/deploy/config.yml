@@ -2,6 +2,7 @@
 kube_deployments:
   - metadata:
       name: nginx-deployment
+      namespace: nginx
       labels:
         app: nginx
     spec:
@@ -22,6 +23,7 @@ kube_deployments:
 kube_services:
   - metadata:
       name: nginx-service
+      namespace: nginx
       labels:
         app: nginx
     spec:
@@ -32,3 +34,6 @@ kube_services:
           protocol: TCP
           port: 80
           target_port: 80
+kube_namespaces:
+  - metadata:
+      name: nginx
