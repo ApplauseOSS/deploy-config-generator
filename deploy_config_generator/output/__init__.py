@@ -1,3 +1,4 @@
+import copy
 import inspect
 import os.path
 import six
@@ -61,7 +62,7 @@ class OutputPluginBase(object):
         '''
         self._plugin_config = self.DEFAULT_CONFIG.copy()
         # Helper var to tidy up the code
-        self._fields = self._plugin_config['fields']
+        self._fields = copy.deepcopy(self._plugin_config['fields'])
         # Convert field definitions into PluginField objects
         for section in self._fields:
             section_fields = self._fields[section]
