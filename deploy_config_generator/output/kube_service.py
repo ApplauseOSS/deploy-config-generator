@@ -8,7 +8,7 @@ class OutputPlugin(kube_common.OutputPlugin):
 
     NAME = 'kube_service'
     DESCR = 'Kubernetes service output plugin'
-    FILE_EXT = '.yml'
+    FILE_EXT = '.yaml'
 
     DEFAULT_CONFIG = {
         'fields': {

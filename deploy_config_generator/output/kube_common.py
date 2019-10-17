@@ -297,7 +297,7 @@ class OutputPlugin(OutputPluginBase):
 
     def build_metadata(self, tmp_vars):
         tmp_metadata = {}
-        for field in ('name', 'labels'):
+        for field in ('annotations', 'labels', 'name', 'namespace'):
             if tmp_vars[field] is not None:
                 tmp_metadata[underscore_to_camelcase(field)] = tmp_vars[field]
         return tmp_metadata
