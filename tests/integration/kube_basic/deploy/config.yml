@@ -19,3 +19,16 @@ kube_deployments:
             image: nginx:1.7.9
             ports:
             - container_port: 80
+kube_services:
+  - metadata:
+      name: nginx-service
+      labels:
+        app: nginx
+    spec:
+      selector:
+        app: nginx
+      ports:
+        - name: http
+          protocol: TCP
+          port: 80
+          target_port: 80
