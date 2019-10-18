@@ -37,3 +37,10 @@ kube_services:
 kube_namespaces:
   - metadata:
       name: nginx
+kube_secrets:
+  - metadata:
+      name: nginx-secrets
+    type: Opaque
+    data:
+      key1: some value
+      key2: another value
