@@ -44,3 +44,34 @@ kube_secrets:
     data:
       key1: some value
       key2: another value
+kube_jobs:
+  - metadata:
+      name: job1
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+          restart_policy: OnFailure
+kube_cronjobs:
+  - metadata:
+      name: cronjob1
+    spec:
+      schedule: '*/5 * * * *'
+      job_template:
+        spec:
+          template:
+            spec:
+              containers:
+              - name: hello
+                image: busybox
+                args:
+                - /bin/sh
+                - -c
+                - date; echo Hello from the Kubernetes cluster
+              restart_policy: OnFailure

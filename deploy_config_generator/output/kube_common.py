@@ -248,6 +248,36 @@ POD_TEMPLATE_FIELD_SPEC = dict(
     ),
 )
 
+JOB_SPEC_FIELD_SPEC = dict(
+    active_deadline_seconds=dict(
+        type='int',
+    ),
+    backoff_limit=dict(
+        type='int',
+    ),
+    completions=dict(
+        type='int',
+    ),
+    manual_selector=dict(
+        type='bool',
+    ),
+    parallelism=dict(
+        type='int',
+    ),
+    selector=dict(
+        type='dict',
+        fields=copy.deepcopy(SELECTOR_FIELD_SPEC),
+    ),
+    template=dict(
+        type='dict',
+        required=True,
+        fields=copy.deepcopy(POD_TEMPLATE_FIELD_SPEC),
+    ),
+    ttl_seconds_after_finished=dict(
+        type='int',
+    ),
+)
+
 
 class OutputPlugin(OutputPluginBase):
 

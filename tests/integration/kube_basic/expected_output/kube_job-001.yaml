@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job1
+spec:
+  template:
+    spec:
+      containers:
+      - args:
+        - /bin/sh
+        - -c
+        - date; echo Hello from the Kubernetes cluster
+        image: busybox
+        name: hello
+      restartPolicy: OnFailure

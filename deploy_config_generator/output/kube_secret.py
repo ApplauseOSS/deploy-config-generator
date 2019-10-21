@@ -25,6 +25,7 @@ class OutputPlugin(kube_common.OutputPlugin):
                 ),
                 data=dict(
                     type='dict',
+                    description='Values will be automatically base64-encoded as expected by the Kubernetes API',
                 ),
                 string_data=dict(
                     type='dict',

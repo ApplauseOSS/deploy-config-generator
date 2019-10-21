@@ -12,7 +12,7 @@ Dummy output plugin for testing
 
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
-`dummy`|`bool`|yes|`False`|Dummy field
+`dummy`|`bool`|yes||Dummy field
 `parent1`|`list` (of `dict`)|no||Used for tests
 `parent1 . child2_1`||no||
 `parent1 . child2_2`||no||

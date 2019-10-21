@@ -47,6 +47,10 @@ Name | Type | Required | Default | Description
 `instances`|`int`|no|`1`|
 `labels`|`dict`|no||
 `mem`|`float`|yes||
+`networks`|`list` (of `dict`)|no||List of networks. This param overrides the "docker_network" param
+`networks . labels`|`dict`|no||
+`networks . mode`|`str`|yes||
+`networks . name`|`str`|no||
 `port_definitions`|`list` (of `dict`)|no||List of port definitions (for HOST networking mode)
 `port_definitions . labels`|`list` (of `dict`)|no||List of label name/value pairs to apply to port
 `port_definitions . labels . condition`||no||Condition to evaluate before applying label. The vars `port` (current port definition) and `port_index` (index of current port definition in list) are available
