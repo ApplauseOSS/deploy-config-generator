@@ -55,11 +55,37 @@ Name | Type | Required | Default | Description
 `spec . job_template . spec . template . spec . containers . env . name`|`str`|yes||
 `spec . job_template . spec . template . spec . containers . env . value`|`str`|no||
 `spec . job_template . spec . template . spec . containers . env . value_from`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . config_map_key_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . config_map_key_ref . key`|`str`|yes||
+`spec . job_template . spec . template . spec . containers . env . value_from . config_map_key_ref . name`|`str`|yes||
+`spec . job_template . spec . template . spec . containers . env . value_from . config_map_key_ref . optional`|`bool`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . field_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . field_ref . api_version`|`str`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . field_ref . field_path`|`str`|yes||
+`spec . job_template . spec . template . spec . containers . env . value_from . resource_field_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . resource_field_ref . container_name`|`str`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . resource_field_ref . divisor`||no||
+`spec . job_template . spec . template . spec . containers . env . value_from . resource_field_ref . resource`|`str`|yes||
+`spec . job_template . spec . template . spec . containers . env . value_from . secret_key_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . env . value_from . secret_key_ref . key`|`str`|yes||
+`spec . job_template . spec . template . spec . containers . env . value_from . secret_key_ref . name`|`str`|yes||
+`spec . job_template . spec . template . spec . containers . env . value_from . secret_key_ref . optional`|`bool`|no||
 `spec . job_template . spec . template . spec . containers . env_from`|`list` (of `dict`)|no||
 `spec . job_template . spec . template . spec . containers . image`|`str`|no||
 `spec . job_template . spec . template . spec . containers . image_pull_policy`|`str`|no||
 `spec . job_template . spec . template . spec . containers . lifecycle`|`dict`|no||
 `spec . job_template . spec . template . spec . containers . liveness_probe`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . exec`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . exec . command`|`list` (of `str`)|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . failure_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . http_get`||no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . initial_delay_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . period_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . success_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . tcp_socket`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . tcp_socket . host`|`str`|no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . tcp_socket . port`||no||
+`spec . job_template . spec . template . spec . containers . liveness_probe . timeout_seconds`|`int`|no||
 `spec . job_template . spec . template . spec . containers . name`|`str`|no||
 `spec . job_template . spec . template . spec . containers . ports`|`list` (of `dict`)|no||
 `spec . job_template . spec . template . spec . containers . ports . container_port`|`int`|no||
@@ -68,6 +94,17 @@ Name | Type | Required | Default | Description
 `spec . job_template . spec . template . spec . containers . ports . name`|`str`|no||
 `spec . job_template . spec . template . spec . containers . ports . protocol`|`str`|no||
 `spec . job_template . spec . template . spec . containers . readiness_probe`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . exec`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . exec . command`|`list` (of `str`)|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . failure_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . http_get`||no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . initial_delay_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . period_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . success_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . tcp_socket`|`dict`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . tcp_socket . host`|`str`|no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . tcp_socket . port`||no||
+`spec . job_template . spec . template . spec . containers . readiness_probe . timeout_seconds`|`int`|no||
 `spec . job_template . spec . template . spec . containers . resources`|`dict`|no||
 `spec . job_template . spec . template . spec . containers . security_context`|`dict`|no||
 `spec . job_template . spec . template . spec . containers . stdin`|`bool`|no||
@@ -93,11 +130,37 @@ Name | Type | Required | Default | Description
 `spec . job_template . spec . template . spec . init_containers . env . name`|`str`|yes||
 `spec . job_template . spec . template . spec . init_containers . env . value`|`str`|no||
 `spec . job_template . spec . template . spec . init_containers . env . value_from`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . config_map_key_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . config_map_key_ref . key`|`str`|yes||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . config_map_key_ref . name`|`str`|yes||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . config_map_key_ref . optional`|`bool`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . field_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . field_ref . api_version`|`str`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . field_ref . field_path`|`str`|yes||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . resource_field_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . resource_field_ref . container_name`|`str`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . resource_field_ref . divisor`||no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . resource_field_ref . resource`|`str`|yes||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . secret_key_ref`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . secret_key_ref . key`|`str`|yes||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . secret_key_ref . name`|`str`|yes||
+`spec . job_template . spec . template . spec . init_containers . env . value_from . secret_key_ref . optional`|`bool`|no||
 `spec . job_template . spec . template . spec . init_containers . env_from`|`list` (of `dict`)|no||
 `spec . job_template . spec . template . spec . init_containers . image`|`str`|no||
 `spec . job_template . spec . template . spec . init_containers . image_pull_policy`|`str`|no||
 `spec . job_template . spec . template . spec . init_containers . lifecycle`|`dict`|no||
 `spec . job_template . spec . template . spec . init_containers . liveness_probe`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . exec`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . exec . command`|`list` (of `str`)|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . failure_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . http_get`||no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . initial_delay_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . period_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . success_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . tcp_socket`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . tcp_socket . host`|`str`|no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . tcp_socket . port`||no||
+`spec . job_template . spec . template . spec . init_containers . liveness_probe . timeout_seconds`|`int`|no||
 `spec . job_template . spec . template . spec . init_containers . name`|`str`|no||
 `spec . job_template . spec . template . spec . init_containers . ports`|`list` (of `dict`)|no||
 `spec . job_template . spec . template . spec . init_containers . ports . container_port`|`int`|no||
@@ -106,6 +169,17 @@ Name | Type | Required | Default | Description
 `spec . job_template . spec . template . spec . init_containers . ports . name`|`str`|no||
 `spec . job_template . spec . template . spec . init_containers . ports . protocol`|`str`|no||
 `spec . job_template . spec . template . spec . init_containers . readiness_probe`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . exec`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . exec . command`|`list` (of `str`)|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . failure_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . http_get`||no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . initial_delay_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . period_seconds`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . success_threshold`|`int`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . tcp_socket`|`dict`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . tcp_socket . host`|`str`|no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . tcp_socket . port`||no||
+`spec . job_template . spec . template . spec . init_containers . readiness_probe . timeout_seconds`|`int`|no||
 `spec . job_template . spec . template . spec . init_containers . resources`|`dict`|no||
 `spec . job_template . spec . template . spec . init_containers . security_context`|`dict`|no||
 `spec . job_template . spec . template . spec . init_containers . stdin`|`bool`|no||

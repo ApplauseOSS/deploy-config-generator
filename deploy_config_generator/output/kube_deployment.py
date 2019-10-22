@@ -58,7 +58,6 @@ class OutputPlugin(kube_common.OutputPlugin):
                                 ),
                                 type=dict(
                                     type='str',
-                                    required=True,
                                 ),
                             ),
                         ),
@@ -108,7 +107,7 @@ class OutputPlugin(kube_common.OutputPlugin):
             tmp_strategy['type'] = app_vars['APP']['spec']['strategy']['type']
         if app_vars['APP']['spec']['strategy']['rolling_update']:
             tmp_rolling_update = dict()
-            for field in ('max_surge', 'max_available'):
+            for field in ('max_surge', 'max_unavailable'):
                 if app_vars['APP']['spec']['strategy']['rolling_update'].get(field, None) is not None:
                     tmp_rolling_update[underscore_to_camelcase(field)] = app_vars['APP']['spec']['strategy']['rolling_update'][field]
             if tmp_rolling_update:
