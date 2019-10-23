@@ -44,6 +44,71 @@ SELECTOR_FIELD_SPEC = dict(
     ),
 )
 
+# We use the { ... } syntax for this dict because 'exec' can't be used as a bareword in py27
+PROBE_FIELD_SPEC = {
+    'exec': dict(
+        type='dict',
+        fields=dict(
+            command=dict(
+                type='list',
+                subtype='str',
+            ),
+        ),
+    ),
+    'failure_threshold': dict(
+        type='int',
+    ),
+    'http_get': dict(
+        host=dict(
+            type='str',
+        ),
+        http_headers=dict(
+            type='list',
+            subtype='dict',
+            fields=dict(
+                name=dict(
+                    type='str',
+                ),
+                value=dict(
+                    type='str',
+                ),
+            ),
+        ),
+        path=dict(
+            type='str',
+        ),
+        port=dict(
+            # This can be either int or str, so we don't set a type
+        ),
+        scheme=dict(
+            type='str',
+        ),
+    ),
+    'initial_delay_seconds': dict(
+        type='int',
+    ),
+    'period_seconds': dict(
+        type='int',
+    ),
+    'success_threshold': dict(
+        type='int',
+    ),
+    'tcp_socket': dict(
+        type='dict',
+        fields=dict(
+            host=dict(
+                type='str',
+            ),
+            port=dict(
+                # This can be either int or str, so we don't set a type
+            ),
+        ),
+    ),
+    'timeout_seconds': dict(
+        type='int',
+    ),
+}
+
 CONTAINER_FIELD_SPEC = dict(
     args=dict(
         type='list',
@@ -66,6 +131,67 @@ CONTAINER_FIELD_SPEC = dict(
             ),
             value_from=dict(
                 type='dict',
+                fields=dict(
+                    config_map_key_ref=dict(
+                        type='dict',
+                        fields=dict(
+                            key=dict(
+                                type='str',
+                                required=True,
+                            ),
+                            name=dict(
+                                type='str',
+                                required=True,
+                            ),
+                            optional=dict(
+                                type='bool',
+                            ),
+                        ),
+                    ),
+                    field_ref=dict(
+                        type='dict',
+                        fields=dict(
+                            api_version=dict(
+                                type='str',
+                            ),
+                            field_path=dict(
+                                type='str',
+                                required=True,
+                            ),
+                        ),
+                    ),
+                    resource_field_ref=dict(
+                        type='dict',
+                        fields=dict(
+                            container_name=dict(
+                                type='str',
+                            ),
+                            divisor=dict(
+                                # This field can have multiple types (int or str), so we set none
+                            ),
+                            resource=dict(
+                                type='str',
+                                required=True,
+                            ),
+                        ),
+                    ),
+                    secret_key_ref=dict(
+                        type='dict',
+                        fields=dict(
+                            key=dict(
+                                type='str',
+                                required=True,
+                            ),
+                            name=dict(
+                                type='str',
+                                required=True,
+                            ),
+                            optional=dict(
+                                type='bool',
+                            ),
+                        ),
+                    ),
+                ),
             ),
         ),
     ),
@@ -84,6 +210,7 @@ CONTAINER_FIELD_SPEC = dict(
     ),
     liveness_probe=dict(
         type='dict',
+        fields=copy.deepcopy(PROBE_FIELD_SPEC),
     ),
     name=dict(
         type='str',
@@ -111,6 +238,7 @@ CONTAINER_FIELD_SPEC = dict(
     ),
     readiness_probe=dict(
         type='dict',
+        fields=copy.deepcopy(PROBE_FIELD_SPEC),
     ),
     resources=dict(
         type='dict',
