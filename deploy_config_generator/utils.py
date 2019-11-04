@@ -121,3 +121,15 @@ def underscore_to_camelcase(value):
         # Grab the last character of the match and upper-case it
         return match.group(0)[-1].upper()
     return re.sub(r'_[a-z]', replacer, value)
+
+
+# Override boolean definition for YAML dumper to properly quote Y/N values
+# This is needed because PyYAML doesn't consider Y/N as boolean values (which
+# deviates from the YAML spec), so it doesn't quote them when dumping, but
+# kubectl does consider them boolean values, so it misinterprets YAML generated
+# by this tool with those string values as being boolean values
+yaml.resolver.Resolver.add_implicit_resolver(
+    u'tag:yaml.org,2002:bool',
+    re.compile(r'^(?:y|Y|n|N|yes|Yes|YES|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)$', re.X),
+    list(u'yYnNtTfFoO')
+)
