@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+  name: nginx-deployment
+  namespace: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - env:
+        - name: test1
+          value: 'yes'
+        - name: test2
+          value: 'on'
+        - name: test3
+          value: 'Y'
+        - name: test4
+          value: 'no'
+        - name: test5
+          value: 'off'
+        - name: test6
+          value: 'N'
+        image: nginx:1.7.9
+        name: nginx
+        ports:
+        - containerPort: 80

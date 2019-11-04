@@ -1,0 +1,35 @@
+---
+kube_deployments:
+  - metadata:
+      name: nginx-deployment
+      namespace: nginx
+      labels:
+        app: nginx
+    spec:
+      replicas: 3
+      selector:
+        match_labels:
+          app: nginx
+      template:
+        metadata:
+          labels:
+            app: nginx
+        spec:
+          containers:
+          - name: nginx
+            image: nginx:1.7.9
+            ports:
+            - container_port: 80
+            env:
+            - name: test1
+              value: 'yes'
+            - name: test2
+              value: 'on'
+            - name: test3
+              value: 'Y'
+            - name: test4
+              value: 'no'
+            - name: test5
+              value: 'off'
+            - name: test6
+              value: 'N'
