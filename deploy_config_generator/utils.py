@@ -120,7 +120,7 @@ def underscore_to_camelcase(value):
     def replacer(match):
         # Grab the last character of the match and upper-case it
         return match.group(0)[-1].upper()
-    return re.sub(r'_[a-z]', replacer, value)
+    return re.sub(r'_[a-zA-Z]', replacer, value)
 
 
 # Override boolean definition for YAML dumper to properly quote Y/N values
