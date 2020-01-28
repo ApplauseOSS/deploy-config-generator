@@ -44,45 +44,61 @@ SELECTOR_FIELD_SPEC = dict(
     ),
 )
 
+EXEC_ACTION_FIELD_SPEC = dict(
+    command=dict(
+        type='list',
+        subtype='str',
+    ),
+)
+
+HTTP_GET_ACTION_FIELD_SPEC = dict(
+    host=dict(
+        type='str',
+    ),
+    http_headers=dict(
+        type='list',
+        subtype='dict',
+        fields=dict(
+            name=dict(
+                type='str',
+            ),
+            value=dict(
+                type='str',
+            ),
+        ),
+    ),
+    path=dict(
+        type='str',
+    ),
+    port=dict(
+        # This can be either int or str, so we don't set a type
+    ),
+    scheme=dict(
+        type='str',
+    ),
+)
+
+TCP_SOCKET_ACTION_FIELD_SPEC = dict(
+    host=dict(
+        type='str',
+    ),
+    port=dict(
+        # This can be either int or str, so we don't set a type
+    ),
+)
+
 # We use the { ... } syntax for this dict because 'exec' can't be used as a bareword in py27
 PROBE_FIELD_SPEC = {
     'exec': dict(
         type='dict',
-        fields=dict(
-            command=dict(
-                type='list',
-                subtype='str',
-            ),
-        ),
+        fields=copy.deepcopy(EXEC_ACTION_FIELD_SPEC),
     ),
     'failure_threshold': dict(
         type='int',
     ),
     'http_get': dict(
-        host=dict(
-            type='str',
-        ),
-        http_headers=dict(
-            type='list',
-            subtype='dict',
-            fields=dict(
-                name=dict(
-                    type='str',
-                ),
-                value=dict(
-                    type='str',
-                ),
-            ),
-        ),
-        path=dict(
-            type='str',
-        ),
-        port=dict(
-            # This can be either int or str, so we don't set a type
-        ),
-        scheme=dict(
-            type='str',
-        ),
+        type='dict',
+        fields=copy.deepcopy(HTTP_GET_ACTION_FIELD_SPEC),
     ),
     'initial_delay_seconds': dict(
         type='int',
@@ -95,17 +111,26 @@ PROBE_FIELD_SPEC = {
     ),
     'tcp_socket': dict(
         type='dict',
-        fields=dict(
-            host=dict(
-                type='str',
-            ),
-            port=dict(
-                # This can be either int or str, so we don't set a type
-            ),
-        ),
+        fields=copy.deepcopy(TCP_SOCKET_ACTION_FIELD_SPEC),
     ),
     'timeout_seconds': dict(
         type='int',
+    ),
+}
+
+# We use the { ... } syntax for this dict because 'exec' can't be used as a bareword in py27
+LIFECYCLE_HANDLER_FIELD_SPEC = {
+    'exec': dict(
+        type='dict',
+        fields=copy.deepcopy(EXEC_ACTION_FIELD_SPEC),
+    ),
+    'http_get': dict(
+        type='dict',
+        fields=copy.deepcopy(HTTP_GET_ACTION_FIELD_SPEC),
+    ),
+    'tcp_socket': dict(
+        type='dict',
+        fields=copy.deepcopy(TCP_SOCKET_ACTION_FIELD_SPEC),
     ),
 }
 
@@ -207,6 +232,16 @@ CONTAINER_FIELD_SPEC = dict(
     ),
     lifecycle=dict(
         type='dict',
+        fields=dict(
+            pre_stop=dict(
+                type='dict',
+                fields=copy.deepcopy(LIFECYCLE_HANDLER_FIELD_SPEC),
+            ),
+            post_start=dict(
+                type='dict',
+                fields=copy.deepcopy(LIFECYCLE_HANDLER_FIELD_SPEC),
+            ),
+        ),
     ),
     liveness_probe=dict(
         type='dict',

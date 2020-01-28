@@ -279,7 +279,7 @@ class PluginField(object):
         self._config_version = config_version
         self._config = self.BASE_CONFIG.copy()
         if config is not None:
-            self._config.update(config)
+            self._config.update(copy.deepcopy(config))
         self.convert_fields()
 
     def __getattr__(self, key, default=None):
