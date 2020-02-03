@@ -288,6 +288,12 @@ class PluginField(object):
     __getitem__ = __getattr__
     get = __getattr__
 
+    def __setattr__(self, key, value):
+        if self._config is not None and key in self._config:
+            self._config[key] = value
+        else:
+            super(PluginField, self).__setattr__(key, value)
+
     def __contains__(self, key):
         return (key in self._config)
 
@@ -326,9 +332,11 @@ class PluginField(object):
             if k == 'fields':
                 for field_name, field in v.items():
                     # Update existing field config or create new
-                    if field_name in self.fields:
+                    if self.fields is not None and field_name in self.fields:
                         self.fields[field_name].update_config(field)
                     else:
+                        if self.fields is None:
+                            self.fields = {}
                         self.fields[field_name] = PluginField(field_name, field, self._config_version, parent=self)
             else:
                 if isinstance(v, dict):
