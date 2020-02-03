@@ -134,6 +134,21 @@ LIFECYCLE_HANDLER_FIELD_SPEC = {
     ),
 }
 
+SELINUX_OPTIONS_FIELD_SPEC = dict(
+    level=dict(
+        type='str',
+    ),
+    role=dict(
+        type='str',
+    ),
+    type=dict(
+        type='str',
+    ),
+    user=dict(
+        type='str',
+    ),
+)
+
 CONTAINER_FIELD_SPEC = dict(
     args=dict(
         type='list',
@@ -277,9 +292,57 @@ CONTAINER_FIELD_SPEC = dict(
     ),
     resources=dict(
         type='dict',
+        fields=dict(
+            limits=dict(
+                type='dict',
+            ),
+            requests=dict(
+                type='dict',
+            ),
+        ),
     ),
     security_context=dict(
         type='dict',
+        fields=dict(
+            allow_privilege_escalation=dict(
+                type='bool',
+            ),
+            capabilities=dict(
+                type='dict',
+                fields=dict(
+                    add=dict(
+                        type='list',
+                        subtype='str',
+                    ),
+                    drop=dict(
+                        type='list',
+                        substype='str',
+                    ),
+                ),
+            ),
+            privileged=dict(
+                type='bool',
+            ),
+            proc_mount=dict(
+                type='str',
+            ),
+            read_only_root_filesystem=dict(
+                type='bool',
+            ),
+            run_as_group=dict(
+                type='int',
+            ),
+            run_as_non_root=dict(
+                type='bool',
+            ),
+            run_as_user=dict(
+                type='int',
+            ),
+            selinux_options=dict(
+                type='dict',
+                fields=copy.deepcopy(SELINUX_OPTIONS_FIELD_SPEC),
+            ),
+        ),
     ),
     stdin=dict(
         type='bool',
@@ -375,6 +438,40 @@ POD_SPEC_FIELD_SPEC = dict(
     ),
     security_context=dict(
         type='dict',
+        fields=dict(
+            fs_group=dict(
+                type='int',
+            ),
+            run_as_group=dict(
+                type='int',
+            ),
+            run_as_non_root=dict(
+                type='bool',
+            ),
+            run_as_user=dict(
+                type='int',
+            ),
+            selinux_options=dict(
+                type='dict',
+                fields=copy.deepcopy(SELINUX_OPTIONS_FIELD_SPEC),
+            ),
+            supplemental_groups=dict(
+                type='list',
+                subtype='int',
+            ),
+            sysctls=dict(
+                type='list',
+                subtype='dict',
+                fields=dict(
+                    name=dict(
+                        type='str',
+                    ),
+                    value=dict(
+                        type='str',
+                    ),
+                ),
+            ),
+        ),
     ),
     service_account_name=dict(
         type='str',
