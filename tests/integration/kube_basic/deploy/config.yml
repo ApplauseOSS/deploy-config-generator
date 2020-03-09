@@ -75,3 +75,36 @@ kube_cronjobs:
                 - -c
                 - date; echo Hello from the Kubernetes cluster
               restart_policy: OnFailure
+kube_statefulsets:
+  - metadata:
+      name: web
+    spec:
+      selector:
+        match_labels:
+          app: nginx
+      service_name: "nginx"
+      replicas: 3
+      template:
+        metadata:
+          labels:
+            app: nginx
+        spec:
+          termination_grace_period_seconds: 10
+          containers:
+          - name: nginx
+            image: k8s.gcr.io/nginx-slim:0.8
+            ports:
+            - container_port: 80
+              name: web
+            volume_mounts:
+            - name: www
+              mount_path: /usr/share/nginx/html
+      volume_claim_templates:
+      - metadata:
+          name: www
+        spec:
+          access_modes: [ "ReadWriteOnce" ]
+          storage_class_name: "my-storage-class"
+          resources:
+            requests:
+              storage: 1Gi

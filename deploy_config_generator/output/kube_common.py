@@ -538,6 +538,51 @@ JOB_SPEC_FIELD_SPEC = dict(
     ),
 )
 
+PERSISTENT_VOLUME_CLAIM_FIELD_SPEC = dict(
+    access_modes=dict(
+        type='list',
+        subtype='str',
+    ),
+    data_source=dict(
+        type='dict',
+        fields=dict(
+            api_group=dict(
+                type='str',
+            ),
+            kind=dict(
+                type='str',
+            ),
+            name=dict(
+                type='str',
+            ),
+        ),
+    ),
+    resources=dict(
+        type='dict',
+        fields=dict(
+            limits=dict(
+                type='dict',
+            ),
+            requests=dict(
+                type='dict',
+            ),
+        ),
+    ),
+    selector=dict(
+        type='dict',
+        fields=copy.deepcopy(SELECTOR_FIELD_SPEC),
+    ),
+    storage_class_name=dict(
+        type='str',
+    ),
+    volume_mode=dict(
+        type='str',
+    ),
+    volume_name=dict(
+        type='str',
+    ),
+)
+
 
 class OutputPlugin(OutputPluginBase):
 
@@ -551,7 +596,9 @@ class OutputPlugin(OutputPluginBase):
         ),
     }
 
-    def build_generic(self, tmp_vars, fields):
+    def build_generic(self, tmp_vars, fields, debug=False):
+        if debug:
+            print('build_generic(): tmp_vars=%s, fields=%s' % (tmp_vars, fields))
         ret = dict()
         for field in fields:
             field_value = tmp_vars.get(field, None)
@@ -564,7 +611,7 @@ class OutputPlugin(OutputPluginBase):
                 if fields[field].get('subtype', None) == 'dict' and 'fields' in fields[field]:
                     ret2 = []
                     for entry in field_value:
-                        ret3 = self.build_generic(entry, fields[field]['fields'])
+                        ret3 = self.build_generic(entry, fields[field]['fields'], debug=debug)
                         if ret3:
                             ret2.append(ret3)
                     if ret2:
@@ -573,8 +620,8 @@ class OutputPlugin(OutputPluginBase):
                     if field_value:
                         ret[underscore_to_camelcase(field)] = field_value
             elif value_type == 'dict':
-                if 'fields' in fields[field] and field_value:
-                    ret2 = self.build_generic(field_value, fields[field]['fields'])
+                if fields[field].get('fields', None) and field_value:
+                    ret2 = self.build_generic(field_value, fields[field]['fields'], debug=debug)
                     if ret2:
                         ret[underscore_to_camelcase(field)] = ret2
                 else:
