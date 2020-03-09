@@ -87,7 +87,7 @@ class OutputPlugin(kube_common.OutputPlugin):
         # Basic structure
         data = {
             'apiVersion': 'apps/v1',
-            'kind': 'Statefulset',
+            'kind': 'StatefulSet',
             'spec': dict(
             ),
         }
