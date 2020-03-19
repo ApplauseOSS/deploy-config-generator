@@ -37,7 +37,7 @@ class OutputPlugin(kube_common.OutputPlugin):
         data['metadata'] = self.build_metadata(app_vars['APP']['metadata'])
         for field in ('username', 'custom_id'):
             if app_vars['APP'][field]:
-                data[field] = self.build_generic(app_vars['APP'], {field: self._fields['kong_consumers'][field]}, camel_case=False)
+                data.update(self.build_generic(app_vars['APP'], {field: self._fields['kong_consumers'][field]}, camel_case=False))
 
         output = yaml_dump(self._template.render_template(data, app_vars))
         return output

@@ -2,5 +2,4 @@ apiVersion: configuration.konghq.com/v1
 kind: KongConsumer
 metadata:
   name: consumer-team-x
-username:
-  username: team-X
+username: team-X
