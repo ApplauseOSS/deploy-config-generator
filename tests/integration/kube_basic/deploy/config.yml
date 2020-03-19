@@ -108,3 +108,16 @@ kube_statefulsets:
           resources:
             requests:
               storage: 1Gi
+kube_ingresses:
+  - metadata:
+      name: test-ingress
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      rules:
+      - http:
+          paths:
+          - path: /testpath
+            backend:
+              service_name: test
+              service_port: 80
