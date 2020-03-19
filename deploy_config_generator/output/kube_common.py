@@ -596,7 +596,7 @@ class OutputPlugin(OutputPluginBase):
         ),
     }
 
-    def build_generic(self, tmp_vars, fields, debug=False):
+    def build_generic(self, tmp_vars, fields, camel_case=True, debug=False):
         if debug:
             print('build_generic(): tmp_vars=%s, fields=%s' % (tmp_vars, fields))
         ret = dict()
@@ -611,25 +611,25 @@ class OutputPlugin(OutputPluginBase):
                 if fields[field].get('subtype', None) == 'dict' and 'fields' in fields[field]:
                     ret2 = []
                     for entry in field_value:
-                        ret3 = self.build_generic(entry, fields[field]['fields'], debug=debug)
+                        ret3 = self.build_generic(entry, fields[field]['fields'], camel_case=camel_case, debug=debug)
                         if ret3:
                             ret2.append(ret3)
                     if ret2:
                         ret[field] = ret2
                 else:
                     if field_value:
-                        ret[underscore_to_camelcase(field)] = field_value
+                        ret[(underscore_to_camelcase(field) if camel_case else field)] = field_value
             elif value_type == 'dict':
                 if fields[field].get('fields', None) and field_value:
-                    ret2 = self.build_generic(field_value, fields[field]['fields'], debug=debug)
+                    ret2 = self.build_generic(field_value, fields[field]['fields'], camel_case=camel_case, debug=debug)
                     if ret2:
-                        ret[underscore_to_camelcase(field)] = ret2
+                        ret[(underscore_to_camelcase(field) if camel_case else field)] = ret2
                 else:
                     if field_value:
-                        ret[underscore_to_camelcase(field)] = field_value
+                        ret[(underscore_to_camelcase(field) if camel_case else field)] = field_value
             else:
                 if field_value is not None:
-                    ret[underscore_to_camelcase(field)] = field_value
+                    ret[(underscore_to_camelcase(field) if camel_case else field)] = field_value
         return ret
 
     def build_metadata(self, tmp_vars):
