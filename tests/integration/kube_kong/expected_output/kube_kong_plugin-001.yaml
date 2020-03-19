@@ -1,9 +1,7 @@
 apiVersion: configuration.konghq.com/v1
 config:
-  config:
-    header_name: my-request-id
+  header_name: my-request-id
 kind: KongPlugin
 metadata:
   name: request-id
-plugin:
-  plugin: correlation-id
+plugin: correlation-id
