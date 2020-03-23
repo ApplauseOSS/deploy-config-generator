@@ -41,8 +41,11 @@ def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH'):
     template = Template()
     tmp_vars = dict(env=env)
 
+    # Load vars from site config
+    varset.update(SITE_CONFIG.default_vars)
+
     # Load "local" vars
-    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.local_vars_file_patterns, tmp_vars), allow_var_references=False)
+    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.local_vars_file_patterns, tmp_vars))
 
     # Load env vars
     if SITE_CONFIG.use_env_vars:

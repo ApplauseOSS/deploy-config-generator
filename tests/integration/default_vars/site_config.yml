@@ -1,0 +1,13 @@
+---
+default_output: dummy
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        some_field:
+          type: str
+default_vars:
+  SOME_VAR: some value
+  ANOTHER_VAR: another value
