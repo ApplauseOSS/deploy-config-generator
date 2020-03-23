@@ -44,9 +44,6 @@ def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH'):
     # Load vars from site config
     varset.update(SITE_CONFIG.default_vars)
 
-    # Load "local" vars
-    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.local_vars_file_patterns, tmp_vars))
-
     # Load env vars
     if SITE_CONFIG.use_env_vars:
         DISPLAY.v('Loading vars from environment')
@@ -165,6 +162,7 @@ def main():
     parser.add_argument(
         '-e', '--env',
         help="Environment to generate deploy configs for",
+        default='local',
     )
     parser.add_argument(
         '-o', '--output-dir',
