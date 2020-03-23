@@ -1,0 +1,1 @@
+FOO="bar ${SOME_VAR} baz ${ANOTHER_VAR}"

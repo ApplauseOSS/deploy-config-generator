@@ -35,6 +35,8 @@ class SiteConfig(with_metaclass(Singleton, object)):
         'plugins': {},
         # Default apps
         'default_apps': {},
+        # Default vars
+        'default_vars': {},
     }
 
     def __init__(self):

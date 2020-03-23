@@ -1,1 +1,0 @@
-Error loading vars: ./deploy/var/local.var: line 1: Found variable reference where not allowed
