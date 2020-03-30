@@ -22,7 +22,6 @@ class SiteConfig(with_metaclass(Singleton, object)):
         # Directory within deploy dir to look for vars files
         'vars_dir': 'var',
         # Patterns for finding vars files
-        'local_vars_file_patterns': ['local.var'],
         'defaults_vars_file_patterns': ['defaults.var'],
         'env_vars_file_patterns': ['{{ env }}.var', 'env_{{ env }}.var'],
         # Whether to use vars from environment
