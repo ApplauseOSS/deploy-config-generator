@@ -24,6 +24,10 @@ class OutputPlugin(kube_common.OutputPlugin):
                 custom_id=dict(
                     type='str',
                 ),
+                credentials=dict(
+                    type='list',
+                    subtype='str',
+                ),
             ),
         }
     }
@@ -35,7 +39,7 @@ class OutputPlugin(kube_common.OutputPlugin):
             'kind': 'KongConsumer',
         }
         data['metadata'] = self.build_metadata(app_vars['APP']['metadata'])
-        for field in ('username', 'custom_id'):
+        for field in ('username', 'custom_id', 'credentials'):
             if app_vars['APP'][field]:
                 data.update(self.build_generic(app_vars['APP'], {field: self._fields['kong_consumers'][field]}, camel_case=False))
 
