@@ -1,0 +1,11 @@
+---
+kube_dnsendpoints:
+  - metadata:
+      name: test-end-endpoint
+    spec:
+      endpoints:
+        - dns_name: foo.bar.com
+          record_TTL: 180
+          record_type: A
+          targets:
+          - 192.168.99.216
