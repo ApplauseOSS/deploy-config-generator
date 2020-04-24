@@ -13,6 +13,7 @@ kong_ingresses:
   - metadata:
       name: configuration-demo
     upstream:
+      slots: 10
       hash_on: none
       hash_fallback: none
       healthchecks:
@@ -45,7 +46,6 @@ kong_ingresses:
             - 503
             tcp_failures: 0
             timeouts: 0
-        slots: 10
     proxy:
       protocol: http
       path: /
