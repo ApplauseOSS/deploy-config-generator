@@ -165,6 +165,9 @@ class OutputPlugin(kube_common.OutputPlugin):
                             type='list',
                             subtype='str',
                         ),
+                        path_handling=dict(
+                            type='str',
+                        ),
                     ),
                 ),
             ),
