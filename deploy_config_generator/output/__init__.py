@@ -171,12 +171,12 @@ class OutputPluginBase(object):
         '''
         Validate the provided app config against plugin field definitions
         '''
-        # Check that all required fields are provided
+        # Check that all required top-level fields are provided
         req_fields = self.get_required_fields()
         for field in req_fields:
             if field not in app:
                 raise DeployConfigError("required field '%s' not defined" % field)
-        # Check field/subfield types and if field is locked
+        # Check field/subfield types, required, and if field is locked
         unmatched = []
         for field, value in app.items():
             if self.has_field(field):
@@ -401,9 +401,9 @@ class PluginField(object):
         '''
         Validate passed value against field config
         '''
-        if value is None:
-            return
         unmatched = []
+        if value is None:
+            return unmatched
         field_type = self.type
         if use_subtype:
             # Use the field subtype
@@ -434,6 +434,12 @@ class PluginField(object):
                         continue
                     field_unmatched = self.fields[k].validate(v)
                     unmatched.extend(field_unmatched)
+                # Check for required and locked sub-fields
+                for tmp_field_name, tmp_field in self.fields.items():
+                    if tmp_field.required and value.get(tmp_field_name, None) is None and tmp_field.default is None:
+                        raise DeployConfigError("field '%s' is required, but no value provided" % tmp_field.get_full_name())
+                    if tmp_field.locked and value.get(tmp_field_name, None) is not None:
+                        raise DeployConfigError("field '%s' is locked, but a value was provided" % tmp_field.get_full_name())
 
         return unmatched
 

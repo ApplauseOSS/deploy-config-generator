@@ -1,1 +1,1 @@
-Failed to validate fields in deploy config: required field 'parent1' not defined
+Failed to validate fields in deploy config: field 'parent2.field1' is required, but no value provided
