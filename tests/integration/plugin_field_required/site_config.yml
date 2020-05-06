@@ -6,6 +6,12 @@ plugins:
     enabled: true
     fields:
       test:
-        # This is already the default, but it doesn't hurt to show intent
-        parent1:
-          required: true
+        parent2:
+          type: list
+          subtype: dict
+          fields:
+            field1:
+              type: str
+              required: true
+            field2:
+              type: str

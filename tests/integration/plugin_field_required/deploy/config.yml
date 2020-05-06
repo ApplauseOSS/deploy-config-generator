@@ -1,3 +1,5 @@
 ---
 test:
   dummy: True
+  parent2:
+    - field2: whatever

@@ -12,7 +12,6 @@ METADATA_FIELD_SPEC = dict(
     ),
     name=dict(
         type='str',
-        required=True,
     ),
     namespace=dict(
         type='str',
@@ -498,7 +497,6 @@ POD_SPEC_FIELD_SPEC = dict(
 POD_TEMPLATE_FIELD_SPEC = dict(
     metadata=dict(
         type='dict',
-        required=True,
         fields=copy.deepcopy(METADATA_FIELD_SPEC),
     ),
     spec=dict(
