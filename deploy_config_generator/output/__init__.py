@@ -24,7 +24,9 @@ class OutputPluginBase(object):
     _fields = None
     _config_version = None
 
-    DEFAULT_CONFIG = {}
+    COMMON_DEFAULT_CONFIG = dict(
+        enabled=True,
+    )
     PRIORITY = 1
 
     def __init__(self, varset, output_dir, config_version):
@@ -60,7 +62,8 @@ class OutputPluginBase(object):
         '''
         Build the plugin config
         '''
-        self._plugin_config = self.DEFAULT_CONFIG.copy()
+        self._plugin_config = self.COMMON_DEFAULT_CONFIG.copy()
+        self._plugin_config.update(self.DEFAULT_CONFIG)
         # Helper var to tidy up the code
         self._fields = copy.deepcopy(self._plugin_config['fields'])
         # Convert field definitions into PluginField objects
