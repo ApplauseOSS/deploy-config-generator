@@ -64,16 +64,18 @@ class Template(object):
         if isinstance(template, dict):
             ret = {}
             for k, v in template.items():
+                v = self.type_fixup(self.render_template(v, args))
                 if v == OMIT_TOKEN:
                     continue
-                ret[k] = self.type_fixup(self.render_template(v, args))
+                ret[k] = v
             return ret
         elif isinstance(template, (list, tuple)):
             ret = []
             for i, v in enumerate(template):
+                v = self.type_fixup(self.render_template(v, args))
                 if v == OMIT_TOKEN:
                     continue
-                ret.append(self.type_fixup(self.render_template(v, args)))
+                ret.append(v)
             return ret
         elif isinstance(template, six.string_types):
             try:

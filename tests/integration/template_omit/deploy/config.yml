@@ -1,0 +1,6 @@
+---
+test:
+  dummy: True
+  parent1:
+    - child2_1: '{{ omit }}'
+      child2_2: foo
