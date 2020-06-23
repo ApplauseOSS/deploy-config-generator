@@ -267,8 +267,10 @@ class PluginField(object):
         # * None - no combining, user value replaces default
         # * 'append' - default value is included at end of list
         # * 'prepend' - default value is included at beginning of list
-        # * 'merge' - user value is merged with default value (for dicts)
+        # * 'merge' - user value is merged with default value (for lists/dicts)
         'default_action': None,
+        # Key to use for merging (for lists of dicts)
+        'merge_key': None,
         # Minimum/maximum config version that field is valid for
         'min_version': None,
         'max_version': None,
@@ -515,8 +517,27 @@ class PluginField(object):
             def_val = self.default
             if not isinstance(def_val, list):
                 def_val = [def_val]
+            # User values are merged with default values
+            if self.default_action == 'merge':
+                # Create a copy of the default values, since we'll be modifying it
+                def_val = def_val[:]
+                # Iterate over user values and compare against default values
+                for tmp_value in ret:
+                    for idx, tmp_def_val in enumerate(def_val):
+                        if self.subtype == 'dict' and self.merge_key is not None:
+                            # Delete default value if the merge key value matches the current value
+                            if tmp_value.get(self.merge_key, "MERGE_KEY_USER") == tmp_def_val.get(self.merge_key, "MERGE_KEY_DEFAULT"):
+                                del def_val[idx]
+                                break
+                        else:
+                            # Delete default value if it matches the current value
+                            if tmp_value == tmp_def_val:
+                                del def_val[idx]
+                                break
+                # Prepend remaining defaults to user values
+                ret = def_val + ret
             # User values go after default value
-            if self.default_action == 'prepend':
+            elif self.default_action == 'prepend':
                 ret = def_val + ret
             # User values go before default value
             elif self.default_action == 'append':
@@ -545,14 +566,18 @@ class PluginField(object):
                 for field in self.fields:
                     ret[field] = self.fields[field].apply_default(value.get(field, None))
             else:
-                if value is None:
-                    ret = self.default
+                # Don't apply defaults for subtype
+                if use_subtype:
+                    ret = value
                 else:
-                    if self.default_action == 'merge':
-                        ret = self.default.copy()
-                        ret.update(value)
+                    if value is None:
+                        ret = self.default
                     else:
-                        ret = value.copy()
+                        if self.default_action == 'merge':
+                            ret = self.default.copy()
+                            ret.update(value)
+                        else:
+                            ret = value.copy()
         else:
             # Use default if no value was provided
             if value is None:

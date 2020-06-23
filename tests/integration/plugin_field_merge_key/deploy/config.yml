@@ -1,0 +1,8 @@
+---
+test:
+  dummy: true
+  list_test1:
+    - name: baz
+      value: BAZ
+    - name: foo
+      value: NEW FOO

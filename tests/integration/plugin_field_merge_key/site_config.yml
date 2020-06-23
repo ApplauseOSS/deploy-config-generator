@@ -1,0 +1,19 @@
+---
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        # Create field to test default merging with key
+        list_test1:
+          type: list
+          subtype: dict
+          required: true
+          default_action: merge
+          merge_key: name
+          default:
+            - name: foo
+              value: FOO
+            - name: bar
+              value: BAR
