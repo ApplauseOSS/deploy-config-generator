@@ -22,6 +22,6 @@ for env in NONE test_env; do
 
 	python -m deploy_config_generator -v -c site_config.yml -o tmp.${env} ${env_flag} .
 
-	diff -wru expected_output.${env} tmp.${env}
+	diff -ru expected_output.${env} tmp.${env}
 	)
 done

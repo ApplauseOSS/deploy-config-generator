@@ -10,6 +10,7 @@ proxy:
   retries: 10
   write_timeout: 10000
 route:
+  https_redirect_status_code: 302
   methods:
   - POST
   - GET
@@ -52,4 +53,4 @@ upstream:
         - 503
         tcp_failures: 0
         timeouts: 0
-    slots: 10
+  slots: 10

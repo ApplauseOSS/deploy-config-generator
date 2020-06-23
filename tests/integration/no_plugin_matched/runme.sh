@@ -19,4 +19,4 @@ if [[ $? = 0 ]]; then
 	exit 1
 fi
 
-diff -wru expected_output tmp
+diff -ru expected_output tmp
