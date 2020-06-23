@@ -37,6 +37,15 @@ kube_services:
 kube_namespaces:
   - metadata:
       name: nginx
+kube_pdbs:
+  - metadata:
+      name: nginx
+    spec:
+      max_unavailable: 1
+      min_available: 2
+      selector:
+        match_labels:
+          app: nginx
 kube_secrets:
   - metadata:
       name: nginx-secrets
