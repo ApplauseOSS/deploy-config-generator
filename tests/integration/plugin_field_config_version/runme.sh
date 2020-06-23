@@ -17,6 +17,6 @@ for version in NONE 0 1 99; do
 	python -m deploy_config_generator -c site_config.${version}.yml -o tmp.${version} . &> tmp.${version}/cmd_output.txt
 	echo $? > tmp.${version}/exit_code.txt
 
-	diff -wru expected_output.${version} tmp.${version}
+	diff -ru expected_output.${version} tmp.${version}
 	)
 done

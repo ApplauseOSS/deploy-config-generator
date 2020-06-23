@@ -14,4 +14,4 @@ set -x
 
 python -m deploy_config_generator -c /dev/null -v -o tmp . $@
 
-diff -wru expected_output tmp
+diff -ru expected_output tmp

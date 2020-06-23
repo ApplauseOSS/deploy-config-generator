@@ -168,6 +168,9 @@ class OutputPlugin(kube_common.OutputPlugin):
                         path_handling=dict(
                             type='str',
                         ),
+                        https_redirect_status_code=dict(
+                            type='int',
+                        ),
                     ),
                 ),
             ),

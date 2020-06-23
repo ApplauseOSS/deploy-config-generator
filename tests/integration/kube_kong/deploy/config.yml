@@ -63,3 +63,4 @@ kong_ingresses:
       protocols:
       - http
       - https
+      https_redirect_status_code: 302
