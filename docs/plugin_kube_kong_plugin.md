@@ -1,24 +1,24 @@
 <!--
 NOTE: this document is automatically generated. Any manual changes will get overwritten.
 -->
-# kube_secret
+# kube_kong_plugin
 
-Kubernetes secret output plugin
+Kubernetes KongPlugin output plugin
 
 ### Parameters
 
 
-#### Deploy config section: kube_secrets
+#### Deploy config section: kong_plugins
 
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
-`data`|`dict`|no||Values will be automatically base64-encoded as expected by the Kubernetes API
+`config`|`dict`|no||
+`disabled`|`bool`|no||
 `metadata`|`dict`|yes||
 `metadata . annotations`|`dict`|no||
 `metadata . labels`|`dict`|no||
 `metadata . name`|`str`|no||
 `metadata . namespace`|`str`|no||
-`string_data`|`dict`|no||
-`type`|`str`|yes||
+`plugin`|`str`|no||
 
 

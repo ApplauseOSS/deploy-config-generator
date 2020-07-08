@@ -1,24 +1,26 @@
 <!--
 NOTE: this document is automatically generated. Any manual changes will get overwritten.
 -->
-# kube_secret
+# kube_pdb
 
-Kubernetes secret output plugin
+Kubernetes PDB output plugin
 
 ### Parameters
 
 
-#### Deploy config section: kube_secrets
+#### Deploy config section: kube_pdbs
 
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
-`data`|`dict`|no||Values will be automatically base64-encoded as expected by the Kubernetes API
 `metadata`|`dict`|yes||
 `metadata . annotations`|`dict`|no||
 `metadata . labels`|`dict`|no||
 `metadata . name`|`str`|no||
 `metadata . namespace`|`str`|no||
-`string_data`|`dict`|no||
-`type`|`str`|yes||
+`spec`|`dict`|yes||
+`spec . max_unavailable`|`int`|no||
+`spec . min_available`|`int`|no||
+`spec . selector`|`dict`|no||
+`spec . selector . match_labels`|`dict`|no||
 
 

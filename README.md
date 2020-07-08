@@ -121,10 +121,23 @@ This tool uses a plugin system for handling the generation of deploy files for v
 
 The following output plugins are available:
 
+* [`dummy`](docs/plugin_dummy.md)
+* [`kongfig`](docs/plugin_kongfig.md)
+* [`kube_cronjob`](docs/plugin_kube_cronjob.md)
+* [`kube_deployment`](docs/plugin_kube_deployment.md)
+* [`kube_dnsendpoint`](docs/plugin_kube_dnsendpoint.md)
+* [`kube_ingress`](docs/plugin_kube_ingress.md)
+* [`kube_job`](docs/plugin_kube_job.md)
+* [`kube_kong_consumer`](docs/plugin_kube_kong_consumer.md)
+* [`kube_kong_ingress`](docs/plugin_kube_kong_ingress.md)
+* [`kube_kong_plugin`](docs/plugin_kube_kong_plugin.md)
+* [`kube_namespace`](docs/plugin_kube_namespace.md)
+* [`kube_pdb`](docs/plugin_kube_pdb.md)
+* [`kube_secret`](docs/plugin_kube_secret.md)
+* [`kube_service`](docs/plugin_kube_service.md)
+* [`kube_statefulset`](docs/plugin_kube_statefulset.md)
 * [`marathon`](docs/plugin_marathon.md)
 * [`metronome`](docs/plugin_metronome.md)
-* [`kongfig`](docs/plugin_kongfig.md)
-* [`dummy`](docs/plugin_dummy.md)
 
 ## Development
 

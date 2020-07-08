@@ -1,0 +1,38 @@
+---
+test:
+  dummy: true
+  list_test1:
+    # Should be present
+    - name: baz
+      value: BAZ
+      test2:
+        # Should NOT be present
+        - name: baz1
+          condition: parent_item.name == 'whatever'
+        # Should be present
+        - name: baz2
+          condition: parent_item.name == 'baz'
+        # Should be present
+        - name: baz3
+          condition: child_item.name == 'baz3'
+        # Should NOT be present
+        - name: baz4
+          condition: child_item.name == 'whatever'
+    # Should be present
+    - name: foo
+      value: FOO
+      condition: parent_item.name == 'foo'
+    # Should NOT be present
+    - name: bar
+      value: BAR
+      condition: parent_item.name == 'whatever'
+  list_test2:
+    # Should be present
+    - name: foo
+      condition: item.name == 'foo'
+    # Should be present
+    - name: bar
+      condition: item_index == 1
+    # Should NOT be present
+    - name: baz
+      condition: item.name == 'whatever'
