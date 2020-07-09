@@ -15,7 +15,7 @@ Name | Type | Required | Default | Description
 `metadata`|`dict`|yes||
 `metadata . annotations`|`dict`|no||
 `metadata . labels`|`dict`|no||
-`metadata . name`|`str`|yes||
+`metadata . name`|`str`|no||
 `metadata . namespace`|`str`|no||
 `spec`|`dict`|yes||
 `spec . cluster_IP`|`str`|no||

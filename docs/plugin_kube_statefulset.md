@@ -1,14 +1,14 @@
 <!--
 NOTE: this document is automatically generated. Any manual changes will get overwritten.
 -->
-# kube_job
+# kube_statefulset
 
-Kubernetes job output plugin
+Kubernetes statefulset output plugin
 
 ### Parameters
 
 
-#### Deploy config section: kube_jobs
+#### Deploy config section: kube_statefulsets
 
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
@@ -18,17 +18,16 @@ Name | Type | Required | Default | Description
 `metadata . name`|`str`|no||
 `metadata . namespace`|`str`|no||
 `spec`|`dict`|yes||
-`spec . active_deadline_seconds`|`int`|no||
-`spec . backoff_limit`|`int`|no||
-`spec . completions`|`int`|no||
-`spec . manual_selector`|`bool`|no||
-`spec . parallelism`|`int`|no||
-`spec . selector`|`dict`|no||
+`spec . pod_management_policy`|`str`|no||
+`spec . replicas`|`int`|no||
+`spec . revision_history_limit`|`int`|no||
+`spec . selector`|`dict`|yes||
 `spec . selector . match_expressions`|`list` (of `dict`)|no||
 `spec . selector . match_expressions . key`|`str`|yes||
 `spec . selector . match_expressions . operator`|`str`|yes||
 `spec . selector . match_expressions . values`|`list` (of `str`)|yes||
 `spec . selector . match_labels`|`dict`|no||
+`spec . service_name`|`str`|yes||
 `spec . template`|`dict`|yes||
 `spec . template . metadata`|`dict`|no||
 `spec . template . metadata . annotations`|`dict`|no||
@@ -325,6 +324,33 @@ Name | Type | Required | Default | Description
 `spec . template . spec . termination_grace_period_seconds`|`int`|no||
 `spec . template . spec . tolerations`|`list` (of `dict`)|no||
 `spec . template . spec . volumes`|`list` (of `dict`)|no||
-`spec . ttl_seconds_after_finished`|`int`|no||
+`spec . update_strategy`|`dict`|no||
+`spec . update_strategy . rolling_update`|`dict`|no||
+`spec . update_strategy . rolling_update . partition`|`int`|no||
+`spec . update_strategy . type`|`str`|no||
+`spec . volume_claim_templates`|`list` (of `dict`)|no||
+`spec . volume_claim_templates . metadata`|`dict`|yes||
+`spec . volume_claim_templates . metadata . annotations`|`dict`|no||
+`spec . volume_claim_templates . metadata . labels`|`dict`|no||
+`spec . volume_claim_templates . metadata . name`|`str`|no||
+`spec . volume_claim_templates . metadata . namespace`|`str`|no||
+`spec . volume_claim_templates . spec`|`dict`|yes||
+`spec . volume_claim_templates . spec . access_modes`|`list` (of `str`)|no||
+`spec . volume_claim_templates . spec . data_source`|`dict`|no||
+`spec . volume_claim_templates . spec . data_source . api_group`|`str`|no||
+`spec . volume_claim_templates . spec . data_source . kind`|`str`|no||
+`spec . volume_claim_templates . spec . data_source . name`|`str`|no||
+`spec . volume_claim_templates . spec . resources`|`dict`|no||
+`spec . volume_claim_templates . spec . resources . limits`|`dict`|no||
+`spec . volume_claim_templates . spec . resources . requests`|`dict`|no||
+`spec . volume_claim_templates . spec . selector`|`dict`|no||
+`spec . volume_claim_templates . spec . selector . match_expressions`|`list` (of `dict`)|no||
+`spec . volume_claim_templates . spec . selector . match_expressions . key`|`str`|yes||
+`spec . volume_claim_templates . spec . selector . match_expressions . operator`|`str`|yes||
+`spec . volume_claim_templates . spec . selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . volume_claim_templates . spec . selector . match_labels`|`dict`|no||
+`spec . volume_claim_templates . spec . storage_class_name`|`str`|no||
+`spec . volume_claim_templates . spec . volume_mode`|`str`|no||
+`spec . volume_claim_templates . spec . volume_name`|`str`|no||
 
 

@@ -70,7 +70,7 @@ class OutputPluginBase(object):
         for section in self._fields:
             section_fields = self._fields[section]
             for k, v in section_fields.items():
-                section_fields[k] = PluginField(k, v, self._config_version)
+                section_fields[k] = PluginField(k, v, self._config_version, self._template)
         self.build_config_site()
 
     def build_config_site(self):
@@ -90,7 +90,7 @@ class OutputPluginBase(object):
                             if field_name in self._fields[section]:
                                 self._fields[section][field_name].update_config(field)
                             else:
-                                self._fields[section][field_name] = PluginField(field_name, field, self._config_version)
+                                self._fields[section][field_name] = PluginField(field_name, field, self._config_version, self._template)
                 else:
                     if k in self._plugin_config:
                         if isinstance(v, dict):
@@ -164,7 +164,7 @@ class OutputPluginBase(object):
         Merge user-provided values with configured field defaults
         '''
         ret = {}
-        # Apply defaults
+        # Apply defaults/transforms
         for field, value in self._fields[self._section].items():
             ret[field] = value.apply_default(app.get(field, None))
             ret[field] = value.apply_transform(ret.get(field, None))
@@ -215,6 +215,10 @@ class OutputPluginBase(object):
                                 # Parsed vars
                                 'VARS': dict(self._vars),
                             }
+                            # Check conditionals
+                            for field, value in self._fields[self._section].items():
+                                app_vars['APP'][field] = value.check_conditionals(app_vars['APP'].get(field, None), app_vars)
+                            # Generate output
                             output = self.generate_output(app_vars)
                             self._display.v('Writing output file %s' % path)
                             with open(path, 'w') as f:
@@ -276,12 +280,19 @@ class PluginField(object):
         'max_version': None,
         # Field definitions (for dicts)
         'fields': None,
+        # Whether the field supports a conditional (for dicts)
+        'conditional': False,
+        # Field name to use for conditional
+        'conditional_key': 'condition',
+        # Loop var (for use in conditionals)
+        'loop_var': 'item',
     }
 
-    def __init__(self, name, config, config_version, parent=None):
+    def __init__(self, name, config, config_version, template, parent=None):
         self._name = name
         self._parent = parent
         self._config_version = config_version
+        self._template = template
         self._config = self.BASE_CONFIG.copy()
         if config is not None:
             self._config.update(copy.deepcopy(config))
@@ -327,7 +338,7 @@ class PluginField(object):
         '''
         if self._config['fields'] is not None:
             for k, v in self._config['fields'].items():
-                self._config['fields'][k] = PluginField(k, v, self._config_version, parent=self)
+                self._config['fields'][k] = PluginField(k, v, self._config_version, self._template, parent=self)
 
     def update_config(self, config):
         '''
@@ -342,7 +353,7 @@ class PluginField(object):
                     else:
                         if self.fields is None:
                             self.fields = {}
-                        self.fields[field_name] = PluginField(field_name, field, self._config_version, parent=self)
+                        self.fields[field_name] = PluginField(field_name, field, self._config_version, self._template, parent=self)
             else:
                 if isinstance(v, dict):
                     if self._config[k] is None:
@@ -584,4 +595,41 @@ class PluginField(object):
                 ret = self.default
             else:
                 ret = value
+        return ret
+
+    def check_conditionals(self, value, app_vars, use_subtype=False):
+        '''
+        Check conditionals and filter value
+        '''
+        ret = None
+        field_type = self.type
+        if use_subtype:
+            # Use the field subtype
+            field_type = self.subtype
+        if field_type == 'list':
+            ret = []
+            for idx, item in enumerate(value):
+                if self.loop_var:
+                    # Add loop item and index vars
+                    app_vars = app_vars.copy()
+                    app_vars.update({self.loop_var: item, ('%s_index' % self.loop_var): idx})
+                tmp_value = self.check_conditionals(item, app_vars, use_subtype=True)
+                # Don't add item to returned data if its condition evaluated to False
+                if tmp_value is not None:
+                    ret.append(tmp_value)
+        elif field_type == 'dict':
+            ret = {}
+            if self.fields is not None:
+                for field in self.fields:
+                    ret[field] = self.fields[field].check_conditionals(value.get(field, None), app_vars)
+            else:
+                ret = value
+            if self.conditional and self.conditional_key in ret:
+                if ret[self.conditional_key] is not None:
+                    if not self._template.evaluate_condition(ret[self.conditional_key], app_vars):
+                        return None
+                # Remove the conditional key from the returned data
+                del ret[self.conditional_key]
+        else:
+            ret = value
         return ret

@@ -1,0 +1,40 @@
+---
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        # Create field to test default merging with key
+        list_test1:
+          type: list
+          subtype: dict
+          required: true
+          conditional: true
+          loop_var: parent_item
+          fields:
+            name:
+              type: str
+            value:
+              type: str
+            condition:
+              type: str
+            test2:
+              type: list
+              subtype: dict
+              conditional: true
+              loop_var: child_item
+              fields:
+                name:
+                  type: str
+                condition:
+                  type: str
+        list_test2:
+          type: list
+          subtype: dict
+          conditional: true
+          fields:
+            name:
+              type: str
+            condition:
+              type: str

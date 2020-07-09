@@ -1,0 +1,35 @@
+Dummy output plugin
+
+App config:
+
+{
+  "dummy": true,
+  "list_test1": [
+    {
+      "name": "baz",
+      "test2": [
+        {
+          "name": "baz2"
+        },
+        {
+          "name": "baz3"
+        }
+      ],
+      "value": "BAZ"
+    },
+    {
+      "name": "foo",
+      "test2": [],
+      "value": "FOO"
+    }
+  ],
+  "list_test2": [
+    {
+      "name": "foo"
+    },
+    {
+      "name": "bar"
+    }
+  ],
+  "parent1": []
+}
