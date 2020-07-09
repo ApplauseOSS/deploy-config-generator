@@ -620,6 +620,8 @@ class PluginField(object):
         elif field_type == 'dict':
             ret = {}
             if self.fields is not None:
+                if value is None:
+                    value = {}
                 for field in self.fields:
                     ret[field] = self.fields[field].check_conditionals(value.get(field, None), app_vars)
             else:
