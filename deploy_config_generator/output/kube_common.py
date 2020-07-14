@@ -613,7 +613,7 @@ class OutputPlugin(OutputPluginBase):
                         if ret3:
                             ret2.append(ret3)
                     if ret2:
-                        ret[field] = ret2
+                        ret[(underscore_to_camelcase(field) if camel_case else field)] = ret2
                 else:
                     if field_value:
                         ret[(underscore_to_camelcase(field) if camel_case else field)] = field_value
