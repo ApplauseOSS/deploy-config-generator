@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  selector:
+    matchExpressions:
+    - key: environment
+      operator: In
+      values:
+      - dev
+    matchLabels:
+      release: stable
+  storageClassName: slow
+  volumeMode: Filesystem

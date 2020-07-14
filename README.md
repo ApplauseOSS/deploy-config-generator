@@ -133,6 +133,7 @@ The following output plugins are available:
 * [`kube_kong_plugin`](docs/plugin_kube_kong_plugin.md)
 * [`kube_namespace`](docs/plugin_kube_namespace.md)
 * [`kube_pdb`](docs/plugin_kube_pdb.md)
+* [`kube_pvc`](docs/plugin_kube_pvc.md)
 * [`kube_secret`](docs/plugin_kube_secret.md)
 * [`kube_service`](docs/plugin_kube_service.md)
 * [`kube_statefulset`](docs/plugin_kube_statefulset.md)
