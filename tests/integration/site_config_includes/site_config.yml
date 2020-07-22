@@ -1,0 +1,13 @@
+---
+default_output: dummy
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        new_field1:
+          type: str
+
+include:
+  - site_config.1.yml

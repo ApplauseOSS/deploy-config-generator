@@ -102,10 +102,12 @@ def dict_merge(dict_to, dict_from, depth=None):
     dict_to = dict_to.copy()
     for k in dict_from:
         if k in dict_to and isinstance(dict_to[k], dict) and isinstance(dict_from[k], dict):
+            # Continue merging if source and dest are a dict
             if depth is not None:
-                tmp_depth = depth - 1
-            dict_to[k] = dict_merge(dict_to[k], dict_from[k], depth=tmp_depth)
+                depth = depth - 1
+            dict_to[k] = dict_merge(dict_to[k], dict_from[k], depth=depth)
         else:
+            # Overwrite value
             dict_to[k] = dict_from[k]
     return dict_to
 
