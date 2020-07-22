@@ -1,0 +1,11 @@
+Dummy output plugin
+
+App config:
+
+{
+  "dummy": true,
+  "new_field1": "field1",
+  "new_field2": "field2",
+  "new_field3": "field3",
+  "parent1": []
+}

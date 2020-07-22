@@ -1,0 +1,10 @@
+---
+plugins:
+  dummy:
+    fields:
+      test:
+        new_field2:
+          type: str
+
+include:
+  - site_config.2.yml

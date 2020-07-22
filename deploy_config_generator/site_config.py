@@ -4,7 +4,7 @@ from six import with_metaclass
 
 from deploy_config_generator.display import Display
 from deploy_config_generator.errors import ConfigError
-from deploy_config_generator.utils import objdict, yaml_load, Singleton
+from deploy_config_generator.utils import objdict, yaml_load, dict_merge, Singleton
 
 
 class SiteConfig(with_metaclass(Singleton, object)):
@@ -73,18 +73,34 @@ class SiteConfig(with_metaclass(Singleton, object)):
     def get_config(self):
         return self._config
 
+    def load_file(self, path):
+        with open(path) as f:
+            data = yaml_load(f)
+        # Handle empty site config file
+        # This is mostly here to allow doing '-c /dev/null' in the integration
+        # tests to prevent them from picking up the user site config
+        if data is None:
+            data = {}
+        if not isinstance(data, dict):
+            raise ConfigError('config file %s should be formatted as YAML dict' % path)
+        if 'include' in data:
+            include_paths = data['include']
+            if not isinstance(include_paths, list):
+                include_paths = [include_paths]
+            for include_path in include_paths:
+                if not include_path.startswith('/'):
+                    # Normalize include path based on location of parent file
+                    include_path = os.path.join(os.path.dirname(path), include_path)
+                self._display.v('Loading site config from included file %s' % include_path)
+                include_data = self.load_file(include_path)
+                data = dict_merge(data, include_data)
+            del data['include']
+        return data
+
     def load(self, path):
         try:
             self._display.v('Loading site config from %s' % path)
-            with open(path) as f:
-                data = yaml_load(f)
-            # Handle empty site config file
-            # This is mostly here to allow doing '-c /dev/null' in the integration
-            # tests to prevent them from picking up the user site config
-            if data is None:
-                data = {}
-            if not isinstance(data, dict):
-                raise ConfigError('config file should be formatted as YAML dict')
+            data = self.load_file(path)
             self._path = os.path.realpath(path)
             # Special case for plugin dirs
             if 'plugin_dirs' in data:

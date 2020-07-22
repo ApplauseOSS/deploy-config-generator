@@ -1,0 +1,7 @@
+---
+plugins:
+  dummy:
+    fields:
+      test:
+        new_field3:
+          type: str
