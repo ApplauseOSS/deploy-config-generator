@@ -74,6 +74,7 @@ class SiteConfig(with_metaclass(Singleton, object)):
         return self._config
 
     def load_file(self, path):
+        path = os.path.realpath(path)
         with open(path) as f:
             data = yaml_load(f)
         # Handle empty site config file
@@ -100,8 +101,8 @@ class SiteConfig(with_metaclass(Singleton, object)):
     def load(self, path):
         try:
             self._display.v('Loading site config from %s' % path)
-            data = self.load_file(path)
             self._path = os.path.realpath(path)
+            data = self.load_file(self._path)
             # Special case for plugin dirs
             if 'plugin_dirs' in data:
                 if not isinstance(data['plugin_dirs'], list):
