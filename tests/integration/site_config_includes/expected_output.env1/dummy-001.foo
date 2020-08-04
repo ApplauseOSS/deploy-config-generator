@@ -7,5 +7,6 @@ App config:
   "new_field1": "field1",
   "new_field2": "field2",
   "new_field3": "field3",
+  "new_field4": "default from env1",
   "parent1": []
 }

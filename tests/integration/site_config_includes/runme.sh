@@ -5,13 +5,17 @@ cd ${TEST_DIR}
 
 export PYTHONPATH=../../..
 
-rm -rf tmp
-mkdir tmp
+set -e
 
-(
-set -x
+for env in env1 env2; do
+	rm -rf tmp.${env}
+	mkdir tmp.${env}
 
-python -m deploy_config_generator -c site_config.yml -o tmp . $@
-)
+	(
+	set -x
 
-diff -ru expected_output tmp
+	python -m deploy_config_generator -c site_config.yml -e ${env} -o tmp.${env} . $@
+
+	diff -ru expected_output.${env} tmp.${env}
+	)
+done

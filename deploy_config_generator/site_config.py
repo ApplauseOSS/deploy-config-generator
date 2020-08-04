@@ -4,6 +4,7 @@ from six import with_metaclass
 
 from deploy_config_generator.display import Display
 from deploy_config_generator.errors import ConfigError
+from deploy_config_generator.template import Template
 from deploy_config_generator.utils import objdict, yaml_load, dict_merge, Singleton
 
 
@@ -38,9 +39,14 @@ class SiteConfig(with_metaclass(Singleton, object)):
         'default_vars': {},
     }
 
-    def __init__(self):
+    def __init__(self, env=None):
         self._display = Display()
         self._config = self._defaults
+        # Used for replacing vars in include paths
+        tmp_vars = dict()
+        if env is not None:
+            tmp_vars['env'] = env
+        self._template = Template(default_vars=tmp_vars)
 
     def __getattr__(self, key):
         '''Allows object-like access to keys in the _config dict'''
@@ -85,7 +91,7 @@ class SiteConfig(with_metaclass(Singleton, object)):
         if not isinstance(data, dict):
             raise ConfigError('config file %s should be formatted as YAML dict' % path)
         if 'include' in data:
-            include_paths = data['include']
+            include_paths = self._template.render_template(data['include'])
             if not isinstance(include_paths, list):
                 include_paths = [include_paths]
             for include_path in include_paths:

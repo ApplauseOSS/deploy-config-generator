@@ -11,7 +11,7 @@ mkdir tmp
 (
 set -x
 
-python -m deploy_config_generator -o tmp . $@ 2>&1 > tmp/cmd_output.txt
+python -m deploy_config_generator -o tmp -c /dev/null . $@ 2>&1 > tmp/cmd_output.txt
 )
 
 if [[ $? = 0 ]]; then
