@@ -182,7 +182,7 @@ def main():
         DISPLAY.vv('%s: %s' % (arg, getattr(args, arg)))
     DISPLAY.vv()
 
-    SITE_CONFIG = SiteConfig()
+    SITE_CONFIG = SiteConfig(env=args.env)
     if args.config is None:
         # Possible config locations
         config_paths = [
@@ -197,6 +197,7 @@ def main():
             SITE_CONFIG.load(args.config)
         except ConfigError as e:
             DISPLAY.display('Failed to load site config: %s' % str(e))
+            show_traceback(DISPLAY.get_verbosity())
             sys.exit(1)
 
     DISPLAY.vvvv('Site config:')

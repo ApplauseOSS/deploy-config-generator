@@ -1,0 +1,8 @@
+---
+plugins:
+  dummy:
+    fields:
+      test:
+        new_field4:
+          type: str
+          default: default from env2

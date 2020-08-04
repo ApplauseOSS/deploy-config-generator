@@ -10,9 +10,11 @@ OMIT_TOKEN = '__OMIT__TOKEN__'
 
 class Template(object):
 
-    def __init__(self, recursive=True):
+    def __init__(self, recursive=True, default_vars=None):
         # Whether to recursively resolve vars
         self._recursive = recursive
+        # Default vars
+        self._default_vars = default_vars
         # Setup custom Jinja2 Environment instance with our own 'finalize' function,
         # filters, and top-level functions. We use StrictUndefined to raise an exception
         # when accessing an undefined var, so that we can report it to the user
@@ -57,10 +59,12 @@ class Template(object):
                     return eval(matches.group(2))
         return value
 
-    def render_template(self, template, args):
+    def render_template(self, template, args=None):
         '''
         This function will recursively render templates in strings, dicts, and lists
         '''
+        if args is None:
+            args = self._default_vars
         if isinstance(template, dict):
             ret = {}
             for k, v in template.items():
