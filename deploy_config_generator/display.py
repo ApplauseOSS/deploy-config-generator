@@ -24,6 +24,9 @@ class Display(with_metaclass(Singleton, object)):
         if self._verbosity >= verbosity_level:
             print(msg)
 
+    def warn(self, msg='', verbosity_level=1, **kwargs):
+        self.display(msg='[WARNING]: %s' % msg, verbosity_level=verbosity_level, **kwargs)
+
     def v(self, msg=''):
         self.display(msg, 1)
 
