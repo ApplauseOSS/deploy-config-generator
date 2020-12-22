@@ -1,0 +1,6 @@
+---
+test:
+  dummy: true
+  some_dict:
+    foo: bar
+    baz: 2
