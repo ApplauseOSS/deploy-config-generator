@@ -265,7 +265,7 @@ class PluginField(object):
         # * prefix - prefix to add to value
         # * suffix - suffix to add to value
         'transform': None,
-        # Expected type for sub-items (for lists)
+        # Expected type for sub-items (for lists and free-form dicts)
         'subtype': None,
         # How to combine defaults
         # * None - no combining, user value replaces default
@@ -442,20 +442,26 @@ class PluginField(object):
                 item_unmatched = self.validate(value_item, use_subtype=True)
                 unmatched.extend(item_unmatched)
         else:
-            # Recursively validate sub-field values
-            if field_type == 'dict' and self.fields is not None:
-                for k, v in value.items():
-                    if k not in self.fields or not self.fields[k].is_valid_for_config_version():
-                        unmatched.append('%s.%s' % (self.get_full_name(), k))
-                        continue
-                    field_unmatched = self.fields[k].validate(v)
-                    unmatched.extend(field_unmatched)
-                # Check for required and locked sub-fields
-                for tmp_field_name, tmp_field in self.fields.items():
-                    if tmp_field.required and value.get(tmp_field_name, None) is None and tmp_field.default is None:
-                        raise DeployConfigError("field '%s' is required, but no value provided" % tmp_field.get_full_name())
-                    if tmp_field.locked and value.get(tmp_field_name, None) is not None:
-                        raise DeployConfigError("field '%s' is locked, but a value was provided" % tmp_field.get_full_name())
+            if field_type == 'dict':
+                # Recursively validate sub-field values
+                if self.fields is not None:
+                    for k, v in value.items():
+                        if k not in self.fields or not self.fields[k].is_valid_for_config_version():
+                            unmatched.append('%s.%s' % (self.get_full_name(), k))
+                            continue
+                        field_unmatched = self.fields[k].validate(v)
+                        unmatched.extend(field_unmatched)
+                    # Check for required and locked sub-fields
+                    for tmp_field_name, tmp_field in self.fields.items():
+                        if tmp_field.required and value.get(tmp_field_name, None) is None and tmp_field.default is None:
+                            raise DeployConfigError("field '%s' is required, but no value provided" % tmp_field.get_full_name())
+                        if tmp_field.locked and value.get(tmp_field_name, None) is not None:
+                            raise DeployConfigError("field '%s' is locked, but a value was provided" % tmp_field.get_full_name())
+                # Validate free-form value type
+                elif self.subtype is not None and not use_subtype:
+                    for value_item in value.values():
+                        item_unmatched = self.validate(value_item, use_subtype=True)
+                        unmatched.extend(item_unmatched)
 
         return unmatched
 
