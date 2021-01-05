@@ -1,6 +1,7 @@
 import copy
 import inspect
 import os.path
+import re
 import six
 
 from deploy_config_generator.site_config import SiteConfig
@@ -286,6 +287,8 @@ class PluginField(object):
         'conditional_key': 'condition',
         # Loop var (for use in conditionals)
         'loop_var': 'item',
+        # Validation regex pattern (for strings)
+        'validation_pattern': None,
     }
 
     def __init__(self, name, config, config_version, template, parent=None):
@@ -441,27 +444,30 @@ class PluginField(object):
                 # Use field's subtype for list items
                 item_unmatched = self.validate(value_item, use_subtype=True)
                 unmatched.extend(item_unmatched)
-        else:
-            if field_type == 'dict':
-                # Recursively validate sub-field values
-                if self.fields is not None:
-                    for k, v in value.items():
-                        if k not in self.fields or not self.fields[k].is_valid_for_config_version():
-                            unmatched.append('%s.%s' % (self.get_full_name(), k))
-                            continue
-                        field_unmatched = self.fields[k].validate(v)
-                        unmatched.extend(field_unmatched)
-                    # Check for required and locked sub-fields
-                    for tmp_field_name, tmp_field in self.fields.items():
-                        if tmp_field.required and value.get(tmp_field_name, None) is None and tmp_field.default is None:
-                            raise DeployConfigError("field '%s' is required, but no value provided" % tmp_field.get_full_name())
-                        if tmp_field.locked and value.get(tmp_field_name, None) is not None:
-                            raise DeployConfigError("field '%s' is locked, but a value was provided" % tmp_field.get_full_name())
-                # Validate free-form value type
-                elif self.subtype is not None and not use_subtype:
-                    for value_item in value.values():
-                        item_unmatched = self.validate(value_item, use_subtype=True)
-                        unmatched.extend(item_unmatched)
+        elif field_type == 'dict':
+            # Recursively validate sub-field values
+            if self.fields is not None:
+                for k, v in value.items():
+                    if k not in self.fields or not self.fields[k].is_valid_for_config_version():
+                        unmatched.append('%s.%s' % (self.get_full_name(), k))
+                        continue
+                    field_unmatched = self.fields[k].validate(v)
+                    unmatched.extend(field_unmatched)
+                # Check for required and locked sub-fields
+                for tmp_field_name, tmp_field in self.fields.items():
+                    if tmp_field.required and value.get(tmp_field_name, None) is None and tmp_field.default is None:
+                        raise DeployConfigError("field '%s' is required, but no value provided" % tmp_field.get_full_name())
+                    if tmp_field.locked and value.get(tmp_field_name, None) is not None:
+                        raise DeployConfigError("field '%s' is locked, but a value was provided" % tmp_field.get_full_name())
+            # Validate free-form value type
+            elif self.subtype is not None and not use_subtype:
+                for value_item in value.values():
+                    item_unmatched = self.validate(value_item, use_subtype=True)
+                    unmatched.extend(item_unmatched)
+        elif field_type == 'str':
+            if self.validation_pattern is not None:
+                if not re.match(self.validation_pattern, value):
+                    raise DeployConfigError("value for field '%s' did not match validation pattern: %s" % (self.get_full_name(), self.validation_pattern))
 
         return unmatched
 

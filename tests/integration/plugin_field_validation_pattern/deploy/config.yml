@@ -1,0 +1,4 @@
+---
+test:
+  dummy: true
+  some_field: ABC
