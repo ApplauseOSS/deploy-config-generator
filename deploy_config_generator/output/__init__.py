@@ -192,11 +192,29 @@ class OutputPluginBase(object):
                 unmatched.append(field)
         return unmatched
 
+    def build_app_vars(self, index, app, path=''):
+        # Build vars for template
+        app_vars = {
+            'PLUGIN_NAME': self.NAME,
+            'APP_INDEX': index,
+            'OUTPUT_FILE': os.path.basename(path),
+            'OUTPUT_PATH': path,
+            # App config
+            'APP': self.merge_with_field_defaults(app),
+            # Parsed vars
+            'VARS': dict(self._vars),
+        }
+        return app_vars
+
+    def pre_process(self, config):
+        pass
+
     def generate(self, config):
         '''
         Write out the generated config to disk
         '''
         try:
+            self.pre_process(config)
             for section in config:
                 if section in self._fields:
                     self.set_section(section)
@@ -206,21 +224,14 @@ class OutputPluginBase(object):
                         if self.is_needed(app):
                             path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
                             # Build vars for template
-                            app_vars = {
-                                'PLUGIN_NAME': self.NAME,
-                                'APP_INDEX': index,
-                                'OUTPUT_FILE': os.path.basename(path),
-                                'OUTPUT_PATH': path,
-                                # App config
-                                'APP': self.merge_with_field_defaults(app),
-                                # Parsed vars
-                                'VARS': dict(self._vars),
-                            }
+                            app_vars = self.build_app_vars(index, app, path)
                             # Check conditionals
                             for field, value in self._fields[self._section].items():
                                 app_vars['APP'][field] = value.check_conditionals(app_vars['APP'].get(field, None), app_vars)
                             # Generate output
                             output = self.generate_output(app_vars)
+                            if output is None:
+                                continue
                             self._display.v('Writing output file %s' % path)
                             with open(path, 'w') as f:
                                 f.write(output)
