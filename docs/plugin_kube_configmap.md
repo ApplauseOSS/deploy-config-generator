@@ -1,24 +1,22 @@
 <!--
 NOTE: this document is automatically generated. Any manual changes will get overwritten.
 -->
-# kube_secret
+# kube_configmap
 
-Kubernetes secret output plugin
+Kubernetes ConfigMap output plugin
 
 ### Parameters
 
 
-#### Deploy config section: kube_secrets
+#### Deploy config section: kube_configmaps
 
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
-`data`|`dict` (of `str`)|no||Values will be automatically base64-encoded as expected by the Kubernetes API
+`data`|`dict` (of `str`)|yes||
 `metadata`|`dict`|yes||
 `metadata . annotations`|`dict`|no||
 `metadata . labels`|`dict`|no||
 `metadata . name`|`str`|no||
 `metadata . namespace`|`str`|no||
-`string_data`|`dict`|no||
-`type`|`str`|yes||
 
 
