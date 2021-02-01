@@ -123,6 +123,7 @@ The following output plugins are available:
 
 * [`dummy`](docs/plugin_dummy.md)
 * [`kongfig`](docs/plugin_kongfig.md)
+* [`kube_configmap`](docs/plugin_kube_configmap.md)
 * [`kube_cronjob`](docs/plugin_kube_cronjob.md)
 * [`kube_deployment`](docs/plugin_kube_deployment.md)
 * [`kube_dnsendpoint`](docs/plugin_kube_dnsendpoint.md)

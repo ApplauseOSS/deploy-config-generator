@@ -32,7 +32,7 @@ Name | Type | Required | Default | Description
 `spec . selector . match_expressions . operator`|`str`|yes||
 `spec . selector . match_expressions . values`|`list` (of `str`)|yes||
 `spec . selector . match_labels`|`dict`|no||
-`spec . storage_class_name`|`str`|yes||
+`spec . storage_class_name`|`str`|no||
 `spec . volume_mode`|`str`|no||
 `spec . volume_name`|`str`|no||
 

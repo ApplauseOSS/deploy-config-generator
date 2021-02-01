@@ -146,3 +146,12 @@ kube_pvcs:
           release: "stable"
         match_expressions:
           - {key: environment, operator: In, values: [dev]}
+kube_configmaps:
+  - metadata:
+      name: test-configmap
+    data:
+      foo: bar
+      some.file: |
+        test1
+        test2
+        test3
