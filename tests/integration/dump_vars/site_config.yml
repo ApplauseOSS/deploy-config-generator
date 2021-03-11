@@ -1,0 +1,5 @@
+---
+default_vars:
+  FOO: foo
+  BAR: bar
+  BAZ: abc123
