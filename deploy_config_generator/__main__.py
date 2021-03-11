@@ -35,9 +35,7 @@ def find_deploy_dir(path):
     return deploy_dir
 
 
-def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH'):
-    vars_path = os.path.join(deploy_dir, SITE_CONFIG.vars_dir)
-
+def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH', only_site_config=False):
     # Used for replacing vars in file patterns
     template = Template()
     tmp_vars = dict(env=env)
@@ -49,16 +47,19 @@ def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH'):
             DISPLAY.warn("implicitly converted non-string value for var '%s' from site config to string" % key)
     varset.update(SITE_CONFIG.default_vars)
 
-    # Load env vars
-    if SITE_CONFIG.use_env_vars:
-        DISPLAY.v('Loading vars from environment')
-        varset.update(os.environ)
+    if not only_site_config:
+        vars_path = os.path.join(deploy_dir, SITE_CONFIG.vars_dir)
 
-    # Load "defaults" vars
-    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.defaults_vars_file_patterns, tmp_vars))
+        # Load env vars
+        if SITE_CONFIG.use_env_vars:
+            DISPLAY.v('Loading vars from environment')
+            varset.update(os.environ)
 
-    # Load env-specific vars
-    load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.env_vars_file_patterns, tmp_vars))
+        # Load "defaults" vars
+        load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.defaults_vars_file_patterns, tmp_vars))
+
+        # Load env-specific vars
+        load_vars_files(varset, vars_path, template.render_template(SITE_CONFIG.env_vars_file_patterns, tmp_vars))
 
 
 def load_vars_files(varset, vars_dir, patterns, allow_var_references=True):
@@ -174,6 +175,12 @@ def main():
         help="Directory to output generated deploy configs to (defaults to '.')",
         default='.'
     )
+    parser.add_argument(
+        '--dump-vars',
+        help="Output all site config vars in shell format",
+        action='store_true',
+        default=False,
+    )
     args = parser.parse_args()
 
     DISPLAY = Display()
@@ -213,14 +220,23 @@ def main():
     varset = Vars()
     varset['env'] = args.env
 
-    deploy_dir = find_deploy_dir(args.path)
+    deploy_dir = None
+    if not args.dump_vars:
+        deploy_dir = find_deploy_dir(args.path)
 
     try:
-        load_vars(varset, deploy_dir, args.env)
+        load_vars(varset, deploy_dir, args.env, only_site_config=(True if args.dump_vars else False))
     except Exception as e:
         DISPLAY.display('Error loading vars: %s' % str(e))
         show_traceback(DISPLAY.get_verbosity())
         sys.exit(1)
+
+    if args.dump_vars:
+        template = Template()
+        templated_vars = template.render_template(dict(varset), dict(VARS=dict(varset)))
+        for key in sorted(templated_vars.keys()):
+            print('%s=%s' % (key, six.moves.shlex_quote(templated_vars[key])))
+        sys.exit(0)
 
     DISPLAY.vvvv()
     DISPLAY.vvvv('Vars:')

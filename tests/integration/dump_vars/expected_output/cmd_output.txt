@@ -1,0 +1,4 @@
+BAR=bar
+BAZ=abc123
+FOO=foo
+env=local
