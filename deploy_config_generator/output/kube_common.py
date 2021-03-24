@@ -12,8 +12,8 @@ METADATA_FIELD_SPEC = dict(
     ),
     name=dict(
         type='str',
-        # Validation regex pulled from Kubernetes code
-        validation_pattern=r'[a-z0-9]([-a-z0-9]*[a-z0-9])?',
+        # Validation regex pulled from Kubernetes code, plus $
+        validation_pattern=r'[a-z0-9]([-a-z0-9]*[a-z0-9])?$',
     ),
     namespace=dict(
         type='str',
