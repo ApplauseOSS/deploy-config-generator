@@ -14,4 +14,4 @@ set -x
 python -m deploy_config_generator -c site_config.yml --dump-vars . $@ 2>&1 > tmp/cmd_output.txt
 )
 
-diff -ru expected_output tmp
+diff -BurN expected_output tmp

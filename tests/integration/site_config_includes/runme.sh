@@ -16,6 +16,6 @@ for env in env1 env2; do
 
 	python -m deploy_config_generator -c site_config.yml -e ${env} -o tmp.${env} . $@
 
-	diff -ru expected_output.${env} tmp.${env}
+	diff -BurN expected_output.${env} tmp.${env}
 	)
 done

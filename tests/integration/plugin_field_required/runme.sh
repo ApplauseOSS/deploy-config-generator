@@ -19,4 +19,4 @@ if [[ $? = 0 ]]; then
 	exit 1
 fi
 
-diff -ru expected_output tmp
+diff -BurN expected_output tmp
