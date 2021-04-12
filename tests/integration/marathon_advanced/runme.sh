@@ -20,8 +20,8 @@ for env in NONE test_env; do
 	(
 	set -x
 
-	python -m deploy_config_generator -v -c site_config.yml -o tmp.${env} ${env_flag} .
+	python -m deploy_config_generator -v -c site_config.yml -o tmp.${env} ${env_flag} . $@
 
-	diff -ru expected_output.${env} tmp.${env}
+	diff -BurN expected_output.${env} tmp.${env}
 	)
 done

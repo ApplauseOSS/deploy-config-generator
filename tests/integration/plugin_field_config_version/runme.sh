@@ -14,9 +14,9 @@ for version in NONE 0 1 99; do
 	(
 	set -x
 
-	python -m deploy_config_generator -c site_config.${version}.yml -o tmp.${version} . &> tmp.${version}/cmd_output.txt
+	python -m deploy_config_generator -c site_config.${version}.yml -o tmp.${version} . $@ &> tmp.${version}/cmd_output.txt
 	echo $? > tmp.${version}/exit_code.txt
 
-	diff -ru expected_output.${version} tmp.${version}
+	diff -BurN expected_output.${version} tmp.${version}
 	)
 done
