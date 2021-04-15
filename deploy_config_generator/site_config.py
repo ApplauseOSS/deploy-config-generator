@@ -23,8 +23,22 @@ class SiteConfig(with_metaclass(Singleton, object)):
         # Directory within deploy dir to look for vars files
         'vars_dir': 'var',
         # Patterns for finding vars files
-        'defaults_vars_file_patterns': ['defaults.var'],
-        'env_vars_file_patterns': ['{{ env }}.var', 'env_{{ env }}.var'],
+        'defaults_vars_file_patterns': [
+            'defaults.var',
+            'defaults.yml',
+            'defaults.yaml',
+            'defaults.json',
+        ],
+        'env_vars_file_patterns': [
+            '{{ env }}.var',
+            'env_{{ env }}.var',
+            '{{ env }}.yml',
+            '{{ env }}.yaml',
+            '{{ env }}.json',
+            'env_{{ env }}.yml',
+            'env_{{ env }}.yaml',
+            'env_{{ env }}.json',
+        ],
         # Whether to use vars from environment
         'use_env_vars': True,
         # Deploy config version to assume if none is provided (defaults to latest)
