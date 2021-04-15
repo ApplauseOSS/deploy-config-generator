@@ -1,0 +1,10 @@
+---
+test:
+  dummy: True
+  parent1:
+    - child2_1: '{{ VARS.foo }}'
+      child2_2: '${foo}'
+    - child2_1: '{{ VARS.bar }}'
+      child2_2: '${bar}'
+    - child2_1: '{{ VARS.baz | output_complex }}'
+      child2_2: '{{ VARS.qux | output_complex }}'

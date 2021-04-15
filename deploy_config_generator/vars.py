@@ -2,6 +2,7 @@ import re
 import six
 
 from deploy_config_generator.errors import VarsParseError, VarsReplacementError
+from deploy_config_generator.utils import yaml_load
 
 EOF_TOKEN = None
 NEWLINE_TOKEN = '\n'
@@ -34,7 +35,13 @@ class Vars(dict):
 
     def read_vars_file(self, path, allow_var_references=True):
         with open(path, 'r') as f:
-            VarsParser(fh=f, path=path, varset=self, allow_var_references=allow_var_references).parse()
+            if re.search(r'[.](ya?ml|json)$', path):
+                # Parse YAML/JSON vars file
+                data = yaml_load(f.read())
+                self.update(data)
+            else:
+                # Parse bash-style vars file
+                VarsParser(fh=f, path=path, varset=self, allow_var_references=allow_var_references).parse()
 
     def replace_vars(self, value, allow_var_references=True):
         def replace_var(match):
@@ -42,7 +49,7 @@ class Vars(dict):
                 raise VarsReplacementError("Found variable reference where not allowed")
             var_name = match.group(2)
             try:
-                return self[var_name]
+                return str(self[var_name])
             except KeyError:
                 raise VarsReplacementError("Unknown variable '%s'" % var_name)
 
