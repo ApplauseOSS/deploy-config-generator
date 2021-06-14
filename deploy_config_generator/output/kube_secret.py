@@ -58,5 +58,6 @@ class OutputPlugin(kube_common.OutputPlugin):
                 tmp_data[key] = base64.b64encode(tmp_value).decode('utf-8')
             data['data'] = tmp_data
 
-        output = yaml_dump(self._template.render_template(data, app_vars))
-        return output
+        data = self._template.render_template(data, app_vars)
+        output = yaml_dump(data)
+        return (output, self.get_output_filename_suffix(data))

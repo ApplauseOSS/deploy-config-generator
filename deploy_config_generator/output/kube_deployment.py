@@ -82,8 +82,9 @@ class OutputPlugin(kube_common.OutputPlugin):
         data['metadata'] = self.build_metadata(app_vars['APP']['metadata'])
         self.build_spec(app_vars, data)
 
-        output = yaml_dump(self._template.render_template(data, app_vars))
-        return output
+        data = self._template.render_template(data, app_vars)
+        output = yaml_dump(data)
+        return (output, self.get_output_filename_suffix(data))
 
     def build_spec(self, app_vars, data):
         for field in ('min_ready_seconds', 'paused', 'progress_deadline_seconds', 'replicas', 'revision_history_limit'):

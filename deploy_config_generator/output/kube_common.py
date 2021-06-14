@@ -644,3 +644,13 @@ class OutputPlugin(OutputPluginBase):
         tmp_template['metadata'] = self.build_metadata(tmp_vars['metadata'])
         tmp_template['spec'] = self.build_generic(tmp_vars['spec'], POD_TEMPLATE_FIELD_SPEC['spec']['fields'])
         return tmp_template
+
+    def get_output_filename_suffix(self, data):
+        ret = ''
+        if data['metadata'].get('namespace', None):
+            ret = data['metadata']['namespace']
+        if data['metadata'].get('name', None):
+            if ret:
+                ret += '-'
+            ret += data['metadata']['name']
+        return ret
