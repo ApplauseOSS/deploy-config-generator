@@ -188,5 +188,6 @@ class OutputPlugin(kube_common.OutputPlugin):
             if app_vars['APP'][field]:
                 data.update(self.build_generic(app_vars['APP'], {field: self._fields['kong_ingresses'][field]}, camel_case=False))
 
-        output = yaml_dump(self._template.render_template(data, app_vars))
-        return output
+        data = self._template.render_template(data, app_vars)
+        output = yaml_dump(data)
+        return (output, self.get_output_filename_suffix(data))

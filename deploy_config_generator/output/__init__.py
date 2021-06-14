@@ -197,8 +197,6 @@ class OutputPluginBase(object):
         app_vars = {
             'PLUGIN_NAME': self.NAME,
             'APP_INDEX': index,
-            'OUTPUT_FILE': os.path.basename(path),
-            'OUTPUT_PATH': path,
             # App config
             'APP': self.merge_with_field_defaults(app),
             # Parsed vars
@@ -222,16 +220,19 @@ class OutputPluginBase(object):
                         # We want a 1-based index for the output files
                         index = idx + 1
                         if self.is_needed(app):
-                            path = os.path.join(self._output_dir, '%s-%03d%s' % (self.NAME, index, self.FILE_EXT))
                             # Build vars for template
-                            app_vars = self.build_app_vars(index, app, path)
+                            app_vars = self.build_app_vars(index, app)
                             # Check conditionals
                             for field, value in self._fields[self._section].items():
                                 app_vars['APP'][field] = value.check_conditionals(app_vars['APP'].get(field, None), app_vars)
                             # Generate output
                             output = self.generate_output(app_vars)
+                            path_suffix = None
+                            if isinstance(output, (tuple, list)):
+                                output, path_suffix = output
                             if output is None:
                                 continue
+                            path = os.path.join(self._output_dir, '%s-%03d%s%s' % (self.NAME, index, ('-%s' % path_suffix if path_suffix else ''), self.FILE_EXT))
                             self._display.v('Writing output file %s' % path)
                             with open(path, 'w') as f:
                                 f.write(output)

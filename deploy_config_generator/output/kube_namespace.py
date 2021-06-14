@@ -43,5 +43,6 @@ class OutputPlugin(kube_common.OutputPlugin):
             if tmp_spec:
                 data['spec'] = tmp_spec
 
-        output = yaml_dump(self._template.render_template(data, app_vars))
-        return output
+        data = self._template.render_template(data, app_vars)
+        output = yaml_dump(data)
+        return (output, self.get_output_filename_suffix(data))
