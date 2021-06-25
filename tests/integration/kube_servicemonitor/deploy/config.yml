@@ -1,0 +1,20 @@
+---
+kube_servicemonitors:
+  - metadata:
+      labels:
+        monitoring-key: keycloak
+      name: keycloak
+      namespace: default
+    spec:
+      endpoints: 
+        - path: "/auth/realms/master/metrics"
+          port: keycloak
+          scheme: https
+        - path: "/metrics"
+          port: KeycloakMonitoringServiceName
+          scheme: http
+          tls_config:
+            insecure_skip_verify: true
+      selector:
+        match_labels:
+          app: keycloak
