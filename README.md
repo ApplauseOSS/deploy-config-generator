@@ -137,6 +137,7 @@ The following output plugins are available:
 * [`kube_pvc`](docs/plugin_kube_pvc.md)
 * [`kube_secret`](docs/plugin_kube_secret.md)
 * [`kube_service`](docs/plugin_kube_service.md)
+* [`kube_servicemonitor`](docs/plugin_kube_servicemonitor.md)
 * [`kube_statefulset`](docs/plugin_kube_statefulset.md)
 * [`marathon`](docs/plugin_marathon.md)
 * [`metronome`](docs/plugin_metronome.md)
