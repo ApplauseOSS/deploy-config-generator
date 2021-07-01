@@ -394,6 +394,9 @@ POD_SPEC_FIELD_SPEC = dict(
     dns_policy=dict(
         type='str',
     ),
+    enable_service_links=dict(
+        type='bool',
+    ),
     host_aliases=dict(
         type='list',
         subtype='dict',
