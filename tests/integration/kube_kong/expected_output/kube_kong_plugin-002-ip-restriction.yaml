@@ -1,0 +1,9 @@
+apiVersion: configuration.konghq.com/v1
+configFrom:
+  secretKeyRef:
+    key: config
+    name: ip-restriction-secret
+kind: KongPlugin
+metadata:
+  name: ip-restriction
+plugin: ip-restriction
