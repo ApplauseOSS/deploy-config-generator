@@ -5,6 +5,13 @@ kong_plugins:
     config:
       header_name: my-request-id
     plugin: correlation-id
+  - metadata:
+      name: ip-restriction
+    plugin: ip-restriction
+    config_from:
+      secret_key_ref:
+        name: ip-restriction-secret
+        key: config
 kong_consumers:
   - metadata:
       name: consumer-team-x

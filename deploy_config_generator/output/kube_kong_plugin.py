@@ -24,6 +24,25 @@ class OutputPlugin(kube_common.OutputPlugin):
                 config=dict(
                     type='dict',
                 ),
+                config_from=dict(
+                    type='dict',
+                    fields=dict(
+                        secret_key_ref=dict(
+                            type='dict',
+                            required=True,
+                            fields=dict(
+                                name=dict(
+                                    type='str',
+                                    required=True,
+                                ),
+                                key=dict(
+                                    type='str',
+                                    required=True,
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
                 plugin=dict(
                     type='str',
                 ),
@@ -38,9 +57,9 @@ class OutputPlugin(kube_common.OutputPlugin):
             'kind': 'KongPlugin',
         }
         data['metadata'] = self.build_metadata(app_vars['APP']['metadata'])
-        for field in ('disabled', 'config', 'plugin'):
+        for field in ('disabled', 'config', 'config_from', 'plugin'):
             if app_vars['APP'][field]:
-                data.update(self.build_generic(app_vars['APP'], {field: self._fields['kong_plugins'][field]}, camel_case=False))
+                data.update(self.build_generic(app_vars['APP'], {field: self._fields['kong_plugins'][field]}))
 
         data = self._template.render_template(data, app_vars)
         output = yaml_dump(data)
