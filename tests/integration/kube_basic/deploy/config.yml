@@ -15,6 +15,18 @@ kube_deployments:
           labels:
             app: nginx
         spec:
+          affinity:
+            pod_anti_affinity:
+              preferred_during_scheduling_ignored_during_execution:
+              - weight: 100
+                pod_affinity_term:
+                  label_selector:
+                    match_expressions:
+                    - key: security
+                      operator: In
+                      values:
+                      - S2
+                  topology_key: kubernetes.io/hostname
           containers:
           - name: nginx
             image: nginx:1.7.9

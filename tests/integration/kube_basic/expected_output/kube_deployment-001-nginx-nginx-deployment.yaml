@@ -15,6 +15,18 @@ spec:
       labels:
         app: nginx
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: security
+                  operator: In
+                  values:
+                  - S2
+              topologyKey: kubernetes.io/hostname
+            weight: 100
       containers:
       - image: nginx:1.7.9
         name: nginx
