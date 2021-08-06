@@ -373,12 +373,65 @@ CONTAINER_FIELD_SPEC = dict(
     ),
 )
 
+POD_AFFINITY_TERM_FIELD_SPEC = dict(
+    label_selector=dict(
+        type='dict',
+        fields=copy.deepcopy(SELECTOR_FIELD_SPEC),
+    ),
+    node_selector=dict(
+        type='dict',
+        fields=copy.deepcopy(SELECTOR_FIELD_SPEC),
+    ),
+    namespaces=dict(
+        type='list',
+        subtype='str',
+    ),
+    topology_key=dict(
+        type='str',
+    ),
+)
+
+POD_AFFINITY_FIELD_SPEC = dict(
+    preferred_during_scheduling_ignored_during_execution=dict(
+        type='list',
+        subtype='dict',
+        fields=dict(
+            pod_affinity_term=dict(
+                type='dict',
+                fields=copy.deepcopy(POD_AFFINITY_TERM_FIELD_SPEC),
+            ),
+            weight=dict(
+                type='int',
+            ),
+        ),
+    ),
+    required_during_scheduling_ignored_during_execution=dict(
+        type='list',
+        subtype='dict',
+        fields=copy.deepcopy(POD_AFFINITY_TERM_FIELD_SPEC),
+    ),
+)
+
 POD_SPEC_FIELD_SPEC = dict(
     active_deadline_seconds=dict(
         type='int',
     ),
     affinity=dict(
         type='dict',
+        fields=dict(
+            node_affinity=dict(
+                type='dict',
+                # TODO: populate field spec
+            ),
+            pod_affinity=dict(
+                type='dict',
+                fields=copy.deepcopy(POD_AFFINITY_FIELD_SPEC),
+            ),
+            pod_anti_affinity=dict(
+                type='dict',
+                fields=copy.deepcopy(POD_AFFINITY_FIELD_SPEC),
+            ),
+        ),
     ),
     automount_service_account_token=dict(
         type='bool',
