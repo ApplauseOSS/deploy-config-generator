@@ -1,0 +1,16 @@
+Dummy output plugin
+
+App config:
+
+dict_test:
+  bar: foo {{ bar }} baz
+  foo: bar
+dummy: true
+list_test:
+- - foo bar baz
+  - foo {{ bar }} baz
+parent1: []
+string_test:
+- foo bar baz
+- foo {{ bar }} baz
+- foo bar baz

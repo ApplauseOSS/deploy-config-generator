@@ -1,0 +1,14 @@
+---
+test:
+  dummy: true
+  string_test:
+    - foo bar baz
+    - !unsafe foo {{ bar }} baz
+    - foo {{ 'bar' }} baz
+  list_test:
+    - !unsafe
+      - foo bar baz
+      - foo {{ bar }} baz
+  dict_test: !unsafe
+    foo: bar
+    bar: foo {{ bar }} baz

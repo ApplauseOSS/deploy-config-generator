@@ -2,8 +2,11 @@ from __future__ import print_function
 
 import json
 import re
+import six
 import traceback
 import yaml
+
+from deploy_config_generator.template import UnsafeText
 
 
 class objdict(dict):
@@ -81,15 +84,77 @@ def show_traceback(verbosity=0):
         print()
 
 
+def represent_yaml_unsafe(dumper, value):
+    '''
+    YAML representer for UnsafeText
+    '''
+    if dumper is None:
+        dumper = yaml.SafeDumper
+    return dumper.represent_scalar('tag:yaml.org,2002:str', str(value))
+
+
 def yaml_dump(value, **kwargs):
-    return yaml.safe_dump(value, default_flow_style=False, **kwargs)
+    '''
+    Utility function for dumping a value to YAML
+    '''
+    dumper = yaml.SafeDumper
+    dumper.add_representer(UnsafeText, represent_yaml_unsafe)
+    return yaml.dump(value, Dumper=dumper, default_flow_style=False, **kwargs)
+
+
+def construct_yaml_unsafe(loader, node):
+    '''
+    YAML constructor function for values tagged with !unsafe
+    '''
+    if loader is None:
+        loader = yaml.SafeLoader
+    try:
+        constructor = getattr(node, 'id', 'object')
+        if constructor is not None:
+            constructor = getattr(loader, 'construct_%s' % constructor)
+    except AttributeError:
+        constructor = loader.construct_object
+
+    value = constructor(node)
+
+    return wrap_unsafe(value)
+
+
+def wrap_unsafe(value):
+    '''
+    Helper function to recursively wrap string values in UnsafeText
+    '''
+    if isinstance(value, list):
+        ret = []
+        for item in value:
+            ret.append(wrap_unsafe(item))
+        return ret
+    elif isinstance(value, dict):
+        ret = {}
+        for k, v in value.items():
+            ret[k] = wrap_unsafe(v)
+        return ret
+    elif isinstance(value, six.string_types):
+        return UnsafeText(value)
+    else:
+        return value
 
 
 def yaml_load(value, **kwargs):
-    return yaml.safe_load(value, **kwargs)
+    '''
+    Utility function for loading a value from YAML
+    '''
+    loader = yaml.SafeLoader
+    loader.add_constructor(
+        u'!unsafe',
+        construct_yaml_unsafe)
+    return yaml.load(value, Loader=loader, **kwargs)
 
 
 def json_dump(value, sort_keys=True, indent=2, separators=(',', ': '), **kwargs):
+    '''
+    Utility function for dumping a value to JSON
+    '''
     return json.dumps(value, sort_keys=sort_keys, indent=indent, separators=separators, **kwargs)
 
 

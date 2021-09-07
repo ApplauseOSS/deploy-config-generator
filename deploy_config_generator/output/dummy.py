@@ -1,6 +1,6 @@
 import inspect
 
-from deploy_config_generator.utils import json_dump
+from deploy_config_generator.utils import json_dump, yaml_dump
 from deploy_config_generator.output import OutputPluginBase
 
 
@@ -14,6 +14,10 @@ class OutputPlugin(OutputPluginBase):
         'enabled': False,
         'fields': {
             'test': {
+                'format': dict(
+                    type='str',
+                    default='json',
+                ),
                 'parent1': {
                     'description': 'Used for tests',
                     'required': False,
@@ -50,5 +54,10 @@ class OutputPlugin(OutputPluginBase):
     def generate_output(self, app_vars):
         output = inspect.cleandoc(self.TEMPLATE)
         output += "\n\n"
-        output += json_dump(self._template.render_template(app_vars['APP'], app_vars))
+        output_fmt = app_vars['APP']['format']
+        del app_vars['APP']['format']
+        if output_fmt == 'json':
+            output += json_dump(self._template.render_template(app_vars['APP'], app_vars))
+        elif output_fmt == 'yaml':
+            output += yaml_dump(self._template.render_template(app_vars['APP'], app_vars))
         return output

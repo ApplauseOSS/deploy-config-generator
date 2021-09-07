@@ -3,6 +3,7 @@ import six
 
 from deploy_config_generator.errors import VarsParseError, VarsReplacementError
 from deploy_config_generator.utils import yaml_load
+from deploy_config_generator.template import UnsafeText
 
 EOF_TOKEN = None
 NEWLINE_TOKEN = '\n'
@@ -68,6 +69,8 @@ class Vars(dict):
             # the last capture group looks for a closing curly brace *if* the first capture
             # group matched anything
             ret = re.sub(r'\$(?P<curly>\{)?%s(?(curly)\})' % RE_VAR_NAME, replace_var, ret)
+            if isinstance(value, UnsafeText):
+                ret = UnsafeText(ret)
         else:
             ret = value
 
