@@ -1,0 +1,19 @@
+---
+default_output: dummy
+plugins:
+  dummy:
+    # Enable 'dummy' plugin, which is disabled by default
+    enabled: true
+    fields:
+      test:
+        format:
+          default: yaml
+        parent1:
+          required: false
+        string_test:
+          type: list
+          subtype: str
+        list_test:
+          type: list
+        dict_test:
+          type: dict

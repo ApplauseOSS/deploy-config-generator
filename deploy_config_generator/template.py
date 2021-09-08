@@ -8,6 +8,11 @@ from deploy_config_generator.errors import TemplateUndefinedError
 OMIT_TOKEN = '__OMIT__TOKEN__'
 
 
+class UnsafeText(six.text_type):
+
+    __UNSAFE__ = True
+
+
 class Template(object):
 
     def __init__(self, recursive=True, default_vars=None):
@@ -65,6 +70,8 @@ class Template(object):
         '''
         if args is None:
             args = self._default_vars
+        if isinstance(template, UnsafeText):
+            return template
         if isinstance(template, dict):
             ret = {}
             for k, v in template.items():
