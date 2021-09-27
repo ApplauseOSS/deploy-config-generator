@@ -82,11 +82,11 @@ Name | Type | Required | Default | Description
 `spec . endpoints . tls_config . cert . secret . optional`|`bool`|no||
 `spec . endpoints . tls_config . cert_file`|`string`|no||
 `spec . endpoints . tls_config . insecure_skip_verify`|`bool`|no||
-`spec . endpoints . tls_config . keyFile`|`str`|no||
-`spec . endpoints . tls_config . keySecret`|`dict`|no||
-`spec . endpoints . tls_config . keySecret . key`|`str`|yes||
-`spec . endpoints . tls_config . keySecret . name`|`str`|no||
-`spec . endpoints . tls_config . keySecret . optional`|`bool`|no||
+`spec . endpoints . tls_config . key_file`|`str`|no||
+`spec . endpoints . tls_config . key_secret`|`dict`|no||
+`spec . endpoints . tls_config . key_secret . key`|`str`|yes||
+`spec . endpoints . tls_config . key_secret . name`|`str`|no||
+`spec . endpoints . tls_config . key_secret . optional`|`bool`|no||
 `spec . endpoints . tls_config . server_name`|`str`|no||
 `spec . job_label`|`str`|no||
 `spec . namespace_selector`|`dict`|no||
@@ -100,7 +100,7 @@ Name | Type | Required | Default | Description
 `spec . selector . match_expressions . operator`|`str`|yes||
 `spec . selector . match_expressions . values`|`list` (of `str`)|yes||
 `spec . selector . match_labels`|`dict`|no||
-`spec . targetLabels`|`list` (of `str`)|no||
-`spec . targetLimit`|`int`|no||
+`spec . target_labels`|`list` (of `str`)|no||
+`spec . target_limit`|`int`|no||
 
 

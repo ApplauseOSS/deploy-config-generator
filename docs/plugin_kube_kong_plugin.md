@@ -13,6 +13,10 @@ Kubernetes KongPlugin output plugin
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
 `config`|`dict`|no||
+`config_from`|`dict`|no||
+`config_from . secret_key_ref`|`dict`|yes||
+`config_from . secret_key_ref . key`|`str`|yes||
+`config_from . secret_key_ref . name`|`str`|yes||
 `disabled`|`bool`|no||
 `metadata`|`dict`|yes||
 `metadata . annotations`|`dict`|no||

@@ -32,6 +32,7 @@ kube_deployments:
             image: nginx:1.7.9
             ports:
             - container_port: 80
+
 kube_services:
   - metadata:
       name: nginx-service
@@ -46,9 +47,11 @@ kube_services:
           protocol: TCP
           port: 80
           target_port: 80
+
 kube_namespaces:
   - metadata:
       name: nginx
+
 kube_pdbs:
   - metadata:
       name: nginx
@@ -58,6 +61,7 @@ kube_pdbs:
       selector:
         match_labels:
           app: nginx
+
 kube_secrets:
   - metadata:
       name: nginx-secrets
@@ -65,6 +69,7 @@ kube_secrets:
     data:
       key1: some value
       key2: another value
+
 kube_jobs:
   - metadata:
       name: job1
@@ -79,6 +84,7 @@ kube_jobs:
             - -c
             - date; echo Hello from the Kubernetes cluster
           restart_policy: OnFailure
+
 kube_cronjobs:
   - metadata:
       name: cronjob1
@@ -96,6 +102,7 @@ kube_cronjobs:
                 - -c
                 - date; echo Hello from the Kubernetes cluster
               restart_policy: OnFailure
+
 kube_statefulsets:
   - metadata:
       name: web
@@ -129,6 +136,7 @@ kube_statefulsets:
           resources:
             requests:
               storage: 1Gi
+
 kube_ingresses:
   - metadata:
       name: test-ingress
@@ -139,9 +147,13 @@ kube_ingresses:
       - http:
           paths:
           - path: /testpath
+            path_type: Prefix
             backend:
-              service_name: test
-              service_port: 80
+              service:
+                name: test
+                port:
+                  number: 80
+
 kube_pvcs:
   - metadata:
       name: test-pvc
@@ -158,6 +170,7 @@ kube_pvcs:
           release: "stable"
         match_expressions:
           - {key: environment, operator: In, values: [dev]}
+
 kube_configmaps:
   - metadata:
       name: test-configmap
