@@ -37,6 +37,73 @@ Name | Type | Required | Default | Description
 `spec . template . spec`|`dict`|yes||
 `spec . template . spec . active_deadline_seconds`|`int`|no||
 `spec . template . spec . affinity`|`dict`|no||
+`spec . template . spec . affinity . node_affinity`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . namespaces`|`list` (of `str`)|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . topology_key`|`str`|no||
+`spec . template . spec . affinity . pod_affinity . preferred_during_scheduling_ignored_during_execution . weight`|`int`|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . label_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . namespaces`|`list` (of `str`)|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . node_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_affinity . required_during_scheduling_ignored_during_execution . topology_key`|`str`|no||
+`spec . template . spec . affinity . pod_anti_affinity`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . label_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . namespaces`|`list` (of `str`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . node_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . pod_affinity_term . topology_key`|`str`|no||
+`spec . template . spec . affinity . pod_anti_affinity . preferred_during_scheduling_ignored_during_execution . weight`|`int`|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . label_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . label_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . namespaces`|`list` (of `str`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . node_selector`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions`|`list` (of `dict`)|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions . key`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions . operator`|`str`|yes||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_expressions . values`|`list` (of `str`)|yes||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . node_selector . match_labels`|`dict`|no||
+`spec . template . spec . affinity . pod_anti_affinity . required_during_scheduling_ignored_during_execution . topology_key`|`str`|no||
 `spec . template . spec . automount_service_account_token`|`bool`|no||
 `spec . template . spec . containers`|`list` (of `dict`)|no||
 `spec . template . spec . containers . args`|`list` (of `str`)|no||
@@ -166,6 +233,7 @@ Name | Type | Required | Default | Description
 `spec . template . spec . containers . working_dir`|`str`|no||
 `spec . template . spec . dns_config`|`dict`|no||
 `spec . template . spec . dns_policy`|`str`|no||
+`spec . template . spec . enable_service_links`|`bool`|no||
 `spec . template . spec . host_IPC`|`bool`|no||
 `spec . template . spec . host_PID`|`bool`|no||
 `spec . template . spec . host_aliases`|`list` (of `dict`)|no||

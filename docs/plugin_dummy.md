@@ -13,6 +13,7 @@ Dummy output plugin for testing
 Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
 `dummy`|`bool`|yes||Dummy field
+`format`|`str`|no|`json`|
 `parent1`|`list` (of `dict`)|no||Used for tests
 `parent1 . child2_1`||no||
 `parent1 . child2_2`||no||
