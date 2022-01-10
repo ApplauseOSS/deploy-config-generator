@@ -1,14 +1,12 @@
 import os.path
 
-from six import with_metaclass
-
 from deploy_config_generator.display import Display
 from deploy_config_generator.errors import ConfigError
 from deploy_config_generator.template import Template
 from deploy_config_generator.utils import objdict, yaml_load, dict_merge, Singleton
 
 
-class SiteConfig(with_metaclass(Singleton, object)):
+class SiteConfig(object, metaclass=Singleton):
 
     _path = None
     _config = None

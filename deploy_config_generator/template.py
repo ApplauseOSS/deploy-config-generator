@@ -1,14 +1,13 @@
 import jinja2
 import json
 import re
-import six
 
 from deploy_config_generator.errors import TemplateUndefinedError
 
 OMIT_TOKEN = '__OMIT__TOKEN__'
 
 
-class UnsafeText(six.text_type):
+class UnsafeText(str):
 
     __UNSAFE__ = True
 
@@ -34,7 +33,7 @@ class Template(object):
         us to do recursive templating of vars (vars referencing other vars)
         '''
         # If the value appears to contain a template, render it and return the result
-        if self._recursive and isinstance(value, six.string_types):
+        if self._recursive and isinstance(value, str):
             if '{{' in value or '{%' in value:
                 return context.environment.from_string(value).render(context)
 
@@ -45,7 +44,7 @@ class Template(object):
         This function looks for a type header/footer (as added by the various output_*
         Jinja filters) and converts as necessary
         '''
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             # This regex looks for a value like '__int__whatever__int__' and captures
             # the value in the middle
             matches = re.match(r'^__(?P<type>[a-z]+)__(.*)__(?P=type)__$', value)
@@ -88,7 +87,7 @@ class Template(object):
                     continue
                 ret.append(v)
             return ret
-        elif isinstance(template, six.string_types):
+        elif isinstance(template, str):
             try:
                 return self._env.from_string(template).render(**args)
             except jinja2.exceptions.UndefinedError as e:
