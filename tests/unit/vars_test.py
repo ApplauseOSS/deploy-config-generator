@@ -1,5 +1,4 @@
 import inspect
-import six
 import unittest
 
 # py2/3 compatibility
@@ -13,12 +12,6 @@ from deploy_config_generator.errors import VarsParseError
 
 
 class TestVars (unittest.TestCase):
-
-    def setUp(self):
-        # Map PY3 name for function (used in code below) to PY2 name
-        # This allows us to run the tests on both without deprecation warnings
-        if six.PY2:
-            self.assertRaisesRegex = self.assertRaisesRegexp
 
     def wrap_file(self, data):
         return StringIO(inspect.cleandoc(data))

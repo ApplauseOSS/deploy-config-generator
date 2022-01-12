@@ -2,7 +2,6 @@ import copy
 import inspect
 import os.path
 import re
-import six
 
 from deploy_config_generator.site_config import SiteConfig
 from deploy_config_generator.display import Display
@@ -409,11 +408,11 @@ class PluginField(object):
             return 'dict'
         if isinstance(value, bool):
             return 'bool'
-        if isinstance(value, six.integer_types):
+        if isinstance(value, int):
             return 'int'
         if isinstance(value, float):
             return 'float'
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             # Values from variables always come in as a string, so we need special
             # logic to determine their actual type based on the field type
             try:

@@ -1,5 +1,4 @@
 import re
-import six
 
 from deploy_config_generator.errors import VarsParseError, VarsReplacementError
 from deploy_config_generator.utils import yaml_load
@@ -62,7 +61,7 @@ class Vars(dict):
             ret = {}
             for item in value:
                 ret[item] = self.replace_vars(value[item])
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             ret = value
             # Find and Replace var references
             # The first capture group (named 'curly') looks for an opening curly brace, and

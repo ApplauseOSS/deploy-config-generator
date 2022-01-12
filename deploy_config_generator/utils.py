@@ -1,8 +1,5 @@
-from __future__ import print_function
-
 import json
 import re
-import six
 import traceback
 import yaml
 
@@ -134,7 +131,7 @@ def wrap_unsafe(value):
         for k, v in value.items():
             ret[k] = wrap_unsafe(v)
         return ret
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         return UnsafeText(value)
     else:
         return value

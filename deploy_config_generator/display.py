@@ -1,12 +1,8 @@
 # This helps make things py3 compatible
-from __future__ import print_function
-
-from six import with_metaclass
-
 from deploy_config_generator.utils import Singleton
 
 
-class Display(with_metaclass(Singleton, object)):
+class Display(object, metaclass=Singleton):
 
     _verbosity = 0
 

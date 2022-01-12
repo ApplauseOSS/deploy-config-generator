@@ -6,7 +6,7 @@ import sys
 import importlib
 import pkgutil
 import glob
-import six
+import shlex
 
 import deploy_config_generator.output as output_ns
 from deploy_config_generator.site_config import SiteConfig
@@ -42,7 +42,7 @@ def load_vars(varset, deploy_dir, env='BAD_VALUE_NO_MATCH', only_site_config=Fal
 
     # Load vars from site config
     for key, value in list(SITE_CONFIG.default_vars.items()):
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             SITE_CONFIG.default_vars[key] = str(value)
             DISPLAY.warn("implicitly converted non-string value for var '%s' from site config to string" % key)
     varset.update(SITE_CONFIG.default_vars)
@@ -235,7 +235,7 @@ def main():
         template = Template()
         templated_vars = template.render_template(dict(varset), dict(VARS=dict(varset)))
         for key in sorted(templated_vars.keys()):
-            print('%s=%s' % (key, six.moves.shlex_quote(templated_vars[key])))
+            print('%s=%s' % (key, shlex.quote(templated_vars[key])))
         sys.exit(0)
 
     DISPLAY.vvvv()

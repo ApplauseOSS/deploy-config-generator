@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from setuptools import setup
 from distutils.cmd import Command
 
@@ -55,7 +53,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'))
 
 setup(
     name='deploy-config-generator',
-    version='2.20.0',
+    version='2.21.0',
     url='https://github.com/ApplauseOSS/deploy-config-generator',
     license='MIT',
     description='Utility to generate service deploy configurations',
@@ -70,10 +68,10 @@ setup(
         'deploy_config_generator',
         'deploy_config_generator.output',
     ],
+    python_requires=">=3",
     install_requires=[
         'Jinja2>=2.11',
         'PyYAML',
-        'six',
     ],
     entry_points={
         'console_scripts': [
