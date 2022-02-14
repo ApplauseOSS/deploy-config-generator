@@ -65,7 +65,7 @@ class OutputPlugin(kube_common.OutputPlugin):
     def generate_output(self, app_vars):
         # Basic structure
         data = {
-            'apiVersion': 'batch/v1beta1',
+            'apiVersion': 'batch/v1',
             'kind': 'CronJob',
             'spec': dict(),
         }
