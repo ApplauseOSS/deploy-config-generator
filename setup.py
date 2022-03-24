@@ -53,7 +53,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.md'))
 
 setup(
     name='deploy-config-generator',
-    version='2.22.1',
+    version='2.22.2',
     url='https://github.com/ApplauseOSS/deploy-config-generator',
     license='MIT',
     description='Utility to generate service deploy configurations',
@@ -71,8 +71,7 @@ setup(
     python_requires=">=3",
     install_requires=[
         # Jinja2 2.11 fixes a bug around dynamic templating
-        # Jinja 3.1.0 removed some code that we were using, so we temporarily avoid it
-        'Jinja2>=2.11,<3.1.0',
+        'Jinja2>=2.11',
         'PyYAML',
     ],
     entry_points={

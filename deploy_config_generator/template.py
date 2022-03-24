@@ -12,6 +12,15 @@ class UnsafeText(str):
     __UNSAFE__ = True
 
 
+# The name of the decorator changed in 3.x, so this allows us to support both
+if hasattr(jinja2, 'contextfunction'):
+    jinja2_contextfunction = jinja2.contextfunction
+elif hasattr(jinja2, 'pass_context'):
+    jinja2_contextfunction = jinja2.pass_context
+else:
+    raise Exception('could not determine Jinja2 context decorator')
+
+
 class Template(object):
 
     def __init__(self, recursive=True, default_vars=None):
@@ -26,7 +35,7 @@ class Template(object):
         self._env.filters.update(FILTERS)
         self._env.globals.update(GLOBALS)
 
-    @jinja2.contextfunction
+    @jinja2_contextfunction
     def finalize(self, context, value):
         '''
         This function is called on rendered vars before outputting them. This allows
@@ -148,7 +157,7 @@ def filter_regex_replace(arg, pattern, replacement):
     return re.sub(pattern, replacement, str(arg))
 
 
-@jinja2.contextfunction
+@jinja2_contextfunction
 def evaluate_condition(context, condition, **kwargs):
     tmp_vars = context.get_all()
     tmp_vars.update(kwargs)
