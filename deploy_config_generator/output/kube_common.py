@@ -317,7 +317,7 @@ CONTAINER_FIELD_SPEC = dict(
                     ),
                     drop=dict(
                         type='list',
-                        substype='str',
+                        subtype='str',
                     ),
                 ),
             ),

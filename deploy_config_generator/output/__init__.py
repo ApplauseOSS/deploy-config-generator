@@ -1,5 +1,6 @@
 import copy
 import inspect
+import logging
 import os.path
 import re
 
@@ -268,6 +269,8 @@ class PluginField(object):
         'required': False,
         # Default value
         'default': None,
+        # Field description
+        'description': '',
         # Whether field is locked (value cannot be provided by user)
         'locked': False,
         # Expected type for field
@@ -309,6 +312,10 @@ class PluginField(object):
         self._template = template
         self._config = self.BASE_CONFIG.copy()
         if config is not None:
+            for key in config.keys():
+                if key not in self.BASE_CONFIG.keys():
+                    logging.getLogger(self._name).warning('Unknown config field "%s:%s"',
+                                                          self.get_full_name(), key)
             self._config.update(copy.deepcopy(config))
         self.convert_fields()
 
