@@ -211,7 +211,7 @@ Name | Type | Required | Default | Description
 `spec . template . spec . containers . security_context . allow_privilege_escalation`|`bool`|no||
 `spec . template . spec . containers . security_context . capabilities`|`dict`|no||
 `spec . template . spec . containers . security_context . capabilities . add`|`list` (of `str`)|no||
-`spec . template . spec . containers . security_context . capabilities . drop`|`list`|no||
+`spec . template . spec . containers . security_context . capabilities . drop`|`list` (of `str`)|no||
 `spec . template . spec . containers . security_context . privileged`|`bool`|no||
 `spec . template . spec . containers . security_context . proc_mount`|`str`|no||
 `spec . template . spec . containers . security_context . read_only_root_filesystem`|`bool`|no||
@@ -346,7 +346,7 @@ Name | Type | Required | Default | Description
 `spec . template . spec . init_containers . security_context . allow_privilege_escalation`|`bool`|no||
 `spec . template . spec . init_containers . security_context . capabilities`|`dict`|no||
 `spec . template . spec . init_containers . security_context . capabilities . add`|`list` (of `str`)|no||
-`spec . template . spec . init_containers . security_context . capabilities . drop`|`list`|no||
+`spec . template . spec . init_containers . security_context . capabilities . drop`|`list` (of `str`)|no||
 `spec . template . spec . init_containers . security_context . privileged`|`bool`|no||
 `spec . template . spec . init_containers . security_context . proc_mount`|`str`|no||
 `spec . template . spec . init_containers . security_context . read_only_root_filesystem`|`bool`|no||
