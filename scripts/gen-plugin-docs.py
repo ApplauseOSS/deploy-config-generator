@@ -22,7 +22,7 @@ SITE_CONFIG = None
 
 PLUGIN_DOC_TEMPLATE = r'''
 {%- macro cleanup(value) -%}
-{{ value | regex_replace('[|]', '\|') }}
+{{ value | regex_replace('[|]', '\|') | replace('\n', '\\n') }}
 {%- endmacro -%}
 <!--
 NOTE: this document is automatically generated. Any manual changes will get overwritten.
@@ -56,19 +56,29 @@ Name | Type | Required | Default | Description
 
 def load_output_plugins(varset):
     '''
-    Find/import all output plugins
+    Find, import, and instantiate all output plugins
     '''
     plugins = []
-    for finder, name, ispkg in pkgutil.iter_modules(output_ns.__path__, output_ns.__name__ + '.'):
-        try:
-            mod = importlib.import_module(name)
-            cls = getattr(mod, 'OutputPlugin')
-            plugins.append(cls(varset, '', None))
-        except Exception as e:
-            show_traceback(DISPLAY.get_verbosity())
-            DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
-            sys.exit(1)
-    return plugins
+    for plugin_dir in (output_ns.__path__ + SITE_CONFIG.plugin_dirs):
+        DISPLAY.vv('Looking in plugin dir %s' % plugin_dir)
+        sys.path.insert(0, plugin_dir)
+        for finder, name, ispkg in pkgutil.iter_modules([plugin_dir]):
+            try:
+                mod = importlib.import_module(name)
+                cls = getattr(mod, 'OutputPlugin')
+                DISPLAY.v('Loading plugin %s' % cls.NAME)
+                plugins.append(cls(varset, '', None))
+            except ConfigError as e:
+                DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
+                sys.exit(1)
+            except Exception as e:
+                show_traceback(DISPLAY.get_verbosity())
+                DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
+                sys.exit(1)
+        sys.path.pop(0)
+    # Return list of plugins sorted by priority (highest to lowest) and name (Z-A, because
+    # we reverse the sort)
+    return sorted(plugins, reverse=True)
 
 
 def get_plugin_fields(fields):
@@ -95,7 +105,7 @@ def main():
     parser.add_argument(
         '-o', '--output-dir',
         help="Directory to output generated docs to (defaults to '../docs')",
-        default='../docs'
+        default='./docs'
     )
     args = parser.parse_args()
 
@@ -103,7 +113,7 @@ def main():
     # Verbosity of 3 is needed for displaying tracebacks
     DISPLAY.set_verbosity(3)
 
-    SITE_CONFIG = SiteConfig()
+    SITE_CONFIG = SiteConfig(env='local')
     if args.config:
         try:
             SITE_CONFIG.load(args.config)
@@ -127,7 +137,7 @@ def main():
             plugin=plugin,
             fields=tmp_fields,
         )
-        output_file = os.path.join(os.path.dirname(__file__), args.output_dir, 'plugin_%s.md' % plugin.NAME)
+        output_file = os.path.join(args.output_dir, 'plugin_%s.md' % plugin.NAME)
         DISPLAY.display('Writing file %s' % output_file)
         with open(output_file, 'w') as f:
             f.write(tmpl.render_template(PLUGIN_DOC_TEMPLATE, tmp_vars))
