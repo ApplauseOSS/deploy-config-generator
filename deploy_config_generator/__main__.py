@@ -88,8 +88,26 @@ def load_output_plugins(varset, output_dir, config_version):
         sys.path.insert(0, plugin_dir)
         for finder, name, ispkg in pkgutil.iter_modules([plugin_dir]):
             try:
+                # Look through already loaded plugins for the same name
+                found_plugin = False
+                for idx, plugin in enumerate(plugins):
+                    if plugin.NAME == name:
+                        # Remove already loaded plugin in favor of the one we're about to load
+                        plugins.pop(idx)
+                        found_plugin = True
+                        break
+                # Import plugin
                 mod = importlib.import_module(name)
+                # Reload module if we had already loaded one of the same name
+                # This is necessary because import_module() returns the cached module
+                if found_plugin:
+                    mod = importlib.reload(mod)
                 cls = getattr(mod, 'OutputPlugin')
+                # Verify that output plugin NAME attribute matches file name
+                # We assume this is true in the code above, so we actually enforce
+                # that assumption here
+                if cls.NAME != name:
+                    raise Exception('name specified in OutputPlugin class (%s) does not match file name (%s)' % (cls.NAME, name))
                 DISPLAY.v('Loading plugin %s' % cls.NAME)
                 plugins.append(cls(varset, output_dir, config_version))
             except ConfigError as e:

@@ -6,3 +6,4 @@ sdist/
 .tox/
 tmp/
 tmp.*/
+build/
