@@ -102,20 +102,22 @@ def load_output_plugins(varset, output_dir, config_version):
                 # This is necessary because import_module() returns the cached module
                 if found_plugin:
                     mod = importlib.reload(mod)
+                # Get class object
                 cls = getattr(mod, 'OutputPlugin')
                 # Verify that output plugin NAME attribute matches file name
                 # We assume this is true in the code above, so we actually enforce
                 # that assumption here
                 if cls.NAME != name:
                     raise Exception('name specified in OutputPlugin class (%s) does not match file name (%s)' % (cls.NAME, name))
-                DISPLAY.v('Loading plugin %s' % cls.NAME)
+                DISPLAY.v('Loading plugin %s' % name)
+                # Instantiate plugin class
                 plugins.append(cls(varset, output_dir, config_version))
             except ConfigError as e:
-                DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
+                DISPLAY.display('Plugin configuration error: %s: %s' % (name, str(e)))
                 sys.exit(1)
             except Exception as e:
                 show_traceback(DISPLAY.get_verbosity())
-                DISPLAY.display('Failed to load output plugin %s: %s' % (cls.NAME, str(e)))
+                DISPLAY.display('Failed to load output plugin %s: %s' % (name, str(e)))
                 sys.exit(1)
         sys.path.pop(0)
     # Return list of plugins sorted by priority (highest to lowest) and name (Z-A, because
