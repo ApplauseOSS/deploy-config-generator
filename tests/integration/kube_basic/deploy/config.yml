@@ -120,7 +120,7 @@ kube_statefulsets:
           termination_grace_period_seconds: 10
           containers:
           - name: nginx
-            image: k8s.gcr.io/nginx-slim:0.8
+            image: registry.k8s.io/nginx-slim:0.8
             ports:
             - container_port: 80
               name: web
