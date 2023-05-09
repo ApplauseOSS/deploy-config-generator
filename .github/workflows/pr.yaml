@@ -5,11 +5,8 @@ on:
       - master
 jobs:
   Run-CI-Script:
-    runs-on: [self-hosted, medium, amd64]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '2.7'
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
