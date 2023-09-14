@@ -363,10 +363,38 @@ CONTAINER_FIELD_SPEC = dict(
     volume_devices=dict(
         type='list',
         subtype='dict',
+        fields=dict(
+            device_path=dict(
+                type='str',
+            ),
+            name=dict(
+                type='str',
+            ),
+        ),
     ),
     volume_mounts=dict(
         type='list',
         subtype='dict',
+        fields=dict(
+            mount_path=dict(
+                type='str',
+            ),
+            mount_propagation=dict(
+                type='str',
+            ),
+            name=dict(
+                type='str',
+            ),
+            read_only=dict(
+                type='bool',
+            ),
+            sub_path=dict(
+                type='str',
+            ),
+            sub_path_expr=dict(
+                type='str',
+            ),
+        ),
     ),
     working_dir=dict(
         type='str',

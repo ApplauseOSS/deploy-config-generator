@@ -230,7 +230,15 @@ Name | Type | Required | Default | Description
 `spec . template . spec . containers . termination_message_policy`|`str`|no||
 `spec . template . spec . containers . tty`|`bool`|no||
 `spec . template . spec . containers . volume_devices`|`list` (of `dict`)|no||
+`spec . template . spec . containers . volume_devices . device_path`|`str`|no||
+`spec . template . spec . containers . volume_devices . name`|`str`|no||
 `spec . template . spec . containers . volume_mounts`|`list` (of `dict`)|no||
+`spec . template . spec . containers . volume_mounts . mount_path`|`str`|no||
+`spec . template . spec . containers . volume_mounts . mount_propagation`|`str`|no||
+`spec . template . spec . containers . volume_mounts . name`|`str`|no||
+`spec . template . spec . containers . volume_mounts . read_only`|`bool`|no||
+`spec . template . spec . containers . volume_mounts . sub_path`|`str`|no||
+`spec . template . spec . containers . volume_mounts . sub_path_expr`|`str`|no||
 `spec . template . spec . containers . working_dir`|`str`|no||
 `spec . template . spec . dns_config`|`dict`|no||
 `spec . template . spec . dns_policy`|`str`|no||
@@ -365,7 +373,15 @@ Name | Type | Required | Default | Description
 `spec . template . spec . init_containers . termination_message_policy`|`str`|no||
 `spec . template . spec . init_containers . tty`|`bool`|no||
 `spec . template . spec . init_containers . volume_devices`|`list` (of `dict`)|no||
+`spec . template . spec . init_containers . volume_devices . device_path`|`str`|no||
+`spec . template . spec . init_containers . volume_devices . name`|`str`|no||
 `spec . template . spec . init_containers . volume_mounts`|`list` (of `dict`)|no||
+`spec . template . spec . init_containers . volume_mounts . mount_path`|`str`|no||
+`spec . template . spec . init_containers . volume_mounts . mount_propagation`|`str`|no||
+`spec . template . spec . init_containers . volume_mounts . name`|`str`|no||
+`spec . template . spec . init_containers . volume_mounts . read_only`|`bool`|no||
+`spec . template . spec . init_containers . volume_mounts . sub_path`|`str`|no||
+`spec . template . spec . init_containers . volume_mounts . sub_path_expr`|`str`|no||
 `spec . template . spec . init_containers . working_dir`|`str`|no||
 `spec . template . spec . node_name`|`str`|no||
 `spec . template . spec . node_selector`|`dict`|no||
