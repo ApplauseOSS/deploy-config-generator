@@ -20,7 +20,7 @@ spec:
         - containerPort: 80
           name: web
         volumeMounts:
-        - mount_path: /usr/share/nginx/html
+        - mountPath: /usr/share/nginx/html
           name: www
       terminationGracePeriodSeconds: 10
   volumeClaimTemplates:
