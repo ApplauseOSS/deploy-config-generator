@@ -45,7 +45,7 @@ class OutputPlugin(kube_common.OutputPlugin):
     def generate_output(self, app_vars):
         # Basic structure
         data = {
-            'apiVersion': 'policy/v1beta1',
+            'apiVersion': 'policy/v1',
             'kind': 'PodDisruptionBudget',
             'spec': dict(),
         }
