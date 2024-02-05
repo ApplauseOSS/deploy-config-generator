@@ -180,3 +180,14 @@ kube_configmaps:
         test1
         test2
         test3
+
+kube_serviceaccounts:
+  - metadata:
+      name: test-serviceaccount1
+  - metadata:
+      name: test-serviceaccount2
+    automount_service_account_token: false
+    secrets:
+      - name: foo-bar
+    image_pull_secrets:
+      - name: bar-baz
