@@ -667,6 +667,97 @@ PERSISTENT_VOLUME_CLAIM_FIELD_SPEC = dict(
     ),
 )
 
+PERSISTENT_VOLUME_FIELD_SPEC = dict(
+    access_modes=dict(
+        type='list',
+        required=True,
+        subtype='str',
+    ),
+    capacity=dict(
+        type='dict',
+        required=True,
+        fields=dict(
+            storage=dict(
+                type='str',
+            ),
+        ),
+    ),
+    persistent_volume_reclaim_policy=dict(
+        type='str',
+    ),
+    storage_class_name=dict(
+        type='str',
+    ),
+    volume_mode=dict(
+        type='str',
+    ),
+    mount_options=dict(
+        type='list',
+        subtype='str',
+    ),
+    claim_ref=dict(
+        type='dict',
+        fields=dict(
+            api_version=dict(
+                type='str',
+            ),
+            kind=dict(
+                type='str',
+            ),
+            namespace=dict(
+                type='str',
+            ),
+            name=dict(
+                type='str',
+            ),
+        ),
+    ),
+    node_affinity=dict(
+        type='dict',
+        fields=dict(
+            required=dict(
+                type='dict',
+                fields=dict(
+                    node_selector_terms=dict(
+                        type='list',
+                        subtype='dict',
+                    ),
+                ),
+            ),
+        ),
+    ),
+    csi=dict(
+        type='dict',
+        fields=dict(
+            driver=dict(type='str'),
+            volume_handle=dict(type='str'),
+            read_only=dict(
+                type='bool',
+            ),
+            fs_type=dict(
+                type='str',
+            ),
+            volume_attributes=dict(
+                type='dict',
+                subtype='str',
+            ),
+        ),
+    ),
+    nfs=dict(
+        type='dict',
+        fields=dict(
+            path=dict(
+                type='str',
+                required=True
+            ),
+            server=dict(
+                type='str',
+                required=True
+            ),
+        ),
+    ),
+)
+
 
 class OutputPlugin(OutputPluginBase):
 
