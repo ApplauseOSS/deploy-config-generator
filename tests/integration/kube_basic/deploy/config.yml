@@ -171,6 +171,24 @@ kube_pvcs:
         match_expressions:
           - {key: environment, operator: In, values: [dev]}
 
+kube_pvs:
+  - metadata:
+      name: test-pv
+    spec:
+      capacity:
+        storage: 8Gi
+      volume_mode: Filesystem
+      access_modes:
+        - ReadWriteOnce
+      persistent_volume_reclaim_policy: Recycle
+      storage_class_name: slow
+      mount_options:
+        - hard
+        - nfsvers=4.1
+      nfs:
+        path: /tmp
+        server: 172.17.0.2
+
 kube_configmaps:
   - metadata:
       name: test-configmap

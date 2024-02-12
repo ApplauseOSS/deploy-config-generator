@@ -18,31 +18,31 @@ Utility for generating deployment configs for a service
 The below command will generate the required deployment config files for the specified service in the current directory.
 
 ```bash
-$ deploy-config-generator path/to/service/repo
+deploy-config-generator path/to/service/repo
 ```
 
 You can specify the environment to generate configuration for.
 
 ```bash
-$ deploy-config-generator path/to/service/repo -e stage
+deploy-config-generator path/to/service/repo -e stage
 ```
 
 You can specify the output directory using the `--output-dir` option.
 
 ```bash
-$ deploy-config-generator path/to/service/repo --output-dir /tmp
+deploy-config-generator path/to/service/repo --output-dir /tmp
 ```
 
 You can increase the verbosity level to see what the script is doing.
 
 ```bash
-$ deploy-config-generator path/to/service/repo -vvv
+deploy-config-generator path/to/service/repo -vvv
 ```
 
 You can specify the path to a site config file.
 
 ```bash
-$ deploy-config-generator path/to/service/repo --config path/to/site/config.yml
+deploy-config-generator path/to/service/repo --config path/to/site/config.yml
 ```
 
 ## The dirty details
@@ -134,6 +134,7 @@ The following output plugins are available:
 * [`kube_kong_plugin`](docs/plugin_kube_kong_plugin.md)
 * [`kube_namespace`](docs/plugin_kube_namespace.md)
 * [`kube_pdb`](docs/plugin_kube_pdb.md)
+* [`kube_pv`](docs/plugin_kube_pv.md)
 * [`kube_pvc`](docs/plugin_kube_pvc.md)
 * [`kube_secret`](docs/plugin_kube_secret.md)
 * [`kube_service`](docs/plugin_kube_service.md)
@@ -149,14 +150,14 @@ The following output plugins are available:
 This tool comes with unit and integration test suites, which can be run with the commands:
 
 ```bash
-$ python setup.py test
-$ python setup.py integration
+python setup.py test
+python setup.py integration
 ```
 
 You can run the full test suite in multiple python versions using `tox` by running:
 
 ```bash
-$ tox
+tox
 ```
 
 ### Regenerating plugin docs
@@ -165,5 +166,5 @@ The docs for the individual plugins are generated from the code of the plugins. 
 with the following command:
 
 ```bash
-$ scripts/gen-plugin-docs.py
+scripts/gen-plugin-docs.py
 ```
