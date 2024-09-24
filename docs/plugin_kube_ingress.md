@@ -28,6 +28,7 @@ Name | Type | Required | Default | Description
 `spec . default_backend . service . port`|`dict`|no||
 `spec . default_backend . service . port . name`|`str`|no||
 `spec . default_backend . service . port . number`|`int`|no||
+`spec . ingress_class_name`|`str`|no||
 `spec . rules`|`list` (of `dict`)|no||
 `spec . rules . host`|`str`|no||
 `spec . rules . http`|`dict`|no||
