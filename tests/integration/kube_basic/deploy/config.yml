@@ -153,6 +153,22 @@ kube_ingresses:
                 name: test
                 port:
                   number: 80
+  - metadata:
+      name: test-ingress-with-class-name
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      ingress_class_name: kong
+      rules:
+      - http:
+          paths:
+          - path: /testpath
+            path_type: Prefix
+            backend:
+              service:
+                name: test
+                port:
+                  number: 80
 
 kube_pvcs:
   - metadata:

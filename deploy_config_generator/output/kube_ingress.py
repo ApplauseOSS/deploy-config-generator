@@ -63,6 +63,9 @@ class OutputPlugin(kube_common.OutputPlugin):
                             type='dict',
                             fields=copy.deepcopy(INGRESS_BACKEND_FIELD_SPEC),
                         ),
+                        ingress_class_name=dict(
+                            type='str',
+                        ),
                         rules=dict(
                             type='list',
                             subtype='dict',
