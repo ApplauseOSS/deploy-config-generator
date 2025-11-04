@@ -49,6 +49,8 @@ class SiteConfig(object, metaclass=Singleton):
         'default_apps': {},
         # Default vars
         'default_vars': {},
+        # SOPS secrets files to load
+        'secrets_files': [],
     }
 
     def __init__(self, env=None):
@@ -114,6 +116,11 @@ class SiteConfig(object, metaclass=Singleton):
                 include_data = self.load_file(include_path)
                 data = dict_merge(data, include_data)
             del data['include']
+        if 'secrets_files' in data:
+            for idx, secrets_file in enumerate(data['secrets_files']):
+                if not secrets_file.startswith('/'):
+                    # Normalize secrets file path based on location of parent file
+                    data['secrets_files'][idx] = os.path.join(os.path.dirname(path), secrets_file)
         return data
 
     def load(self, path):

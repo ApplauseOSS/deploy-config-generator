@@ -30,8 +30,9 @@ class OutputPluginBase(object):
     )
     PRIORITY = 1
 
-    def __init__(self, varset, output_dir, config_version):
+    def __init__(self, varset, secrets, output_dir, config_version):
         self._vars = varset
+        self._secrets = secrets
         self._output_dir = output_dir
         self._display = Display()
         self._template = Template()
@@ -201,6 +202,8 @@ class OutputPluginBase(object):
             'APP': self.merge_with_field_defaults(app),
             # Parsed vars
             'VARS': dict(self._vars),
+            # Secrets
+            'SECRETS': dict(self._secrets),
         }
         return app_vars
 
