@@ -13,6 +13,7 @@ import deploy_config_generator.output as output_ns
 from deploy_config_generator.site_config import SiteConfig
 from deploy_config_generator.display import Display
 from deploy_config_generator.vars import Vars
+from deploy_config_generator.secrets import Secrets
 from deploy_config_generator.template import Template
 from deploy_config_generator.errors import ConfigError
 from deploy_config_generator.utils import show_traceback
@@ -54,7 +55,7 @@ Name | Type | Required | Default | Description
 '''
 
 
-def load_output_plugins(varset):
+def load_output_plugins(varset, secrets):
     '''
     Find, import, and instantiate all output plugins
     '''
@@ -67,7 +68,7 @@ def load_output_plugins(varset):
                 mod = importlib.import_module(name)
                 cls = getattr(mod, 'OutputPlugin')
                 DISPLAY.v('Loading plugin %s' % cls.NAME)
-                plugins.append(cls(varset, '', None))
+                plugins.append(cls(varset, secrets, '', None))
             except ConfigError as e:
                 DISPLAY.display('Plugin configuration error: %s: %s' % (cls.NAME, str(e)))
                 sys.exit(1)
@@ -123,12 +124,13 @@ def main():
 
     # Needed for instantiating output plugin classes
     varset = Vars()
+    secrets = Secrets()
 
     # Disable recursive variable lookups to avoid rendering templates
     # in field defaults from the site config
     tmpl = Template(recursive=False)
 
-    output_plugins = load_output_plugins(varset)
+    output_plugins = load_output_plugins(varset, secrets)
     for plugin in output_plugins:
         tmp_fields = dict()
         for section in plugin._fields:
