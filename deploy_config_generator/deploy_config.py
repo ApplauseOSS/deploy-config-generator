@@ -12,8 +12,9 @@ class DeployConfig(object):
     _path = None
     _version = None
 
-    def __init__(self, path, varset):
+    def __init__(self, path, varset, secrets):
         self._vars = varset
+        self._secrets = secrets
         self._display = Display()
         self.load(path)
 
@@ -68,7 +69,7 @@ class DeployConfig(object):
                     condition = app[CONDITION_KEY]
                     del app[CONDITION_KEY]
                     template = Template()
-                    tmp_vars = dict(VARS=dict(self._vars))
+                    tmp_vars = dict(VARS=dict(self._vars), SECRETS=dict(self._secrets))
                     # Continue to next item if we have a condition and it evaluated to False
                     if not template.evaluate_condition(condition, tmp_vars):
                         continue

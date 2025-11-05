@@ -16,6 +16,7 @@ from deploy_config_generator.vars import Vars
 from deploy_config_generator.template import Template
 from deploy_config_generator.errors import DeployConfigError, DeployConfigGenerationError, ConfigError, VarsReplacementError
 from deploy_config_generator.utils import yaml_dump, show_traceback
+from deploy_config_generator.secrets import Secrets, SecretsException
 
 DISPLAY = None
 SITE_CONFIG = None
@@ -78,7 +79,7 @@ def load_vars_files(varset, vars_dir, patterns, allow_var_references=True):
         varset.read_vars_file(vars_file, allow_var_references=allow_var_references)
 
 
-def load_output_plugins(varset, output_dir, config_version):
+def load_output_plugins(varset, secrets, output_dir, config_version):
     '''
     Find, import, and instantiate all output plugins
     '''
@@ -111,7 +112,7 @@ def load_output_plugins(varset, output_dir, config_version):
                     raise Exception('name specified in OutputPlugin class (%s) does not match file name (%s)' % (cls.NAME, name))
                 DISPLAY.v('Loading plugin %s' % name)
                 # Instantiate plugin class
-                plugins.append(cls(varset, output_dir, config_version))
+                plugins.append(cls(varset, secrets, output_dir, config_version))
             except ConfigError as e:
                 DISPLAY.display('Plugin configuration error: %s: %s' % (name, str(e)))
                 sys.exit(1)
@@ -263,8 +264,26 @@ def main():
     DISPLAY.vvvv()
     DISPLAY.vvvv(yaml_dump(dict(varset), indent=2))
 
+    secrets = Secrets()
+
     try:
-        deploy_config = DeployConfig(os.path.join(deploy_dir, SITE_CONFIG.deploy_config_file), varset)
+        for f in SITE_CONFIG.secrets_files:
+            if os.path.exists(f):
+                DISPLAY.v('Loading secrets from %s' % f)
+                secrets.load_secrets_file(f)
+    except SecretsException as e:
+        DISPLAY.display('Error loading secrets file %s' % (e.path,))
+        DISPLAY.v('Stderr:')
+        DISPLAY.v()
+        DISPLAY.v(e.stderr)
+        sys.exit(1)
+
+    DISPLAY.vvvv('Secrets:')
+    DISPLAY.vvvv()
+    DISPLAY.vvvv(yaml_dump(dict(secrets), indent=2))
+
+    try:
+        deploy_config = DeployConfig(os.path.join(deploy_dir, SITE_CONFIG.deploy_config_file), varset, secrets)
         deploy_config.set_config(varset.replace_vars(deploy_config.get_config()))
     except DeployConfigError as e:
         DISPLAY.display('Error loading deploy config: %s' % str(e))
@@ -280,7 +299,7 @@ def main():
     DISPLAY.vvvv(yaml_dump(deploy_config.get_config(), indent=2))
 
     deploy_config_version = deploy_config.get_version() or SITE_CONFIG.default_config_version
-    output_plugins = load_output_plugins(varset, args.output_dir, deploy_config_version)
+    output_plugins = load_output_plugins(varset, secrets, args.output_dir, deploy_config_version)
 
     DISPLAY.vvv('Available output plugins:')
     DISPLAY.vvv()

@@ -1,0 +1,6 @@
+# NOTICE: this key file was created for use in the integration tests and should not be
+# used elsewhere
+#
+# created: 2025-11-04T20:43:20Z
+# public key: age1cnlgtr6w8p8phdxqevklllex0u7y97574xclnf0qv050emsstgpqv23h0q
+AGE-SECRET-KEY-1D4HH6NNHZZSRM0WD23PEWT9FTWR2708FNDV957WPTJ0CE0WDFG9QY3QUSY
