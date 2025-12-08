@@ -117,7 +117,10 @@ class SiteConfig(object, metaclass=Singleton):
                 data = dict_merge(data, include_data)
             del data['include']
         if 'secrets_files' in data:
-            for idx, secrets_file in enumerate(data['secrets_files']):
+            secrets_files = self._template.render_template(data['secrets_files'])
+            if not isinstance(secrets_files, list):
+                secrets_files = [secrets_files]
+            for idx, secrets_file in enumerate(secrets_files):
                 if not secrets_file.startswith('/'):
                     # Normalize secrets file path based on location of parent file
                     data['secrets_files'][idx] = os.path.join(os.path.dirname(path), secrets_file)
