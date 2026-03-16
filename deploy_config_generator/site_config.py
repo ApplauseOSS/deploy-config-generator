@@ -112,6 +112,9 @@ class SiteConfig(object, metaclass=Singleton):
                 if not include_path.startswith('/'):
                     # Normalize include path based on location of parent file
                     include_path = os.path.join(os.path.dirname(path), include_path)
+                if not os.path.exists(include_path):
+                    self._display.vv('Skipping non-existant included file %s' % include_path)
+                    continue
                 self._display.v('Loading site config from included file %s' % include_path)
                 include_data = self.load_file(include_path)
                 data = dict_merge(data, include_data)
